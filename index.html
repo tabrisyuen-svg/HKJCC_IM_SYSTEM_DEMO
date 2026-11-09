@@ -337,8 +337,8 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 const IFRAME_PAGES = {
   profile:     { src:'Student/D_01_StudentProfile.html',         code:'D-01', label:'學生檔案',    ready:true  },
   attendance:  { src:'Student/D_02_Attendance.html',             code:'D-02', label:'點名系統',    ready:true  },
-  markbook:    { src:'Student/D_03_MarkBook.html',               code:'D-03', label:'成績冊',      ready:false },
-  scoreboard:  { src:'Student/D_04_ScoreBoard.html',             code:'D-04', label:'記分板',      ready:false },
+  markbook:    { src:'Student/D_03_MarkBook.html',               code:'D-03', label:'成績冊',      ready:true },
+  scoreboard:  { src:'Student/D_04_ScoreBoard.html',             code:'D-04', label:'記分板',      ready:true },
   behavior:    { src:'Student/D_06_BehaviourItemSettings.html',  code:'D-06', label:'行為項目設定', ready:true  },
   importexport:{ src:'Student/D_M2_ImportExport.html',           code:'M-02', label:'匯入 / 匯出', ready:false },
   permission:  { src:'Student/D_M3_Permission.html',             code:'M-03', label:'權限管理',    ready:false },
@@ -428,12 +428,7 @@ function buildDashboard(){
   <div class="mod-card dim">
     <div class="mod-row"><div class="mod-ico mi-y">🏆</div><div class="mod-info"><h4>記分板</h4><p>行為積分管理</p></div><div class="mod-code">D-04</div></div>
     <div class="mod-desc">行為積分記錄、獎懲排行榜、積分統計報告。</div>
-    <span class="mod-pill pill-wip">⋯ 開發中</span>
-  </div>
-  <div class="mod-card dim">
-    <div class="mod-row"><div class="mod-ico mi-mu">🔮</div><div class="mod-info"><h4>D-05（待定）</h4><p>功能規劃中</p></div><div class="mod-code">D-05</div></div>
-    <div class="mod-desc">此模組功能尚未確定，即將規劃建立。</div>
-    <span class="mod-pill pill-tbd">⋯ 待建立</span>
+    <span class="mod-pill pill-wip"✅ 已完成</span>
   </div>
 </div>
 
