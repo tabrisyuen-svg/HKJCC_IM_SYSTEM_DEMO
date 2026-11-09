@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>F_02_學校管理</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--g:#1B6E3C;--gl:#24A05A;--y:#F5C518;--dk:#0D1B2A;--c1:#162032;--c2:#1E2D42;--bd:#2A3D55;--tx:#E8EDF3;--mu:#7A90A8;--pos:#22C55E;--neg:#EF4444;--blue:#3B82F6;}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+
+.topbar{height:56px;background:#07101A;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 18px;gap:12px;position:sticky;top:0;z-index:100;}
+.tb-bdg{width:34px;height:34px;border-radius:8px;background:var(--g);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--y);font-size:11px;flex-shrink:0;letter-spacing:-.3px;}
+.tb-info{flex:1;}.tb-name{font-size:13px;font-weight:700;}.tb-sub{font-size:10px;color:var(--mu);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-chip{display:flex;align-items:center;gap:7px;padding:5px 10px;background:var(--c2);border:1px solid var(--bd);border-radius:8px;}
+.tb-av{width:26px;height:26px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.tb-uname{font-size:12px;font-weight:600;}.tb-role{font-size:10px;color:var(--mu);}
+
+.content{padding:20px;max-width:1200px;margin:0 auto;}
+.phdr{margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.mod-tag{display:inline-flex;align-items:center;padding:4px 10px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.3);border-radius:7px;font-size:12px;font-weight:800;color:var(--y);letter-spacing:.5px;font-family:'Courier New',monospace;}
+.phdr-r{}.phdr-r h1{font-size:19px;font-weight:700;}
+.phdr-r p{font-size:12px;color:var(--mu);margin-top:3px;}
+
+.tabs{display:flex;background:var(--c1);border:1px solid var(--bd);border-radius:10px;overflow-x:auto;width:fit-content;max-width:100%;margin-bottom:18px;}
+.tab{padding:9px 18px;font-size:13px;cursor:pointer;color:var(--mu);font-weight:600;transition:.13s;white-space:nowrap;user-select:none;}
+.tab.on{background:var(--g);color:#fff;}
+.tab:hover:not(.on){background:var(--c2);color:var(--tx);}
+
+.stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.scard{background:var(--c1);border:1px solid var(--bd);border-radius:9px;padding:10px 14px;min-width:80px;}
+.sc-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;}
+.sc-num{font-size:22px;font-weight:700;margin-top:3px;line-height:1;}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.search-box{position:relative;flex:1;min-width:170px;}
+.search-box input{width:100%;background:var(--c1);border:1px solid var(--bd);border-radius:8px;padding:7px 12px 7px 32px;color:var(--tx);font-size:13px;outline:none;transition:.14s;font-family:inherit;}
+.search-box input:focus{border-color:var(--gl);}
+.search-box::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;}
+.fbtns{display:flex;gap:4px;flex-wrap:wrap;}
+.fb{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--c1);color:var(--mu);transition:.13s;user-select:none;white-space:nowrap;}
+.fb.on{background:var(--g);color:#fff;border-color:var(--g);}
+.fb:hover:not(.on){background:var(--c2);}
+.add-btn{padding:7px 14px;border-radius:8px;background:var(--g);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;transition:.13s;white-space:nowrap;}
+.add-btn:hover{background:var(--gl);}
+
+.tbl-wrap{background:var(--c1);border:1px solid var(--bd);border-radius:11px;overflow:hidden;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;padding:10px 13px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap;}
+td{padding:10px 13px;font-size:13px;border-bottom:1px solid rgba(42,61,85,.3);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(30,45,66,.45);}
+tbody tr.row-off td{opacity:.5;}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.av-t{background:rgba(27,110,60,.22);color:#4ADE80;}
+.av-s{background:rgba(59,130,246,.18);color:#93C5FD;}
+.av-a{background:rgba(245,197,24,.18);color:var(--y);}
+.av-x{background:rgba(100,100,100,.15);color:#777;}
+.ncell{display:flex;align-items:center;gap:9px;}
+.nm{font-size:13px;font-weight:600;}.nm2{font-size:11px;color:var(--mu);margin-top:1px;}
+.bdg{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.bon{background:rgba(34,197,94,.12);color:#22C55E;}
+.bof{background:rgba(239,68,68,.12);color:#FCA5A5;}
+.bt{background:rgba(27,110,60,.15);color:#4ADE80;}
+.bs{background:rgba(59,130,246,.12);color:#93C5FD;}
+.ba{background:rgba(245,197,24,.12);color:var(--y);}
+.bact{background:rgba(34,197,94,.1);color:#22C55E;}
+.barc{background:rgba(100,100,100,.12);color:#888;}
+.tg{width:34px;height:19px;border-radius:10px;background:var(--bd);cursor:pointer;transition:.18s;position:relative;flex-shrink:0;}
+.tg.on{background:var(--gl);}
+.tg::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.18s;}
+.tg.on::after{left:18px;}
+.row-acts{display:flex;gap:4px;}
+.ib{width:26px;height:26px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;transition:.12px;}
+.ib:hover{background:var(--c2);}
+.ib.ed:hover{border-color:var(--y);color:var(--y);}
+.ib.dl:hover{border-color:var(--neg);color:var(--neg);}
+
+.yr-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.yr-lbl{font-size:11px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.cls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:10px;}
+.cls-card{background:var(--c1);border:1px solid var(--bd);border-radius:11px;padding:15px;transition:.14s;}
+.cls-card:hover{border-color:rgba(36,160,90,.3);box-shadow:0 3px 16px rgba(0,0,0,.25);}
+.cls-card.c-dim{opacity:.5;}
+.cc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.cc-big{font-size:22px;font-weight:900;color:var(--y);letter-spacing:.5px;}
+.cc-sub{font-size:10px;color:var(--mu);margin-top:2px;}
+.cc-r{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.cc-ico{width:16px;text-align:center;font-size:12px;flex-shrink:0;}
+.cc-val{font-size:12px;font-weight:600;}
+.cc-hint{font-size:10px;color:var(--mu);}
+.cc-sep{height:1px;background:var(--bd);margin:10px 0;}
+.cc-foot{display:flex;align-items:center;justify-content:space-between;}
+.cc-cnt-n{font-size:16px;font-weight:700;}
+.cc-cnt-l{font-size:10px;color:var(--mu);}
+.cc-acts{display:flex;gap:4px;}
+.cls-add-card{border:2px dashed var(--bd);border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;cursor:pointer;transition:.18s;min-height:175px;}
+.cls-add-card:hover{border-color:var(--gl);background:rgba(36,160,90,.04);}
+.cls-add-card span{font-size:28px;}
+.cls-add-card p{font-size:12px;color:var(--mu);}
+
+.sy-list{display:flex;flex-direction:column;gap:10px;}
+.sy-card{background:var(--c1);border:1px solid var(--bd);border-radius:11px;padding:16px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;transition:.14s;}
+.sy-card.sy-cur{border-color:rgba(36,160,90,.4);background:rgba(36,160,90,.03);}
+.sy-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.sy-yr{font-size:20px;font-weight:800;}
+.sy-dates{font-size:11px;color:var(--mu);margin-top:2px;}
+.sy-nums{display:flex;gap:18px;flex:1;flex-wrap:wrap;}
+.sy-n{text-align:center;}
+.sy-n-v{font-size:18px;font-weight:700;}
+.sy-n-l{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;}
+.sy-acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.sy-btn{padding:6px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid var(--bd);background:transparent;color:var(--mu);transition:.13s;white-space:nowrap;}
+.sy-btn:hover{background:var(--c2);}
+.sy-btn-w{border-color:rgba(245,197,24,.3);color:var(--y);}
+.sy-btn-w:hover{background:rgba(245,197,24,.05);}
+.sy-add{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:var(--c1);border:2px dashed var(--bd);border-radius:11px;cursor:pointer;color:var(--mu);font-size:13px;font-weight:600;transition:.18s;}
+.sy-add:hover{border-color:var(--gl);color:#4ADE80;background:rgba(36,160,90,.03);}
+
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;}
+.mbg.hide{display:none;}
+.mbox{background:var(--c1);border:1px solid var(--bd);border-radius:13px;padding:22px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
+.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.mhdr h3{font-size:15px;font-weight:700;}
+.mx{width:26px;height:26px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:var(--c2);}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--bd);}
+.btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid;transition:.13s;font-family:inherit;}
+.btn:active{transform:scale(.97);}
+.btn-g{background:var(--g);color:#fff;border-color:var(--g);}
+.btn-g:hover{background:var(--gl);}
+.btn-r{background:rgba(239,68,68,.1);color:#FCA5A5;border-color:rgba(239,68,68,.3);}
+.btn-r:hover{background:rgba(239,68,68,.2);}
+.btn-o{background:transparent;color:var(--mu);border-color:var(--bd);}
+.btn-o:hover{background:var(--c2);}
+
+.dis-who{display:flex;align-items:center;gap:11px;background:var(--c2);border:1px solid var(--bd);border-radius:9px;padding:12px 14px;margin-bottom:14px;}
+.dis-warn{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.22);border-radius:9px;padding:13px 15px;}
+.dis-warn h4{font-size:13px;color:#FCA5A5;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.dis-warn ul{padding-left:16px;}
+.dis-warn li{font-size:12px;color:var(--mu);line-height:2.1;list-style:disc;}
+.dis-warn li strong{color:#FCA5A5;}
+
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sp2{grid-column:span 2;}
+.ff{display:flex;flex-direction:column;gap:4px;}
+.ff label{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;font-weight:600;}
+.fi{width:100%;background:var(--c2);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;color:var(--tx);font-size:13px;outline:none;transition:.14s;font-family:inherit;}
+.fi:focus{border-color:var(--gl);}
+.fi::placeholder{color:var(--mu);}
+select.fi{cursor:pointer;}
+.rq{color:var(--neg);}
+
+.toast{position:fixed;bottom:18px;right:18px;background:var(--c1);border:1px solid var(--bd);border-radius:9px;padding:10px 14px;font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 25px rgba(0,0,0,.5);z-index:999;transform:translateY(55px);opacity:0;transition:.22s;pointer-events:none;max-width:330px;line-height:1.55;}
+.toast.on{transform:none;opacity:1;}
+.t-ok{border-color:rgba(34,197,94,.4);}
+.t-err{border-color:rgba(239,68,68,.4);background:#170E11;}
+.t-warn{border-color:rgba(245,197,24,.35);}
+
+@media(max-width:640px){
+  .tabs{width:100%;}
+  th:nth-child(n+5),td:nth-child(n+5){display:none;}
+  .fg{grid-template-columns:1fr;}
+  .sp2{grid-column:span 1;}
+  .cls-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:380px){.cls-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="tb-bdg">F_02</div>
+  <div class="tb-info">
+    <div class="tb-name">陳南昌紀念學校</div>
+    <div class="tb-sub">F_02_學校管理 · 管理教師 / 學生 / 班別 / 學年</div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-chip">
+      <div class="tb-av">李</div>
+      <div><div class="tb-uname">李主任</div><div class="tb-role">系統管理員</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="content">
+  <div class="phdr">
+    <div class="mod-tag">F_02_</div>
+    <div class="phdr-r">
+      <h1>學校管理</h1>
+      <p>管理教師 · 學生 · 班別 · 學年 · 停用帳戶後即時無法登入系統</p>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" id="tab-t" onclick="sTab('t')">👔 教師管理</div>
+    <div class="tab"    id="tab-s" onclick="sTab('s')">🎒 學生管理</div>
+    <div class="tab"    id="tab-c" onclick="sTab('c')">🏫 班別管理</div>
+    <div class="tab"    id="tab-y" onclick="sTab('y')">📅 學年管理</div>
+  </div>
+
+  <!-- ═ TEACHER ═ -->
+  <div id="pane-t">
+    <div class="stats-row" id="tStat"></div>
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="tQ" placeholder="搜尋姓名、編號、科目…" oninput="renderT()"></div>
+      <div class="fbtns">
+        <div class="fb on" data-tf="all" onclick="setTF('all')">全部</div>
+        <div class="fb"    data-tf="on"  onclick="setTF('on')">已啟用</div>
+        <div class="fb"    data-tf="off" onclick="setTF('off')">已停用</div>
+      </div>
+      <button class="add-btn" onclick="openM('addT')">➕ 新增教師</button>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>教師</th><th>角色 / 部門</th><th>任教科目</th><th>主任班別</th><th>電郵</th><th>狀態</th><th>操作</th>
+      </tr></thead>
+      <tbody id="tBody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- ═ STUDENT ═ -->
+  <div id="pane-s" style="display:none">
+    <div class="stats-row" id="sStat"></div>
+    <div class="toolbar">
+      <div class="search-box"><input type="text" id="sQ" placeholder="搜尋姓名、學號、班別…" oninput="renderS()"></div>
+      <div class="fbtns">
+        <div class="fb on" data-sf="all" onclick="setSF('all')">全部</div>
+        <div class="fb"    data-sf="中一" onclick="setSF('中一')">中一</div>
+        <div class="fb"    data-sf="中二" onclick="setSF('中二')">中二</div>
+        <div class="fb"    data-sf="中三" onclick="setSF('中三')">中三</div>
+        <div class="fb"    data-sf="on"   onclick="setSF('on')">已啟用</div>
+        <div class="fb"    data-sf="off"  onclick="setSF('off')">已停用</div>
+      </div>
+      <button class="add-btn" onclick="openM('addS')">➕ 新增學生</button>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr>
+        <th>學生</th><th>班別 / 座號</th><th>年級</th><th>學年</th><th>最後登入</th><th>狀態</th><th>操作</th>
+      </tr></thead>
+      <tbody id="sBody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- ═ CLASS ═ -->
+  <div id="pane-c" style="display:none">
+    <div class="yr-bar">
+      <span class="yr-lbl">學年：</span>
+      <div class="fbtns">
+        <div class="fb on" data-cy="2025-2026" onclick="setCY('2025-2026')">2025–2026</div>
+        <div class="fb"    data-cy="2024-2025" onclick="setCY('2024-2025')">2024–2025</div>
+      </div>
+      <button class="add-btn" style="margin-left:auto" onclick="openM('addC')">➕ 新增班別</button>
+    </div>
+    <div class="cls-grid" id="clsGrid"></div>
+  </div>
+
+  <!-- ═ YEAR ═ -->
+  <div id="pane-y" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <p style="font-size:12px;color:var(--mu)">管理學校學年記錄 · 每次只能有一個「進行中」學年</p>
+      <button class="add-btn" onclick="openM('addY')">➕ 新增學年</button>
+    </div>
+    <div class="sy-list" id="syList"></div>
+  </div>
+</div>
+
+<!-- ═══ DISABLE CONFIRM ═══ -->
+<div class="mbg hide" id="m-dis">
+  <div class="mbox" style="max-width:420px">
+    <div class="mhdr">
+      <h3>⛔ 確認停用帳戶</h3>
+      <button class="mx" onclick="closeM('dis')">✕</button>
+    </div>
+    <div class="dis-who" id="disWho"></div>
+    <div class="dis-warn">
+      <h4>⚠️ 停用後即時生效</h4>
+      <ul>
+        <li>帳戶將<strong>即時無法登入</strong>系統</li>
+        <li>如已登入，其 <strong>Session 即時終止</strong></li>
+        <li>所有已排程通知將即時暫停發送</li>
+        <li>如需恢復訪問，請手動重新啟用帳戶</li>
+      </ul>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-o" onclick="closeM('dis')">取消</button>
+      <button class="btn btn-r" onclick="confirmDis()">確認停用</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD TEACHER ═══ -->
+<div class="mbg hide" id="m-addT">
+  <div class="mbox">
+    <div class="mhdr">
+      <h3>➕ 新增教師帳戶</h3>
+      <button class="mx" onclick="closeM('addT')">✕</button>
+    </div>
+    <div class="fg">
+      <div class="ff"><label>職員編號 <span class="rq">*</span></label><input class="fi" placeholder="例：T010" id="nT-id"></div>
+      <div class="ff"><label>性別 <span class="rq">*</span></label><select class="fi" id="nT-sex"><option value="">請選擇</option><option>男</option><option>女</option></select></div>
+      <div class="ff"><label>中文姓名 <span class="rq">*</span></label><input class="fi" placeholder="例：李美華" id="nT-zh"></div>
+      <div class="ff"><label>英文姓名</label><input class="fi" placeholder="例：LEE Mei Wah" id="nT-en"></div>
+      <div class="ff"><label>角色 <span class="rq">*</span></label>
+        <select class="fi" id="nT-role"><option value="">請選擇</option><option>校長</option><option>副校長</option><option>科主任</option><option>班主任</option><option>科任老師</option><option>職員</option><option>系統管理員</option></select>
+      </div>
+      <div class="ff"><label>部門</label><input class="fi" placeholder="例：英文科" id="nT-dept"></div>
+      <div class="ff sp2"><label>學校電郵 <span class="rq">*</span></label><input class="fi" type="email" placeholder="用作 Google / Microsoft 登入" id="nT-email"></div>
+      <div class="ff"><label>手提電話</label><input class="fi" type="tel" placeholder="9XXX XXXX" id="nT-phone"></div>
+      <div class="ff"><label>主任班別</label>
+        <select class="fi" id="nT-cls"><option value="">不適用</option><option>中一 1A</option><option>中一 1B</option><option>中二 2A</option><option>中二 2B</option><option>中三 3A</option><option>中三 3B</option></select>
+      </div>
+      <div class="ff sp2"><label>任教科目（逗號分隔）</label><input class="fi" placeholder="例：英文, 英語文學" id="nT-subj"></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-o" onclick="closeM('addT')">取消</button>
+      <button class="btn btn-g" onclick="saveT()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD STUDENT ═══ -->
+<div class="mbg hide" id="m-addS">
+  <div class="mbox">
+    <div class="mhdr">
+      <h3>➕ 新增學生帳戶</h3>
+      <button class="mx" onclick="closeM('addS')">✕</button>
+    </div>
+    <div class="fg">
+      <div class="ff"><label>學號 <span class="rq">*</span></label><input class="fi" placeholder="例：2026001" id="nS-id"></div>
+      <div class="ff"><label>性別 <span class="rq">*</span></label><select class="fi" id="nS-sex"><option value="">請選擇</option><option>男</option><option>女</option></select></div>
+      <div class="ff"><label>中文姓名 <span class="rq">*</span></label><input class="fi" placeholder="例：陳大文" id="nS-zh"></div>
+      <div class="ff"><label>英文姓名</label><input class="fi" placeholder="例：CHAN Tai Man" id="nS-en"></div>
+      <div class="ff"><label>年級 <span class="rq">*</span></label>
+        <select class="fi" id="nS-grade"><option value="">請選擇</option><option>中一</option><option>中二</option><option>中三</option><option>中四</option><option>中五</option><option>中六</option></select>
+      </div>
+      <div class="ff"><label>班別 <span class="rq">*</span></label>
+        <select class="fi" id="nS-sec"><option value="">請選擇</option><option>A</option><option>B</option><option>C</option></select>
+      </div>
+      <div class="ff"><label>座號 <span class="rq">*</span></label><input class="fi" type="number" min="1" max="40" placeholder="1–40" id="nS-seat"></div>
+      <div class="ff"><label>學年</label><select class="fi" id="nS-yr"><option>2025–2026</option><option>2024–2025</option></select></div>
+      <div class="ff sp2"><label>家長聯絡電話 <span class="rq">*</span></label><input class="fi" type="tel" placeholder="9XXX XXXX" id="nS-phone"></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-o" onclick="closeM('addS')">取消</button>
+      <button class="btn btn-g" onclick="saveS()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD CLASS ═══ -->
+<div class="mbg hide" id="m-addC">
+  <div class="mbox" style="max-width:420px">
+    <div class="mhdr">
+      <h3>🏫 新增班別</h3>
+      <button class="mx" onclick="closeM('addC')">✕</button>
+    </div>
+    <div class="fg">
+      <div class="ff"><label>學年 <span class="rq">*</span></label>
+        <select class="fi" id="nC-yr"><option>2025-2026</option><option>2024-2025</option></select>
+      </div>
+      <div class="ff"><label>年級 <span class="rq">*</span></label>
+        <select class="fi" id="nC-grade"><option value="">請選擇</option><option>中一</option><option>中二</option><option>中三</option><option>中四</option><option>中五</option><option>中六</option></select>
+      </div>
+      <div class="ff"><label>班別代號 <span class="rq">*</span></label>
+        <select class="fi" id="nC-sec"><option value="">請選擇</option><option>A</option><option>B</option><option>C</option></select>
+      </div>
+      <div class="ff"><label>課室號碼</label><input class="fi" placeholder="例：101" id="nC-room"></div>
+      <div class="ff sp2"><label>班主任</label><select class="fi" id="nC-teacher"></select></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-o" onclick="closeM('addC')">取消</button>
+      <button class="btn btn-g" onclick="saveC()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD YEAR ═══ -->
+<div class="mbg hide" id="m-addY">
+  <div class="mbox" style="max-width:380px">
+    <div class="mhdr">
+      <h3>📅 新增學年</h3>
+      <button class="mx" onclick="closeM('addY')">✕</button>
+    </div>
+    <div class="fg">
+      <div class="ff sp2"><label>學年代碼 <span class="rq">*</span></label><input class="fi" placeholder="例：2026-2027" id="nY-id"></div>
+      <div class="ff sp2"><label>顯示名稱</label><input class="fi" placeholder="例：2026–2027" id="nY-lbl"></div>
+      <div class="ff"><label>開始日期 <span class="rq">*</span></label><input class="fi" type="date" id="nY-start"></div>
+      <div class="ff"><label>結束日期 <span class="rq">*</span></label><input class="fi" type="date" id="nY-end"></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-o" onclick="closeM('addY')">取消</button>
+      <button class="btn btn-g" onclick="saveY()">💾 儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"><span id="tIco"></span><span id="tMsg"></span></div>
+
+<script>
+const TEACHERS=[
+  {id:'T001',zh:'陳志明',en:'CHAN Chi Ming',role:'校長',dept:'校長室',subj:[],cls:'',email:'chan@cncs.edu.hk',active:true,last:'09/11 09:30'},
+  {id:'T002',zh:'李美華',en:'LEE Mei Wah',role:'副校長',dept:'校長室',subj:['中文'],cls:'',email:'lee@cncs.edu.hk',active:true,last:'09/11 08:55'},
+  {id:'T003',zh:'張偉強',en:'CHEUNG Wai Keung',role:'科主任',dept:'英文科',subj:['英文','英語文學'],cls:'中一 1A',email:'cheung@cncs.edu.hk',active:true,last:'09/11 09:15'},
+  {id:'T004',zh:'王嘉怡',en:'WONG Ka Yi',role:'班主任',dept:'數學科',subj:['數學','統計'],cls:'中二 2B',email:'wong@cncs.edu.hk',active:true,last:'08/11 16:20'},
+  {id:'T005',zh:'黃俊傑',en:'WONG Chun Kit',role:'科任老師',dept:'科學科',subj:['物理','化學'],cls:'中三 3B',email:'wongck@cncs.edu.hk',active:true,last:'09/11 10:05'},
+  {id:'T006',zh:'劉麗珊',en:'LAU Lai Shan',role:'班主任',dept:'中文科',subj:['中文','普通話'],cls:'中三 3A',email:'lau@cncs.edu.hk',active:true,last:'09/11 07:50'},
+  {id:'T007',zh:'吳建華',en:'NG Kin Wah',role:'科任老師',dept:'歷史科',subj:['歷史','生活與社會'],cls:'',email:'ng@cncs.edu.hk',active:false,last:'15/10 14:30'},
+  {id:'T008',zh:'楊曉彤',en:'YEUNG Hiu Tung',role:'職員',dept:'行政部',subj:[],cls:'',email:'yeung@cncs.edu.hk',active:true,last:'09/11 08:10'},
+  {id:'A001',zh:'李主任',en:'LEE Kwok Wah',role:'系統管理員',dept:'IT部',subj:[],cls:'',email:'admin@cncs.edu.hk',active:true,last:'09/11 09:00'},
+];
+
+const GN2={中一:'1',中二:'2',中三:'3',中四:'4',中五:'5',中六:'6'};
+const SN=['陳','李','張','王','黃','劉','吳','楊','趙','周','鄧','林','徐','孫','馬','朱','胡','梁','何','羅'];
+const GN=['志明','美玲','偉強','嘉怡','文龍','曉彤','雅詩','俊傑','婉儀','建華','志豪','慧敏','國強','寶珊','永康','俊熙','詩雯','子聰','凱琳','浩然'];
+
+function buildStudents(){
+  const cfg=[
+    {grade:'中一',sec:'A',yr:'2025–2026',cnt:7},
+    {grade:'中一',sec:'B',yr:'2025–2026',cnt:6},
+    {grade:'中二',sec:'A',yr:'2024–2025',cnt:7},
+    {grade:'中二',sec:'B',yr:'2024–2025',cnt:6},
+    {grade:'中三',sec:'A',yr:'2023–2024',cnt:5},
+    {grade:'中三',sec:'B',yr:'2023–2024',cnt:5},
+  ];
+  const arr=[];let idx=0;
+  cfg.forEach(c=>{
+    for(let i=0;i<c.cnt;i++){
+      arr.push({
+        id:'20'+c.yr.substring(2,4)+String(idx+1).padStart(3,'0'),
+        zh:SN[idx%SN.length]+GN[idx%GN.length],
+        grade:c.grade,sec:c.sec,
+        cls:`${c.grade} ${GN2[c.grade]}${c.sec}`,
+        seat:i+1,yr:c.yr,
+        active:idx!==8&&idx!==19,
+        last:idx%7===0?'從未登入':'0'+(idx%9+1)+'/11 '+String(7+idx%11).padStart(2,'0')+':'+String(idx*3%60).padStart(2,'0'),
+      });
+      idx++;
+    }
+  });
+  return arr;
+}
+const STUDENTS=buildStudents();
+
+const CLASSES=[
+  {id:'2526-1A',yr:'2025-2026',grade:'中一',sec:'A',room:'101',tid:'T003'},
+  {id:'2526-1B',yr:'2025-2026',grade:'中一',sec:'B',room:'102',tid:'T004'},
+  {id:'2526-2A',yr:'2025-2026',grade:'中二',sec:'A',room:'201',tid:'T006'},
+  {id:'2526-2B',yr:'2025-2026',grade:'中二',sec:'B',room:'202',tid:'T004'},
+  {id:'2526-3A',yr:'2025-2026',grade:'中三',sec:'A',room:'301',tid:'T006'},
+  {id:'2526-3B',yr:'2025-2026',grade:'中三',sec:'B',room:'302',tid:'T005'},
+  {id:'2425-1A',yr:'2024-2025',grade:'中一',sec:'A',room:'101',tid:'T003'},
+  {id:'2425-1B',yr:'2024-2025',grade:'中一',sec:'B',room:'102',tid:'T004'},
+  {id:'2425-2A',yr:'2024-2025',grade:'中二',sec:'A',room:'201',tid:''},
+];
+
+const YEARS=[
+  {id:'2025-2026',label:'2025–2026',start:'2025-09-01',end:'2026-07-15',status:'active',cur:true},
+  {id:'2024-2025',label:'2024–2025',start:'2024-09-02',end:'2025-07-12',status:'archived',cur:false},
+  {id:'2023-2024',label:'2023–2024',start:'2023-09-04',end:'2024-07-13',status:'archived',cur:false},
+];
+
+let tF='all',sF='all',cY='2025-2026';
+let pending={type:'',id:''};
+
+function sTab(k){
+  ['t','s','c','y'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('on',x===k);
+    document.getElementById('pane-'+x).style.display=x===k?'block':'none';
+  });
+  ({t:()=>{renderT();renderTStat();},
+    s:()=>{renderS();renderSStat();},
+    c:renderC,y:renderY})[k]();
+}
+
+function renderTStat(){
+  const on=TEACHERS.filter(x=>x.active).length,off=TEACHERS.filter(x=>!x.active).length;
+  document.getElementById('tStat').innerHTML=`
+    <div class="scard"><div class="sc-lbl">教職員</div><div class="sc-num" style="color:#4ADE80">${TEACHERS.length}</div></div>
+    <div class="scard"><div class="sc-lbl">已啟用</div><div class="sc-num" style="color:#22C55E">${on}</div></div>
+    <div class="scard"><div class="sc-lbl">已停用</div><div class="sc-num" style="color:#FCA5A5">${off}</div></div>`;
+}
+function setTF(f){
+  tF=f;
+  document.querySelectorAll('[data-tf]').forEach(b=>b.classList.toggle('on',b.dataset.tf===f));
+  renderT();
+}
+function renderT(){
+  const q=(document.getElementById('tQ').value||'').toLowerCase();
+  const list=TEACHERS.filter(t=>{
+    if(tF==='on'&&!t.active)return false;
+    if(tF==='off'&&t.active)return false;
+    if(q&&![t.zh,t.en,t.id,t.role,t.dept,...t.subj].join(' ').toLowerCase().includes(q))return false;
+    return true;
+  });
+  const RC={'校長':'ba','副校長':'ba','科主任':'bt','班主任':'bt','科任老師':'bs','職員':'bs','系統管理員':'ba'};
+  const body=document.getElementById('tBody');
+  if(!list.length){body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:26px">沒有符合的教職員</td></tr>`;return;}
+  body.innerHTML=list.map(t=>`<tr class="${t.active?'':'row-off'}">
+    <td><div class="ncell">
+      <div class="av ${!t.active?'av-x':['校長','副校長','系統管理員'].includes(t.role)?'av-a':'av-t'}">${t.zh[0]}</div>
+      <div><div class="nm">${t.zh}</div><div class="nm2">${t.id} · ${t.en}</div></div>
+    </div></td>
+    <td><span class="bdg ${RC[t.role]||'bs'}">${t.role}</span>${t.dept?`<div style="font-size:11px;color:var(--mu);margin-top:3px">${t.dept}</div>`:''}</td>
+    <td style="font-size:12px;color:var(--mu)">${t.subj.length?t.subj.join(' · '):'—'}</td>
+    <td style="font-size:12px">${t.cls||'—'}</td>
+    <td style="font-size:12px;color:var(--mu)">${t.email}</td>
+    <td><div style="display:flex;align-items:center;gap:6px">
+      <div class="tg${t.active?' on':''}" onclick="togAct('t','${t.id}')"></div>
+      <span class="bdg ${t.active?'bon':'bof'}">${t.active?'啟用':'停用'}</span>
+    </div></td>
+    <td><div class="row-acts">
+      <button class="ib ed" onclick="toast('✏️','編輯教師帳戶（示範）')">✏️</button>
+      <button class="ib dl" onclick="toast('🗑','教師已刪除（示範）')">🗑</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function renderSStat(){
+  const byG={};
+  STUDENTS.forEach(s=>{byG[s.grade]=(byG[s.grade]||0)+1;});
+  const on=STUDENTS.filter(x=>x.active).length,off=STUDENTS.filter(x=>!x.active).length;
+  document.getElementById('sStat').innerHTML=`
+    <div class="scard"><div class="sc-lbl">學生總數</div><div class="sc-num" style="color:#93C5FD">${STUDENTS.length}</div></div>
+    ${Object.entries(byG).map(([g,n])=>`<div class="scard"><div class="sc-lbl">${g}</div><div class="sc-num" style="color:#60A5FA">${n}</div></div>`).join('')}
+    <div class="scard"><div class="sc-lbl">已啟用</div><div class="sc-num" style="color:#22C55E">${on}</div></div>
+    <div class="scard"><div class="sc-lbl">已停用</div><div class="sc-num" style="color:#FCA5A5">${off}</div></div>`;
+}
+function setSF(f){
+  sF=f;
+  document.querySelectorAll('[data-sf]').forEach(b=>b.classList.toggle('on',b.dataset.sf===f));
+  renderS();
+}
+function renderS(){
+  const q=(document.getElementById('sQ').value||'').toLowerCase();
+  const list=STUDENTS.filter(s=>{
+    if(sF==='on'&&!s.active)return false;
+    if(sF==='off'&&s.active)return false;
+    if(['中一','中二','中三'].includes(sF)&&s.grade!==sF)return false;
+    if(q&&![s.zh,s.id,s.cls].join(' ').toLowerCase().includes(q))return false;
+    return true;
+  });
+  const body=document.getElementById('sBody');
+  if(!list.length){body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:26px">沒有符合的學生</td></tr>`;return;}
+  body.innerHTML=list.map(s=>`<tr class="${s.active?'':'row-off'}">
+    <td><div class="ncell">
+      <div class="av ${s.active?'av-s':'av-x'}">${s.zh[0]}</div>
+      <div><div class="nm">${s.zh}</div><div class="nm2">${s.id}</div></div>
+    </div></td>
+    <td style="font-size:13px">${s.cls}<span style="color:var(--mu);font-size:11px;margin-left:7px">座 ${s.seat}</span></td>
+    <td><span class="bdg bs">${s.grade}</span></td>
+    <td style="font-size:12px;color:var(--mu)">${s.yr}</td>
+    <td style="font-size:11px;color:var(--mu)">${s.last}</td>
+    <td><div style="display:flex;align-items:center;gap:6px">
+      <div class="tg${s.active?' on':''}" onclick="togAct('s','${s.id}')"></div>
+      <span class="bdg ${s.active?'bon':'bof'}">${s.active?'啟用':'停用'}</span>
+    </div></td>
+    <td><div class="row-acts">
+      <button class="ib ed" onclick="toast('✏️','編輯學生帳戶（示範）')">✏️</button>
+      <button class="ib dl" onclick="toast('🗑','學生已刪除（示範）')">🗑</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function togAct(type,id){
+  const arr=type==='t'?TEACHERS:STUDENTS;
+  const rec=arr.find(x=>x.id===id);
+  if(!rec)return;
+  if(rec.active){
+    pending={type,id};
+    document.getElementById('disWho').innerHTML=`
+      <div class="av ${type==='t'?'av-t':'av-s'}" style="width:38px;height:38px;font-size:14px">${rec.zh[0]}</div>
+      <div>
+        <div style="font-size:14px;font-weight:700">${rec.zh}</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:2px">${rec.id}${type==='t'?' · '+rec.role:' · '+rec.cls}</div>
+      </div>`;
+    document.getElementById('m-dis').classList.remove('hide');
+  } else {
+    rec.active=true;
+    if(type==='t'){renderT();renderTStat();}else{renderS();renderSStat();}
+    toast('✅',`${rec.zh} 帳戶已啟用，可即時登入系統`,'t-ok');
+  }
+}
+function confirmDis(){
+  const arr=pending.type==='t'?TEACHERS:STUDENTS;
+  const rec=arr.find(x=>x.id===pending.id);
+  if(!rec)return;
+  rec.active=false;
+  closeM('dis');
+  if(pending.type==='t'){renderT();renderTStat();}else{renderS();renderSStat();}
+  toast('⛔',`${rec.zh} 帳戶已停用・即時生效，現時無法登入`,'t-err');
+  pending={type:'',id:''};
+}
+
+function setCY(y){
+  cY=y;
+  document.querySelectorAll('[data-cy]').forEach(b=>b.classList.toggle('on',b.dataset.cy===y));
+  renderC();
+}
+function renderC(){
+  const list=CLASSES.filter(c=>c.yr===cY);
+  const isCur=YEARS.find(y=>y.id===cY)?.cur;
+  const cards=list.map(c=>{
+    const t=TEACHERS.find(x=>x.id===c.tid);
+    const clsStr=`${c.grade} ${GN2[c.grade]}${c.sec}`;
+    const cnt=STUDENTS.filter(s=>s.cls===clsStr).length;
+    return`<div class="cls-card${!isCur?' c-dim':''}">
+      <div class="cc-top">
+        <div>
+          <div class="cc-big">${GN2[c.grade]}-${c.sec}</div>
+          <div class="cc-sub">${c.grade} · ${c.yr.replace('-','–')}</div>
+        </div>
+        <span class="bdg ${isCur?'bact':'barc'}">${isCur?'進行中':'已歸檔'}</span>
+      </div>
+      <div class="cc-r"><span class="cc-ico">👤</span>
+        <div><div class="cc-val">${t?t.zh:'未分配'}</div><div class="cc-hint">${t?t.role:'班主任'}</div></div>
+      </div>
+      <div class="cc-r"><span class="cc-ico">🚪</span>
+        <div><div class="cc-val">${c.room||'未分配'}</div><div class="cc-hint">課室</div></div>
+      </div>
+      <div class="cc-sep"></div>
+      <div class="cc-foot">
+        <div><div class="cc-cnt-n">${cnt}</div><div class="cc-cnt-l">學生</div></div>
+        <div class="cc-acts">
+          <button class="ib ed" onclick="toast('✏️','編輯班別設定（示範）')">✏️</button>
+          <button class="ib" style="font-size:9px" onclick="toast('👥','查看班級學生名單（示範）')">👥</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('clsGrid').innerHTML=cards+
+    `<div class="cls-add-card" onclick="openM('addC')"><span>➕</span><p>新增班別</p></div>`;
+}
+
+function renderY(){
+  const html=YEARS.map(y=>{
+    const sCnt=STUDENTS.filter(s=>s.yr===y.label).length;
+    const cCnt=CLASSES.filter(c=>c.yr===y.id).length;
+    const tCnt=TEACHERS.filter(t=>t.active).length;
+    return`<div class="sy-card${y.cur?' sy-cur':''}">
+      <div style="display:flex;align-items:center;gap:10px;min-width:135px">
+        <div class="sy-dot" style="background:${y.cur?'var(--gl)':'var(--bd)'}"></div>
+        <div><div class="sy-yr">${y.label}</div><div class="sy-dates">${y.start} → ${y.end}</div></div>
+      </div>
+      <div class="sy-nums">
+        <div class="sy-n"><div class="sy-n-v" style="color:#4ADE80">${tCnt}</div><div class="sy-n-l">教職員</div></div>
+        <div class="sy-n"><div class="sy-n-v" style="color:#93C5FD">${sCnt}</div><div class="sy-n-l">學生</div></div>
+        <div class="sy-n"><div class="sy-n-v" style="color:var(--y)">${cCnt}</div><div class="sy-n-l">班別</div></div>
+      </div>
+      <div class="sy-acts">
+        <span class="bdg ${y.cur?'bact':'barc'}">${y.cur?'進行中':'已歸檔'}</span>
+        ${y.cur
+          ?`<span style="font-size:11px;color:var(--gl);font-weight:700;white-space:nowrap">● 當前學年</span>`
+          :`<button class="sy-btn sy-btn-w" onclick="setYearCur('${y.id}')">設為當前學年</button>
+            <button class="sy-btn" onclick="toast('📋','已複製 ${y.label} 設定（示範）')">複製設定</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('syList').innerHTML=html+
+    `<div class="sy-add" onclick="openM('addY')">➕ 新增學年</div>`;
+}
+function setYearCur(id){
+  YEARS.forEach(y=>{y.cur=y.id===id;y.status=y.id===id?'active':'archived';});
+  renderY();
+  toast('📅',YEARS.find(y=>y.id===id).label+' 已設為當前學年','t-ok');
+}
+
+function openM(k){
+  if(k==='addC'){
+    const sel=document.getElementById('nC-teacher');
+    sel.innerHTML='<option value="">不適用</option>'+
+      TEACHERS.filter(t=>t.active).map(t=>`<option value="${t.id}">${t.zh}（${t.role}）</option>`).join('');
+  }
+  document.getElementById('m-'+k).classList.remove('hide');
+}
+function closeM(k){document.getElementById('m-'+k).classList.add('hide');}
+
+function saveT(){
+  if(!document.getElementById('nT-id
