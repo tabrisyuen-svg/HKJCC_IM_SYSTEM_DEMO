@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>行為項目設定 · D-06</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--g:#1B6E3C;--gl:#24A05A;--y:#F5C518;--dk:#0D1B2A;--c1:#162032;--c2:#1E2D42;--bd:#2A3D55;--tx:#E8EDF3;--mu:#7A90A8;--pos:#22C55E;--neg:#EF4444;}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh;}
+.w{padding:14px;max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:11px;}
+
+/* Header */
+.hdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.hdr h1{font-size:20px;font-weight:700;}.hdr h1 em{color:var(--y);font-style:normal;}
+.hdr p{font-size:12px;color:var(--mu);margin-top:2px;}
+.dmo{background:var(--y);color:#000;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.rbdg{display:inline-flex;align-items:center;gap:6px;background:var(--c1);border:1px solid var(--bd);border-radius:7px;padding:5px 11px;font-size:12px;}
+.rdot{width:7px;height:7px;border-radius:50%;}
+
+/* Tabs */
+.tabs{display:flex;background:var(--c1);border:1px solid var(--bd);border-radius:9px;overflow:hidden;width:fit-content;}
+.tab{padding:8px 18px;font-size:13px;cursor:pointer;color:var(--mu);font-weight:500;transition:.14s;white-space:nowrap;user-select:none;}
+.tab.on{background:var(--g);color:#fff;}.tab:hover:not(.on){background:var(--c2);color:var(--tx);}
+
+/* Buttons */
+.btn{padding:6px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid;transition:.13s;display:inline-flex;align-items:center;gap:5px;}
+.btn:active{transform:scale(.97);}
+.bg{background:var(--g);color:#fff;border-color:var(--g);}.bg:hover{background:var(--gl);}
+.bo{background:transparent;color:var(--mu);border-color:var(--bd);}.bo:hover{background:var(--c2);color:var(--tx);}
+.brr{background:rgba(239,68,68,.1);color:#EF4444;border-color:rgba(239,68,68,.25);}.brr:hover{background:rgba(239,68,68,.18);}
+
+/* Section */
+.sec{background:var(--c1);border:1px solid var(--bd);border-radius:11px;overflow:hidden;}
+.shdr{padding:9px 13px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.shdr h3{font-size:13px;font-weight:600;}
+.sbdy{padding:11px 13px;}
+
+/* Sync strip */
+.sync-strip{background:rgba(36,160,90,.06);border:1px solid rgba(36,160,90,.18);border-radius:9px;padding:8px 13px;font-size:12px;color:#86EFAC;display:flex;align-items:center;gap:7px;}
+.sync-strip span{color:var(--mu);}
+
+/* Stats */
+.stats{display:flex;gap:6px;flex-wrap:wrap;}
+.stat{background:var(--c2);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;}
+.sl2{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;}
+.sv2{font-size:17px;font-weight:700;}
+
+/* Category section */
+.cat-sec{margin-bottom:16px;}
+.cat-hdr{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.cat-hdr-lbl{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;}
+.cat-bdg{font-size:10px;padding:1px 6px;border-radius:20px;}
+.pos-b{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#86EFAC;}
+.neg-b{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#FCA5A5;}
+
+/* Item card */
+.itm{background:var(--c2);border:2px solid var(--bd);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:9px;transition:.12s;margin-bottom:5px;}
+.itm.off{opacity:.4;}
+.itm:hover{border-color:rgba(60,80,110,.9);}
+.dh{color:var(--mu);cursor:grab;font-size:13px;user-select:none;padding:0 2px;flex-shrink:0;}
+.itm-ico{font-size:22px;width:28px;text-align:center;flex-shrink:0;}
+.itm-inf{flex:1;min-width:0;}
+.itm-n{font-size:13px;font-weight:600;}
+.itm-m{font-size:10px;color:var(--mu);margin-top:1px;}
+.pts-bdg{min-width:44px;padding:4px 11px;border-radius:20px;font-size:14px;font-weight:800;text-align:center;flex-shrink:0;}
+.pb-p{background:rgba(34,197,94,.14);color:#4ADE80;border:1px solid rgba(34,197,94,.2);}
+.pb-n{background:rgba(239,68,68,.14);color:#FCA5A5;border:1px solid rgba(239,68,68,.2);}
+.lk{width:22px;height:22px;border-radius:4px;background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;title:"分數鎖定";}
+
+/* Toggle */
+.tg{width:34px;height:19px;border-radius:10px;background:var(--bd);cursor:pointer;transition:.18s;position:relative;flex-shrink:0;}
+.tg.on{background:var(--gl);}
+.tg::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.18s;}
+.tg.on::after{left:18px;}
+
+/* Action buttons */
+.ib{width:26px;height:26px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;transition:.12s;}
+.ib:hover{background:var(--c1);}
+.ib.ed:hover{border-color:var(--y);color:var(--y);}
+.ib.dl:hover{border-color:var(--neg);color:var(--neg);}
+
+/* Empty */
+.emp{text-align:center;padding:18px;color:var(--mu);font-size:12px;}
+
+/* Two col */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+
+/* Teacher sim */
+.prev-sim{background:rgba(36,160,90,.04);border:2px dashed rgba(36,160,90,.22);border-radius:11px;padding:14px;position:relative;}
+.prev-sim::before{content:'👩‍🏫  老師操作模擬';position:absolute;top:-11px;left:14px;background:var(--dk);padding:0 8px;font-size:10px;color:var(--mu);font-weight:600;letter-spacing:.3px;}
+.bcat-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin:10px 0 6px;}
+.brow{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px;}
+.bb{padding:7px 11px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:.11s;display:inline-flex;align-items:center;gap:5px;user-select:none;}
+.bb.pos{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.2);color:#86EFAC;}
+.bb.pos:hover:not(.sel){background:rgba(34,197,94,.12);}
+.bb.pos.sel{background:var(--pos);color:#fff;border-color:var(--pos);}
+.bb.neg{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.2);color:#FCA5A5;}
+.bb.neg:hover:not(.sel){background:rgba(239,68,68,.12);}
+.bb.neg.sel{background:var(--neg);color:#fff;border-color:var(--neg);}
+.bpt{font-size:10px;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.25);}
+
+/* Score reveal */
+.score-rev{margin-top:13px;background:var(--c1);border:2px solid var(--bd);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;min-height:64px;transition:border-color .18s,background .18s;}
+.score-rev.active{border-color:var(--gl);background:rgba(36,160,90,.04);}
+.rev-ico{font-size:28px;flex-shrink:0;}
+.rev-inf{flex:1;min-width:0;}
+.rev-name{font-size:14px;font-weight:700;}
+.rev-note{font-size:11px;color:var(--mu);margin-top:3px;}
+.rev-auto{display:flex;align-items:center;gap:4px;margin-top:5px;font-size:11px;color:var(--gl);font-weight:600;}
+.rev-pts{text-align:center;flex-shrink:0;}
+.rev-num{font-size:28px;font-weight:800;line-height:1;padding:6px 14px;border-radius:9px;}
+.rev-num.p{background:rgba(34,197,94,.14);color:#4ADE80;}
+.rev-num.n{background:rgba(239,68,68,.14);color:#FCA5A5;}
+.rev-tag{font-size:10px;color:var(--mu);margin-top:4px;}
+
+/* Multi-sel students demo */
+.stu-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px;}
+.chip{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--c2);color:var(--mu);transition:.12s;user-select:none;}
+.chip.sel{background:rgba(36,160,90,.1);border-color:var(--gl);color:#4ADE80;}
+.sel-summary{margin-top:10px;background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:8px 11px;font-size:12px;color:var(--mu);}
+.sel-summary strong{color:var(--tx);}
+
+/* Info cards */
+.icard{background:var(--c2);border:1px solid var(--bd);border-radius:9px;padding:11px 13px;margin-bottom:8px;}
+.icard-title{font-size:12px;font-weight:700;margin-bottom:6px;}
+.icard div{font-size:12px;color:var(--mu);line-height:1.7;}
+.icard strong{color:var(--tx);}
+.icard-y{background:rgba(245,197,24,.05);border-color:rgba(245,197,24,.15);}
+
+/* Modal */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:14px;}
+.mbg.hide{display:none;}
+.mbox{background:var(--c1);border:1px solid var(--bd);border-radius:13px;padding:18px;width:100%;max-width:440px;max-height:92vh;overflow-y:auto;}
+.mhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.mhd h3{font-size:15px;font-weight:700;}
+.mx{width:26px;height:26px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:var(--c2);}
+.mf{margin-bottom:12px;}
+.mf label{display:block;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+.mi{width:100%;background:var(--c2);border:1px solid var(--bd);border-radius:7px;padding:6px 10px;color:var(--tx);font-size:13px;outline:none;}
+.mi:focus{border-color:var(--gl);}
+
+/* Icon picker */
+.ico-grid{display:flex;flex-wrap:wrap;gap:4px;max-height:120px;overflow-y:auto;padding:2px;}
+.ico-opt{width:34px;height:34px;border-radius:7px;border:2px solid transparent;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.1s;background:var(--c2);flex-shrink:0;}
+.ico-opt:hover{background:var(--c1);}
+.ico-opt.sel{border-color:var(--gl);background:rgba(36,160,90,.12);}
+
+/* Cat toggle */
+.cat-tog{display:flex;border:1px solid var(--bd);border-radius:8px;overflow:hidden;width:fit-content;}
+.ct{padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;transition:.12s;user-select:none;}
+.ct.pos{color:#86EFAC;background:rgba(34,197,94,.07);}.ct.pos.on{background:var(--pos);color:#fff;}
+.ct.neg{color:#FCA5A5;background:rgba(239,68,68,.07);}.ct.neg.on{background:var(--neg);color:#fff;}
+
+/* Points stepper */
+.psw{display:flex;align-items:center;gap:6px;}
+.pss{width:30px;height:30px;border-radius:6px;border:1px solid var(--bd);background:var(--c2);color:var(--tx);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.12s;font-weight:700;user-select:none;}
+.pss:hover{background:var(--c1);border-color:var(--gl);}
+.psn{width:52px;text-align:center;background:var(--c2);border:1px solid var(--bd);border-radius:7px;padding:5px;color:var(--tx);font-size:16px;font-weight:800;outline:none;}
+.psn:focus{border-color:var(--gl);}
+.pts-preview{display:inline-flex;padding:4px 10px;border-radius:7px;font-size:13px;font-weight:700;margin-left:6px;}
+
+/* Active toggle */
+.atrow{display:flex;align-items:center;gap:9px;}
+.atlbl{font-size:12px;color:var(--mu);}
+.mbtm{display:flex;gap:6px;justify-content:flex-end;margin-top:14px;}
+.mdgr{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:7px;padding:9px 11px;font-size:12px;color:#FCA5A5;margin-bottom:11px;}
+.mini-info{background:var(--c2);border:1px solid var(--bd);border-radius:7px;padding:9px 11px;font-size:12px;color:var(--mu);line-height:1.8;margin-bottom:10px;}
+.mini-info strong{color:var(--tx);}
+
+/* Audit */
+.at{width:100%;border-collapse:collapse;}
+.at th{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;padding:7px 9px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap;}
+.at td{padding:7px 9px;font-size:12px;border-bottom:1px solid rgba(42,61,85,.25);vertical-align:top;}
+.at tr:last-child td{border-bottom:none;}
+.at tr:hover td{background:rgba(30,45,66,.4);}
+.aa{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;}
+.aac{background:rgba(34,197,94,.14);color:#4ADE80;}
+.aae{background:rgba(245,197,24,.14);color:var(--y);}
+.aad{background:rgba(239,68,68,.14);color:#FCA5A5;}
+.aat{background:rgba(59,130,246,.14);color:#93C5FD;}
+.diff del{color:#FCA5A5;font-style:normal;text-decoration:line-through;}
+.diff ins{color:#4ADE80;text-decoration:none;}
+
+/* Toast */
+.toast{position:fixed;bottom:18px;right:18px;background:var(--c1);border:1px solid var(--bd);border-radius:9px;padding:9px 14px;font-size:12px;display:flex;align-items:center;gap:7px;box-shadow:0 8px 25px rgba(0,0,0,.5);z-index:999;transform:translateY(55px);opacity:0;transition:.22s;pointer-events:none;max-width:290px;}
+.toast.on{transform:none;opacity:1;}
+
+@media(max-width:720px){.two{grid-template-columns:1fr;}}
+@media(max-width:520px){.w{padding:9px;}}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="w">
+
+<!-- Header -->
+<div class="hdr">
+  <div>
+    <h1>行為項目設定 <em>D-06</em></h1>
+    <p>管理員統一設定行為項目及分數 · 老師一揀即自動帶出 · 與 D-04/05 共用</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <span class="dmo">DEMO</span>
+    <div class="rbdg" id="roleBdg"><div class="rdot" style="background:var(--y)"></div><span>管理員模式</span></div>
+  </div>
+</div>
+
+<!-- Sync strip -->
+<div class="sync-strip">
+  🔗 此設定自動同步至 D-04 加減分 及 D-05 報告系統
+  <span>· 啟用 / 停用即時生效，老師端無需刷新</span>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab on"  id="tab-admin" onclick="sTab('admin')">🔐 管理員設定</div>
+  <div class="tab"    id="tab-prev"  onclick="sTab('prev')">👩‍🏫 老師預覽</div>
+  <div class="tab"    id="tab-aud"   onclick="sTab('aud')">📜 審計日誌</div>
+</div>
+
+<!-- ═══ ADMIN PANE ═══ -->
+<div id="pane-admin">
+  <div class="sec">
+    <div class="shdr">
+      <h3>📋 行為項目管理</h3>
+      <div class="stats" id="statsRow" style="margin-left:8px"></div>
+      <div style="margin-left:auto"><button class="btn bg" onclick="openAdd()">➕ 新增項目</button></div>
+    </div>
+    <div class="sbdy">
+      <div class="cat-sec">
+        <div class="cat-hdr">
+          <span class="cat-hdr-lbl">✅ 正面行為</span>
+          <span class="cat-bdg pos-b" id="posCnt">0</span>
+        </div>
+        <div id="posItems"></div>
+      </div>
+      <div class="cat-sec" style="margin-bottom:0">
+        <div class="cat-hdr">
+          <span class="cat-hdr-lbl">❌ 負面行為</span>
+          <span class="cat-bdg neg-b" id="negCnt">0</span>
+        </div>
+        <div id="negItems"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TEACHER PREVIEW PANE ═══ -->
+<div id="pane-prev" style="display:none">
+  <div class="two">
+    <div>
+      <div class="prev-sim">
+        <div class="bcat-lbl">✅ 正面行為</div>
+        <div class="brow" id="prevPos"></div>
+        <div class="bcat-lbl">❌ 負面行為</div>
+        <div class="brow" id="prevNeg"></div>
+
+        <!-- Score reveal panel -->
+        <div class="score-rev" id="scoreRev">
+          <div style="color:var(--mu);font-size:13px;padding:4px 0">← 點選一個行為項目</div>
+        </div>
+
+        <!-- Multi-student demo -->
+        <div style="margin-top:12px;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">👥 學生（可多選）</div>
+        <div class="stu-chips" id="stuChips"></div>
+        <div class="sel-summary" id="selSummary" style="display:none"></div>
+
+        <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+          <div style="font-size:11px;color:var(--mu)">🔒 分數由管理員統一預設，老師不可更改</div>
+          <button class="btn bo" style="font-size:11px;padding:4px 9px" onclick="simClear()">清除</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="icard">
+        <div class="icard-title">🔐 管理員負責</div>
+        <div>設定每個項目的<strong>名稱、圖示、類別、分數</strong>，可隨時啟用 / 停用。分數預設 <strong>2 分</strong>，可調整 1–10 分，正負由類別決定。</div>
+      </div>
+      <div class="icard">
+        <div class="icard-title">👩‍🏫 老師三步記錄</div>
+        <div>① 點選行為項目 → <strong style="color:#4ADE80">分數即時自動帶出</strong><br>② 選擇學生（<strong>支援多選</strong>）<br>③ 確認提交 — 毋需手動輸入分數</div>
+      </div>
+      <div class="icard icard-y">
+        <div class="icard-title" style="color:var(--y)">💡 設計原理</div>
+        <div>管理員一次設定，全校統一標準。老師揀完即記，分數固定不可亂改，確保加減分公平、一致、可追溯。</div>
+      </div>
+      <div class="icard">
+        <div class="icard-title">🔗 與 D-04/05 整合</div>
+        <div>D-06 是行為項目的<strong>唯一來源</strong>。D-04 加減分老師介面、D-05 報告統計，均直接引用此處設定。管理員修改即時生效。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AUDIT PANE ═══ -->
+<div id="pane-aud" style="display:none">
+  <div class="sec">
+    <div class="shdr">
+      <h3>📜 審計日誌</h3>
+      <span id="audBdg" style="font-size:11px;color:var(--mu);background:var(--c2);border:1px solid var(--bd);padding:2px 8px;border-radius:20px;margin-left:7px">0 筆</span>
+    </div>
+    <div style="overflow-x:auto" id="audBody"></div>
+  </div>
+</div>
+
+</div><!-- .w -->
+
+<!-- ═══ Add/Edit Modal ═══ -->
+<div class="mbg hide" id="modEdit">
+  <div class="mbox">
+    <div class="mhd">
+      <h3 id="modTitle">➕ 新增行為項目</h3>
+      <button class="mx" onclick="cMod('modEdit')">✕</button>
+    </div>
+
+    <div class="mf">
+      <label>圖示（點擊選擇）</label>
+      <div class="ico-grid" id="icoPicker"></div>
+      <div style="font-size:11px;color:var(--mu);margin-top:4px">已選：<span id="icoPreview" style="font-size:16px">👏</span></div>
+    </div>
+
+    <div class="mf">
+      <label>項目名稱</label>
+      <input type="text" class="mi" id="mName" placeholder="例：積極參與課堂（最多20字）" maxlength="20">
+    </div>
+
+    <div class="mf">
+      <label>類別</label>
+      <div class="cat-tog">
+        <div class="ct pos on" id="ctPos" onclick="mSetCat('pos')">✅ 正面行為</div>
+        <div class="ct neg"    id="ctNeg" onclick="mSetCat('neg')">❌ 負面行為</div>
+      </div>
+    </div>
+
+    <div class="mf">
+      <label>分數（預設 2 分，範圍 1–10）</label>
+      <div class="psw">
+        <div class="pss" onclick="adjP(-1)">−</div>
+        <input type="number" class="psn" id="mPts" value="2" min="1" max="10" oninput="clampP();updPtsPreview()">
+        <div class="pss" onclick="adjP(+1);updPtsPreview()">+</div>
+        <span class="pts-preview pb-p" id="ptsPreview">+2</span>
+      </div>
+      <div style="font-size:11px;color:var(--mu);margin-top:4px">正面類別顯示 +，負面類別顯示 −，由系統自動決定</div>
+    </div>
+
+    <div class="mf">
+      <label>狀態</label>
+      <div class="atrow">
+        <div class="tg on" id="mActiveTg" onclick="togMActive()"></div>
+        <span class="atlbl" id="mActiveLbl">啟用（老師可見）</span>
+      </div>
+    </div>
+
+    <div class="mbtm">
+      <button class="btn bo" onclick="cMod('modEdit')">取消</button>
+      <button class="btn bg" onclick="saveItem()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Delete Modal ═══ -->
+<div class="mbg hide" id="modDel">
+  <div class="mbox">
+    <div class="mhd"><h3>🗑 確認刪除</h3><button class="mx" onclick="cMod('modDel')">✕</button></div>
+    <div class="mini-info" id="delInfo"></div>
+    <div class="mdgr">⚠️ 刪除後此項目從老師介面消失。歷史加減分記錄不受影響，操作永久寫入審計日誌。</div>
+    <div class="mbtm">
+      <button class="btn bo" onclick="cMod('modDel')">取消</button>
+      <button class="btn brr" onclick="confirmDel()">確認刪除</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tIco"></span><span id="tMsg"></span></div>
+
+<script>
+const ICONS=['👏','🤝','🏆','📝','✨','🌟','💡','📚','✅','🎯','🙋','💪','🌸','🎉','👍',
+             '⭐','🎖','🏅','🎨','📣','🚀','🌈','💎','🔑','🤗',
+             '😴','⚠️','🚫','📋','📵','❌','😤','📱','⛔','💤','🤔','😞','🔴','⚡','🗣'];
+
+const SIM_STUDENTS=['陳大文','李美玲','王志明','張美儀','黃偉強','林曉彤','趙文龍','吳嘉怡','鄭志豪','何雅詩'];
+
+let items=[],logs=[],editId=null,delId=null;
+let mCat='pos',mActive=true,mIco='👏';
+let simBeh=null;
+let simStus=new Set();
+let _id=0;
+const OP='管理員';
+
+function uid(){return'b'+(++_id);}
+function now(){const d=new Date();return[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');}
+function gi(id){return items.find(i=>i.id===id);}
+function ps(p){return(p>0?'+':'')+p;}
+function cl(o){return JSON.parse(JSON.stringify(o));}
+
+// ─── TABS ─────────────────────────────────────────────────────────
+function sTab(t){
+  ['admin','prev','aud'].forEach(x=>{
+    document.getElementById('pane-'+x).style.display=x===t?'':'none';
+    document.getElementById('tab-'+x).classList.toggle('on',x===t);
+  });
+  const rb=document.getElementById('roleBdg');
+  if(t==='prev') rb.innerHTML='<div class="rdot" style="background:var(--gl)"></div><span>老師預覽模式</span>';
+  else           rb.innerHTML='<div class="rdot" style="background:var(--y)"></div><span>管理員模式</span>';
+  if(t==='prev') renderPrev();
+  if(t==='aud')  renderAud();
+}
+
+// ─── ADMIN ────────────────────────────────────────────────────────
+function renderAdmin(){
+  const pos=items.filter(i=>i.cat==='pos');
+  const neg=items.filter(i=>i.cat==='neg');
+  const act=items.filter(i=>i.active).length;
+  document.getElementById('posCnt').textContent=pos.length;
+  document.getElementById('negCnt').textContent=neg.length;
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat"><div class="sl2">總項目</div><div class="sv2" style="color:#93C5FD">${items.length}</div></div>
+    <div class="stat"><div class="sl2">已啟用</div><div class="sv2" style="color:var(--pos)">${act}</div></div>
+    <div class="stat"><div class="sl2">停用中</div><div class="sv2" style="color:var(--mu)">${items.length-act}</div></div>
+  `;
+  renderCat('pos');
+  renderCat('neg');
+}
+
+function renderCat(cat){
+  const list=items.filter(i=>i.cat===cat);
+  const el=document.getElementById(cat+'Items');
+  if(!list.length){
+    el.innerHTML=`<div class="emp">尚無${cat==='pos'?'正面':'負面'}行為項目 — 點「新增項目」建立</div>`;
+    return;
+  }
+  el.innerHTML=list.map(item=>{
+    const p=cat==='pos'?item.pts:-item.pts;
+    return`<div class="itm${item.active?'':' off'}">
+      <span class="dh" title="可拖曳排序">⠿</span>
+      <div class="itm-ico">${item.icon}</div>
+      <div class="itm-inf">
+        <div class="itm-n">${item.name}</div>
+        <div class="itm-m">建立 ${item.createdAt} · 由 ${item.createdBy}${item.updatedAt?' · 更新 '+item.updatedAt:''}</div>
+      </div>
+      <div class="lk" title="分數由管理員鎖定">🔒</div>
+      <div class="pts-bdg ${cat==='pos'?'pb-p':'pb-n'}">${ps(p)}</div>
+      <div class="tg${item.active?' on':''}" title="${item.active?'點擊停用':'點擊啟用'}" onclick="togActive('${item.id}')"></div>
+      <div style="display:flex;gap:3px">
+        <button class="ib ed" onclick="openEdit('${item.id}')" title="編輯">✏️</button>
+        <button class="ib dl" onclick="openDel('${item.id}')"  title="刪除">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── TOGGLE ACTIVE ────────────────────────────────────────────────
+function togActive(id){
+  const item=gi(id);if(!item)return;
+  const before=cl(item);
+  item.active=!item.active;item.updatedAt=now();item.updatedBy=OP;
+  addLog('TOGGLE',item,before,cl(item));
+  renderAdmin();
+  toast(item.active?'✅':'🔕',`${item.name} 已${item.active?'啟用，老師可見':'停用，老師不可見'}`);
+}
+
+// ─── ADD / EDIT MODAL ─────────────────────────────────────────────
+function openAdd(){
+  editId=null;mCat='pos';mActive=true;mIco=ICONS[0];
+  document.getElementById('modTitle').textContent='➕ 新增行為項目';
+  document.getElementById('mName').value='';
+  document.getElementById('mPts').value='2';
+  mSetCat('pos');setMActive(true);updPtsPreview();renderIcoPick();
+  document.getElementById('modEdit').classList.remove('hide');
+}
+
+function openEdit(id){
+  editId=id;const item=gi(id);if(!item)return;
+  mCat=item.cat;mActive=item.active;mIco=item.icon;
+  document.getElementById('modTitle').textContent='✏️ 編輯行為項目';
+  document.getElementById('mName').value=item.name;
+  document.getElementById('mPts').value=item.pts;
+  mSetCat(item.cat);setMActive(item.active);updPtsPreview();renderIcoPick();
+  document.getElementById('modEdit').classList.remove('hide');
+}
+
+function renderIcoPick(){
+  document.getElementById('icoPicker').innerHTML=ICONS.map((ic,i)=>
+    `<div class="ico-opt${mIco===ic?' sel':''}" onclick="pickIco(${i})">${ic}</div>`
+  ).join('');
+  document.getElementById('icoPreview').textContent=mIco;
+}
+
+function pickIco(idx){
+  mIco=ICONS[idx];
+  document.querySelectorAll('.ico-opt').forEach((el,i)=>el.classList.toggle('sel',i===idx));
+  document.getElementById('icoPreview').textContent=mIco;
+}
+
+function mSetCat(cat){
+  mCat=cat;
+  document.getElementById('ctPos').classList.toggle('on',cat==='pos');
+  document.getElementById('ctNeg').classList.toggle('on',cat==='neg');
+  updPtsPreview();
+}
+
+function setMActive(v){
+  mActive=v;
+  document.getElementById('mActiveTg').classList.toggle('on',v);
+  document.getElementById('mActiveLbl').textContent=v?'啟用（老師可見）':'停用（老師不可見）';
+}
+function togMActive(){setMActive(!mActive);}
+
+function adjP(d){
+  const el=document.getElementById('mPts');
+  el.value=Math.min(10,Math.max(1,(parseInt(el.value)||2)+d));
+  updPtsPreview();
+}
+function clampP(){
+  const el=document.getElementById('mPts');
+  el.value=Math.min(10,Math.max(1,parseInt(el.value)||1));
+}
+function updPtsPreview(){
+  const v=parseInt(document.getElementById('mPts').value)||2;
+  const signed=mCat==='pos'?v:-v;
+  const el=document.getElementById('ptsPreview');
+  el.textContent=ps(signed)+' 分';
+  el.className='pts-preview '+(mCat==='pos'?'pb-p':'pb-n');
+}
+
+function saveItem(){
+  const name=document.getElementById('mName').value.trim();
+  if(!name){toast('⚠️','請輸入項目名稱');return;}
+  const pts=Math.min(10,Math.max(1,parseInt(document.getElementById('mPts').value)||2));
+  if(editId){
+    const item=gi(editId);if(!item)return;
+    const before=cl(item);
+    item.name=name;item.cat=mCat;item.pts=pts;item.icon=mIco;item.active=mActive;
+    item.updatedAt=now();item.updatedBy=OP;
+    addLog('EDIT',item,before,cl(item));
+    toast('✏️','已更新：'+name);
+  }else{
+    const item={id:uid(),name,cat:mCat,pts,icon:mIco,active:mActive,
+      createdAt:now(),createdBy:OP,updatedAt:null,updatedBy:null};
+    items.push(item);
+    addLog('CREATE',item,null,cl(item));
+    toast('✅','已新增：'+name+' ('+ps(mCat==='pos'?pts:-pts)+')');
+  }
+  cMod('modEdit');renderAdmin();
+}
+
+// ─── DELETE ───────────────────────────────────────────────────────
+function openDel(id){
+  delId=id;const item=gi(id);if(!item)return;
+  const p=item.cat==='pos'?item.pts:-item.pts;
+  document.getElementById('delInfo').innerHTML=
+    `項目：<strong>${item.icon} ${item.name}</strong><br>
+     類別：<strong>${item.cat==='pos'?'✅ 正面行為':'❌ 負面行為'}</strong>
+     &nbsp;&nbsp; 分數：<strong style="color:${item.cat==='pos'?'#4ADE80':'#FCA5A5'}">${ps(p)}</strong><br>
+     狀態：<strong>${item.active?'啟用中':'已停用'}</strong>`;
+  document.getElementById('modDel').classList.remove('hide');
+}
+
+function confirmDel(){
+  const item=gi(delId);if(!item)return;
+  addLog('DELETE',item,cl(item),null);
+  items=items.filter(i=>i.id!==delId);
+  cMod('modDel');renderAdmin();
+  toast('🗑','已刪除：'+item.name+'（已寫入日誌）');
+}
+
+// ─── TEACHER PREVIEW ─────────────────────────────────────────────
+function renderPrev(){
+  simBeh=null;simStus.clear();
+  renderPrevBtns();renderScoreRev();renderStuChips();
+}
+
+function renderPrevBtns(){
+  const active=items.filter(i=>i.active);
+  const pos=active.filter(i=>i.cat==='pos');
+  const neg=active.filter(i=>i.cat==='neg');
+  document.getElementById('prevPos').innerHTML=
+    pos.length
+      ?pos.map(b=>`<button class="bb pos${simBeh===b.id?' sel':''}" onclick="simPick('${b.id}')">${b.icon} ${b.name} <span class="bpt">+${b.pts}</span></button>`).join('')
+      :'<span style="font-size:12px;color:var(--mu)">無啟用的正面項目</span>';
+  document.getElementById('prevNeg').innerHTML=
+    neg.length
+      ?neg.map(b=>`<button class="bb neg${simBeh===b.id?' sel':''}" onclick="simPick('${b.id}')">${b.icon} ${b.name} <span class="bpt">−${b.pts}</span></button>`).join('')
+      :'<span style="font-size:12px;color:var(--mu)">無啟用的負面項目</span>';
+}
+
+function simPick(id){
+  simBeh=simBeh===id?null:id;
+  renderPrevBtns();renderScoreRev();renderStuChips();
+}
+
+function simClear(){
+  simBeh=null;simStus.clear();
+  renderPrevBtns();renderScoreRev();renderStuChips();
+}
+
+function renderScoreRev(){
+  const el=document.getElementById('scoreRev');
+  if(!simBeh){
+    el.className='score-rev';
+    el.innerHTML='<div style="color:var(--mu);font-size:13px;padding:4px 0">← 點選一個行為項目</div>';
+    return;
+  }
+  const item=gi(simBeh);if(!item){simBeh=null;renderScoreRev();return;}
+  const p=item.cat==='pos'?item.pts:-item.pts;
+  el.className='score-rev active';
+  el.innerHTML=`
+    <div class="rev-ico">${item.icon}</div>
+    <div class="rev-inf">
+      <div class="rev-name">${item.name}</div>
+      <div class="rev-note">${item.cat==='pos'?'✅ 正面行為':'❌ 負面行為'} &nbsp;·&nbsp; 管理員鎖定 🔒</div>
+      <div class="rev-auto">⚡ 分數自動帶出，老師毋需輸入</div>
+    </div>
+    <div class="rev-pts">
+      <div class="rev-num ${item.cat==='pos'?'p':'n'}">${ps(p)}</div>
+      <div class="rev-tag">自動帶出</div>
+    </div>
+  `;
+}
+
+function renderStuChips(){
+  document.getElementById('stuChips').innerHTML=SIM_STUDENTS.map(n=>
+    `<div class="chip${simStus.has(n)?' sel':''}" onclick="togSimStu('${n}')">${n}</div>`
+  ).join('');
+  const ss=document.getElementById('selSummary');
+  if(!simBeh||!simStus.size){ss.style.display='none';return;}
+  const item=gi(simBeh);if(!item){ss.style.display='none';return;}
+  const p=item.cat==='pos'?item.pts:-item.pts;
+  ss.style.display='block';
+  ss.innerHTML=`✅ 已選 <strong>${simStus.size}</strong> 位學生 &nbsp;×&nbsp; <strong>${item.icon} ${item.name} (${ps(p)})</strong><br>
+    <span style="color:var(--mu)">提交後將為 ${[...simStus].join('、')} 各記錄 <strong style="color:${p>0?'#4ADE80':'#FCA5A5'}">${ps(p)} 分</strong></span>`;
+}
+
+function togSimStu(name){
+  simStus.has(name)?simStus.delete(name):simStus.add(name);
+  renderStuChips();
+}
+
+// ─── AUDIT ────────────────────────────────────────────────────────
+function addLog(action,item,before,after){
+  const ch=action==='EDIT'&&before&&after?diffIt(before,after):null;
+  const p=item.cat==='pos'?item.pts:-item.pts;
+  logs.unshift({id:uid(),action,ts:now(),op:OP,iid:item.id,
+    name:item.name,icon:item.icon,cat:item.cat,p,active:item.active,ch});
+}
+
+function diffIt(a,b){
+  const c={};
+  if(a.name!==b.name)    c.name={f:a.name,t:b.name};
+  if(a.cat!==b.cat)      c.cat={f:a.cat==='pos'?'正面':'負面',t:b.cat==='pos'?'正面':'負面'};
+  if(a.pts!==b.pts)      c.pts={f:ps(a.cat==='pos'?a.pts:-a.pts),t:ps(b.cat==='pos'?b.pts:-b.pts)};
+  if(a.icon!==b.icon)    c.icon={f:a.icon,t:b.icon};
+  if(a.active!==b.active)c.active={f:a.active?'啟用':'停用',t:b.active?'啟用':'停用'};
+  return Object.keys(c).length?c:null;
+}
+
+function renderAud(){
+  document.getElementById('audBdg').textContent=logs.length+' 筆';
+  const body=document.getElementById('audBody');
+  if(!logs.length){body.innerHTML='<div class="emp" style="padding:24px">暫無審計日誌</div>';return;}
+  body.innerHTML=`<table class="at">
+    <thead><tr>
+      <th>時間</th><th>動作</th><th>操作者</th><th>項目</th>
+      <th>類別</th><th>分數</th><th>狀態</th><th>變更詳情</th>
+    </tr></thead>
+    <tbody>${logs.map(l=>{
+      const ab={
+        CREATE:'<span class="aa aac">新增</span>',
+        EDIT:  '<span class="aa aae">編輯</span>',
+        DELETE:'<span class="aa aad">刪除</span>',
+        TOGGLE:'<span class="aa aat">切換</span>',
+      }[l.action];
+      let chH='—';
+      if(l.ch){chH=Object.entries(l.ch).map(([k,v])=>{
+        const lbl={name:'名稱',cat:'類別',pts:'分數',icon:'圖示',active:'狀態'}[k]||k;
+        return`<div class="diff">${lbl}: <del>${v.f}</del> <ins>→ ${v.t}</ins></div>`;
+      }).join('');}
+      const pStyle=l.cat==='pos'?'background:rgba(34,197,94,.12);color:#4ADE80':'background:rgba(239,68,68,.12);color:#FCA5A5';
+      return`<tr>
+        <td style="color:var(--mu);font-size:10px;white-space:nowrap">${l.ts}</td>
+        <td>${ab}</td>
+        <td style="font-size:11px">${l.op}</td>
+        <td style="white-space:nowrap">${l.icon} ${l.name}</td>
+        <td style="font-size:11px;white-space:nowrap">${l.cat==='pos'?'✅ 正面':'❌ 負面'}</td>
+        <td><div style="display:inline-flex;min-width:36px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;${pStyle}">${ps(l.p)}</div></td>
+        <td style="font-size:11px">${l.active?'啟用':'停用'}</td>
+        <td style="font-size:11px">${chH}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+// ─── MODAL / TOAST ────────────────────────────────────────────────
+function cMod(id){document.getElementById(id).classList.add('hide');editId=null;delId=null;}
+function toast(ico,msg){
+  const t=document.getElementById('toast');
+  document.getElementById('tIco').textContent=ico;
+  document.getElementById('tMsg').textContent=msg;
+  t.classList.add('on');clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('on'),2800);
+}
+
+// ─── DEMO DATA ────────────────────────────────────────────────────
+(function(){
+  const demo=[
+    {name:'積極參與課堂',   cat:'pos',pts:2,icon:'👏',active:true},
+    {name:'主動協助同學',   cat:'pos',pts:3,icon:'🤝',active:true},
+    {name:'表現優異',        cat:'pos',pts:5,icon:'🏆',active:true},
+    {name:'準時交齊功課',   cat:'pos',pts:2,icon:'📝',active:true},
+    {name:'保持課室整潔',   cat:'pos',pts:2,icon:'✨',active:true},
+    {name:'主動發問',        cat:'pos',pts:1,icon:'🙋',active:false},
+    {name:'課堂不專注',     cat:'neg',pts:2,icon:'😴',active:true},
+    {name:'違反課室規則',   cat:'neg',pts:3,icon:'⚠️',active:true},
+    {name:'欺凌不當行為',   cat:'neg',pts:5,icon:'🚫',active:true},
+    {name:'沒有完成功課',   cat:'neg',pts:2,icon:'📋',active:true},
+    {name:'未許可使用手機', cat:'neg',pts:3,icon:'📵',active:true},
+  ];
+  demo.forEach(d=>{
+    const it={...d,id:uid(),createdAt:now(),createdBy:OP,updatedAt:null,updatedBy:null};
+    items.push(it);
+    logs.push({id:uid(),action:'CREATE',ts:now(),op:OP,iid:it.id,
+      name:it.name,icon:it.icon,cat:it.cat,p:it.cat==='pos'?it.pts:-it.pts,active:it.active,ch:null});
+  });
+  logs.reverse();
+  renderAdmin();
+})();
+</script>
+</body>
+</html>
