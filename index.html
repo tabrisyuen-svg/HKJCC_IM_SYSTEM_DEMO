@@ -15,59 +15,24 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 /* ── TOP BAR ── */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:300;
-  height:58px;background:#07101A;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 16px;gap:0;
-}
-.mob-toggle{
-  display:none;width:34px;height:34px;border-radius:8px;
-  background:var(--card2);border:1px solid var(--border);
-  align-items:center;justify-content:center;
-  cursor:pointer;font-size:16px;flex-shrink:0;margin-right:10px;
-}
-.logo-wrap{
-  display:flex;align-items:center;gap:10px;
-  padding-right:20px;border-right:1px solid var(--border);
-  margin-right:14px;flex-shrink:0;
-}
-.logo-badge{
-  width:36px;height:36px;border-radius:9px;
-  background:var(--green);
-  display:flex;align-items:center;justify-content:center;
-  font-weight:900;color:var(--yellow);font-size:14px;
-}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:300;height:58px;background:#07101A;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:0;}
+.mob-toggle{display:none;width:34px;height:34px;border-radius:8px;background:var(--card2);border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;margin-right:10px;}
+.logo-wrap{display:flex;align-items:center;gap:10px;padding-right:20px;border-right:1px solid var(--border);margin-right:14px;flex-shrink:0;}
+.logo-badge{width:36px;height:36px;border-radius:9px;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--yellow);font-size:14px;}
 .logo-txt h2{font-size:10.5px;color:var(--yellow);font-weight:700;white-space:nowrap;}
 .logo-txt p{font-size:9px;color:var(--muted);margin-top:2px;white-space:nowrap;}
-
 .main-nav{display:flex;gap:3px;flex:1;}
-.nav-tab{
-  display:flex;align-items:center;gap:6px;
-  padding:8px 14px;border-radius:8px;
-  cursor:pointer;font-size:13px;font-weight:600;
-  color:var(--muted);transition:all .2s;
-  user-select:none;white-space:nowrap;
-}
+.nav-tab{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .2s;user-select:none;white-space:nowrap;}
 .nav-tab:hover{background:var(--card2);color:var(--text);}
 .nav-tab.active{background:var(--green);color:#fff;}
 .nav-tab.active .ni{color:var(--yellow);}
 .ni{font-size:15px;}
 .coming-chip{font-size:9px;padding:2px 6px;border-radius:10px;background:rgba(122,144,168,.12);color:var(--muted);}
-
+.admin-authed-chip{font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(27,110,60,.2);color:#4ADE80;display:none;}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.notif-btn{
-  width:34px;height:34px;border-radius:8px;
-  background:var(--card2);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:14px;position:relative;
-}
+.notif-btn{width:34px;height:34px;border-radius:8px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;position:relative;}
 .notif-dot{position:absolute;top:7px;right:7px;width:6px;height:6px;background:#EF4444;border-radius:50%;border:1.5px solid #07101A;}
-.user-chip{
-  display:flex;align-items:center;gap:8px;
-  padding:5px 10px;background:var(--card2);
-  border:1px solid var(--border);border-radius:8px;cursor:pointer;
-}
+.user-chip{display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;cursor:pointer;}
 .user-av{width:27px;height:27px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
 .user-name{font-size:12px;font-weight:600;}
 .user-role{font-size:10px;color:var(--muted);}
@@ -76,25 +41,14 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .body-wrap{display:flex;margin-top:58px;height:calc(100vh - 58px);overflow:hidden;}
 
 /* ── SIDEBAR ── */
-.sidebar{
-  width:220px;flex-shrink:0;
-  background:#09141F;border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  overflow-y:auto;z-index:200;transition:transform .3s;
-}
+.sidebar{width:220px;flex-shrink:0;background:#09141F;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;z-index:200;transition:transform .3s;}
 .sb-sec{display:none;flex-direction:column;flex:1;}
 .sb-sec.on{display:flex;}
 .sb-hdr{padding:14px 14px 10px;border-bottom:1px solid var(--border);}
 .sb-hdr-tag{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
 .sb-hdr-name{font-size:13px;font-weight:700;color:var(--text);margin-top:4px;}
 .sb-nav{padding:8px;}
-.sb-item{
-  display:flex;align-items:center;gap:9px;
-  padding:9px 10px;border-radius:8px;
-  cursor:pointer;font-size:13px;color:var(--muted);
-  transition:all .2s;margin-bottom:2px;
-  border:1px solid transparent;
-}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s;margin-bottom:2px;border:1px solid transparent;}
 .sb-item:hover{background:var(--card2);color:var(--text);}
 .sb-item.on{background:rgba(27,110,60,.2);color:#4ADE80;border-color:rgba(27,110,60,.3);}
 .sb-item.on .si{color:var(--yellow);}
@@ -102,36 +56,28 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .sb-badge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;}
 .bd-done{background:rgba(34,197,94,.15);color:#22C55E;}
 .bd-wip{background:rgba(122,144,168,.1);color:var(--muted);}
-
-.sb-divider{
-  font-size:9px;color:var(--muted);
-  text-transform:uppercase;letter-spacing:1px;font-weight:700;
-  padding:14px 10px 6px;
-  margin-top:4px;
-  border-top:1px solid var(--border);
-}
-
+.sb-divider{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;padding:14px 10px 6px;margin-top:4px;border-top:1px solid var(--border);}
 .sb-cs{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:32px 20px;text-align:center;gap:12px;}
 .sb-cs.on{display:flex;}
 .sb-cs-ico{font-size:36px;opacity:.25;}
 .sb-cs p{font-size:12px;color:var(--muted);line-height:1.8;}
+/* Admin sidebar logout area */
+.sb-logout{padding:8px;border-top:1px solid var(--border);margin-top:auto;}
+.sb-item-danger{color:#FCA5A5 !important;}
+.sb-item-danger:hover{background:rgba(239,68,68,.08) !important;border-color:rgba(239,68,68,.15) !important;color:#FCA5A5 !important;}
 
 /* ── MAIN ── */
 .main{flex:1;min-width:0;height:100%;position:relative;overflow:hidden;}
-
 #dashboard-view{position:absolute;inset:0;overflow-y:auto;padding:24px;display:block;}
 #dashboard-view::-webkit-scrollbar{width:5px}
 #dashboard-view::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-
 #iframe-view{position:absolute;inset:0;display:none;}
 #iframe-view iframe{width:100%;height:100%;border:none;display:block;}
-
 #cs-view{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:32px;overflow-y:auto;}
 .cs-ico{font-size:64px;opacity:.2;}
 .cs-title{font-size:22px;font-weight:700;color:var(--muted);}
 .cs-sub{font-size:13px;color:var(--muted);max-width:340px;line-height:1.8;}
 .cs-pill{background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);color:var(--yellow);padding:7px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.5px;}
-
 .iframe-loader{position:absolute;inset:0;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:10;transition:opacity .3s;}
 .iframe-loader.hide{opacity:0;pointer-events:none;}
 .loader-ring{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gl);border-radius:50%;animation:spin .8s linear infinite;}
@@ -146,7 +92,6 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .dash-hello h1{font-size:21px;font-weight:700;}
 .dash-hello h1 em{color:var(--yellow);font-style:normal;}
 .dash-hello p{font-size:12px;color:var(--muted);margin-top:4px;}
-
 .qs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:11px;margin-bottom:20px;}
 .qs-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 14px;position:relative;overflow:hidden;}
 .qs-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
@@ -159,9 +104,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .qs-num{font-size:26px;font-weight:700;margin:5px 0 3px;line-height:1;}
 .qs-sub{font-size:11px;color:var(--muted);}
 .qs-ico{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:26px;opacity:.1;}
-
 .sec-ttl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
-
 .mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px;margin-bottom:22px;}
 .mod-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:10px;}
 .mod-card:hover{border-color:var(--gl);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
@@ -183,7 +126,6 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .pill-done{background:rgba(34,197,94,.12);color:#22C55E;}
 .pill-wip{background:rgba(122,144,168,.1);color:var(--muted);}
 .pill-tbd{background:rgba(139,92,246,.1);color:#C4B5FD;}
-
 .act-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .act-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(42,61,85,.4);font-size:13px;}
 .act-row:last-child{border-bottom:none;}
@@ -193,17 +135,41 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .act-bd span{display:block;font-size:11px;color:var(--muted);margin-top:2px;}
 .act-time{font-size:11px;color:var(--muted);flex-shrink:0;}
 
+/* ── MODAL (admin login) ── */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;}
+.mbg.hide{display:none;}
+.mbox{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:24px;width:100%;max-width:400px;}
+.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.mhdr h3{font-size:15px;font-weight:700;}
+.mx{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:var(--card2);}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);}
+.btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid;transition:.13s;font-family:inherit;}
+.btn:active{transform:scale(.97);}
+.btn-g{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-g:hover{background:var(--gl);}
+.btn-o{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-o:hover{background:var(--card2);}
+.ff{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.ff label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;}
+.fi{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-size:13px;outline:none;transition:.14s;font-family:inherit;}
+.fi:focus{border-color:var(--gl);}
+.fi::placeholder{color:var(--muted);}
+.login-err{display:none;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 12px;font-size:12px;color:#FCA5A5;margin-bottom:12px;}
+.demo-cred{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-size:11px;color:var(--muted);margin-top:4px;line-height:2;}
+
 /* ── MOBILE ── */
 .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:190;}
 @media(max-width:900px){
   .sidebar{position:fixed;top:58px;bottom:0;left:0;transform:translateX(-220px);}
   .sidebar.open{transform:none;}
+  .mob-toggle{display:flex;}
 }
 @media(max-width:640px){
   #dashboard-view{padding:14px;}
   .logo-txt{display:none;}
   .user-name,.user-role{display:none;}
-  .coming-chip{display:none;}
+  .coming-chip,.admin-authed-chip{display:none !important;}
   .nav-tab{padding:8px 10px;font-size:12px;}
 }
 </style>
@@ -229,17 +195,20 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
     <div class="nav-tab" data-tab="ai" onclick="switchTab('ai')">
       <span class="ni">🤖</span>AI 教練<span class="coming-chip">即將推出</span>
     </div>
+    <!-- 🔐 管理 tab：未登入顯示鎖，已登入顯示 ✅ -->
     <div class="nav-tab" data-tab="admin" onclick="switchTab('admin')">
-      <span class="ni">⚙️</span>管理<span class="coming-chip">即將推出</span>
+      <span class="ni">⚙️</span>管理
+      <span class="coming-chip" id="adminLockChip">🔐</span>
+      <span class="admin-authed-chip" id="adminOkChip">✅ 已登入</span>
     </div>
   </nav>
   <div class="top-right">
     <div class="notif-btn">🔔<span class="notif-dot"></span></div>
-    <div class="user-chip">
-      <div class="user-av">李</div>
+    <div class="user-chip" id="userChip">
+      <div class="user-av" id="userAv">李</div>
       <div>
-        <div class="user-name">李老師</div>
-        <div class="user-role">班主任 · 中二 2A</div>
+        <div class="user-name" id="userName">李老師</div>
+        <div class="user-role" id="userRole">班主任 · 中二 2A</div>
       </div>
     </div>
   </div>
@@ -274,10 +243,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
           <span class="si">🏆</span>記分板
           <span class="sb-badge bd-wip">D-04</span>
         </div>
-
-        <!-- 管理分隔 -->
         <div class="sb-divider">管理</div>
-
         <div class="sb-item" data-page="behavior" onclick="switchPage('behavior')">
           <span class="si">⚙️</span>行為項目設定
           <span class="sb-badge bd-done">D-06</span>
@@ -293,6 +259,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       </nav>
     </div>
 
+    <!-- 技能 / AI：Coming Soon -->
     <div class="sb-cs" id="sb-skills">
       <div class="sb-cs-ico">⭐</div>
       <p><strong style="color:var(--text)">技能系統</strong><br>即將推出</p>
@@ -301,10 +268,42 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       <div class="sb-cs-ico">🤖</div>
       <p><strong style="color:var(--text)">AI 教練</strong><br>即將推出</p>
     </div>
-    <div class="sb-cs" id="sb-admin">
-      <div class="sb-cs-ico">⚙️</div>
-      <p><strong style="color:var(--text)">管理</strong><br>即將推出</p>
+
+    <!-- ═══ 管理 Sidebar（登入後才顯示內容）═══ -->
+    <div class="sb-sec" id="sb-admin">
+      <div class="sb-hdr">
+        <div class="sb-hdr-tag">SYSTEM ADMIN</div>
+        <div class="sb-hdr-name">系統管理</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-item on" data-adminpage="admin-home" onclick="switchAdminPage('admin-home')">
+          <span class="si">🏠</span>管理總覽
+        </div>
+        <div class="sb-divider">功能模組</div>
+        <div class="sb-item" data-adminpage="admin-f02" onclick="switchAdminPage('admin-f02')">
+          <span class="si">🏫</span>學校管理
+          <span class="sb-badge bd-done">F-02</span>
+        </div>
+        <div class="sb-item" data-adminpage="admin-f03" onclick="switchAdminPage('admin-f03')">
+          <span class="si">🤖</span>AI 對話
+          <span class="sb-badge bd-wip">F-03</span>
+        </div>
+        <div class="sb-item" data-adminpage="admin-f04" onclick="switchAdminPage('admin-f04')">
+          <span class="si">🧩</span>示範 Skills
+          <span class="sb-badge bd-wip">F-04</span>
+        </div>
+        <div class="sb-item" data-adminpage="admin-f05" onclick="switchAdminPage('admin-f05')">
+          <span class="si">📊</span>用量及額度
+          <span class="sb-badge bd-wip">F-05</span>
+        </div>
+      </nav>
+      <div class="sb-logout">
+        <div class="sb-item sb-item-danger" onclick="adminLogout()">
+          <span class="si">🚪</span>登出管理
+        </div>
+      </div>
     </div>
+
   </aside>
 
   <main class="main">
@@ -328,69 +327,109 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 
 <div class="mob-overlay" id="mobOverlay" onclick="closeSidebar()"></div>
 
+<!-- ═══ 管理員登入 Modal ═══ -->
+<div class="mbg hide" id="m-adminLogin">
+  <div class="mbox">
+    <div class="mhdr">
+      <h3>🔐 管理員登入</h3>
+      <button class="mx" onclick="closeAdminLogin()">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">管理功能（F-01 至 F-05）需要管理員身份驗證，一般教師帳號無法訪問。</p>
+    <div class="login-err" id="loginErr">❌ 帳號或密碼錯誤，請重試</div>
+    <div class="ff">
+      <label>管理員電郵 *</label>
+      <input class="fi" type="email" id="loginEmail" placeholder="admin@cncs.edu.hk"
+             onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <div class="ff">
+      <label>密碼 *</label>
+      <input class="fi" type="password" id="loginPwd" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <div class="demo-cred">
+      <span style="color:var(--yellow);font-weight:700">🔑 示範帳號</span><br>
+      📧 admin@cncs.edu.hk<br>
+      🔒 Admin@2526
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-o" onclick="closeAdminLogin()">取消</button>
+      <button class="btn btn-g" onclick="doAdminLogin()">🔐 登入管理</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ── CONFIG ── */
 const IFRAME_PAGES = {
-  profile:     { src:'Student/D_01_StudentProfile.html',         code:'D-01', label:'學生檔案',    ready:true  },
-  attendance:  { src:'Student/D_02_Attendance.html',             code:'D-02', label:'點名系統',    ready:true  },
-  markbook:    { src:'Student/D_03_MarkBook.html',               code:'D-03', label:'成績冊',      ready:true },
-  scoreboard:  { src:'Student/D_04_ScoreBoard.html',             code:'D-04', label:'記分板',      ready:true },
-  behavior:    { src:'Student/D_06_BehaviourItemSettings.html',  code:'D-06', label:'行為項目設定', ready:true  },
-  importexport:{ src:'Student/D_M2_ImportExport.html',           code:'M-02', label:'匯入 / 匯出', ready:false },
-  permission:  { src:'Student/D_M3_Permission.html',             code:'M-03', label:'權限管理',    ready:false },
+  // Student
+  profile:      { src:'Student/D_01_StudentProfile.html',        code:'D-01', label:'學生檔案',    ready:true  },
+  attendance:   { src:'Student/D_02_Attendance.html',            code:'D-02', label:'點名系統',    ready:true  },
+  markbook:     { src:'Student/D_03_MarkBook.html',              code:'D-03', label:'成績冊',      ready:true  },
+  scoreboard:   { src:'Student/D_04_ScoreBoard.html',            code:'D-04', label:'記分板',      ready:true  },
+  behavior:     { src:'Student/D_06_BehaviourItemSettings.html', code:'D-06', label:'行為項目設定', ready:true  },
+  importexport: { src:'Student/D_M2_ImportExport.html',          code:'M-02', label:'匯入 / 匯出', ready:false },
+  permission:   { src:'Student/D_M3_Permission.html',            code:'M-03', label:'權限管理',    ready:false },
+  // Admin
+  'admin-f02':  { src:'Admin/F_02_SchoolManagement.html',        code:'F-02', label:'學校管理',    ready:true  },
+  'admin-f03':  { src:'Admin/F_03_AIChat.html',                  code:'F-03', label:'AI 對話',     ready:true  },
+  'admin-f04':  { src:'Admin/F_04_SkillLibrary.html',            code:'F-04', label:'示範 Skills', ready:true  },
+  'admin-f05':  { src:'Admin/F_05_UsageQuota.html',              code:'F-05', label:'用量及額度',  ready:false }, // ⚠️ 待修正檔名
 };
 
 const CS_PAGES = {
-  markbook:    { ico:'📒', title:'成績冊',          sub:'學科成績記錄、測驗分數、科目評分管理，開發中，敬請期待。'           },
-  scoreboard:  { ico:'🏆', title:'記分板',          sub:'行為積分記錄、獎懲排行榜、積分統計報告，開發中，敬請期待。'         },
-  d05:         { ico:'🔮', title:'D-05（功能待定）', sub:'此模組尚未規劃，檔案未建立。請聯絡系統管理員確認功能需求。'        },
-  importexport:{ ico:'📁', title:'匯入 / 匯出',     sub:'學生資料批量匯入、報告匯出 Excel / PDF，開發中，敬請期待。'        },
-  permission:  { ico:'🔒', title:'權限管理',        sub:'老師帳號管理、班別權限設定，開發中，敬請期待。'                     },
+  markbook:     { ico:'📒', title:'成績冊',          sub:'學科成績記錄、測驗分數、科目評分管理，開發中，敬請期待。'     },
+  scoreboard:   { ico:'🏆', title:'記分板',          sub:'行為積分記錄、獎懲排行榜、積分統計報告，開發中，敬請期待。'   },
+  importexport: { ico:'📁', title:'匯入 / 匯出',     sub:'學生資料批量匯入、報告匯出 Excel / PDF，開發中，敬請期待。'  },
+  permission:   { ico:'🔒', title:'權限管理',        sub:'老師帳號管理、班別權限設定，開發中，敬請期待。'               },
+  'admin-f05':  { ico:'⚠️', title:'F-05 · 用量及額度', sub:'GitHub 檔名需先修正（F_05_UsageQuota.html html → F_05_UsageQuota.html），修正後即可載入。' },
 };
 
 const TAB_CS = {
-  skills:{ ico:'⭐', title:'技能系統即將推出',  sub:'加減分、行為記錄、技能評分功能正在開發中，敬請期待。'    },
-  ai:    { ico:'🤖', title:'AI 教練即將推出',  sub:'班級整體分析、個別學生建議、異常預警功能正在開發中。'   },
-  admin: { ico:'⚙️', title:'管理功能即將推出', sub:'班別管理、老師帳號、匯入匯出、權限管理功能正在開發中。' },
+  skills:{ ico:'⭐', title:'技能系統即將推出',  sub:'加減分、行為記錄、技能評分功能正在開發中，敬請期待。'  },
+  ai:    { ico:'🤖', title:'AI 教練即將推出',   sub:'班級整體分析、個別學生建議、異常預警功能正在開發中。' },
 };
 
-let curTab='student', curPage='dashboard';
+/* ── AUTH STATE ── */
+let adminAuthed = sessionStorage.getItem('adminAuthed') === '1';
+let curTab = 'student';
+let curPage = 'dashboard';
+let curAdminPage = 'admin-home';
 
 /* ── VIEWS ── */
 function showView(v){
-  document.getElementById('dashboard-view').style.display = v==='dashboard'?'block':'none';
-  document.getElementById('iframe-view').style.display    = v==='iframe'   ?'block':'none';
-  document.getElementById('cs-view').style.display        = v==='cs'       ?'flex' :'none';
+  document.getElementById('dashboard-view').style.display = v==='dashboard' ? 'block' : 'none';
+  document.getElementById('iframe-view').style.display    = v==='iframe'    ? 'block' : 'none';
+  document.getElementById('cs-view').style.display        = v==='cs'        ? 'flex'  : 'none';
 }
 
 function loadIframe(page){
-  const cfg=IFRAME_PAGES[page];
-  const frame=document.getElementById('mainFrame');
-  const loader=document.getElementById('iframeLoader');
-  document.getElementById('loaderCode').textContent=cfg.code;
-  document.getElementById('loaderTxt').textContent=`載入 ${cfg.label}…`;
+  const cfg = IFRAME_PAGES[page];
+  const frame = document.getElementById('mainFrame');
+  const loader = document.getElementById('iframeLoader');
+  document.getElementById('loaderCode').textContent = cfg.code;
+  document.getElementById('loaderTxt').textContent  = `載入 ${cfg.label}…`;
   loader.classList.remove('hide');
-  frame.src='';
+  frame.src = '';
   showView('iframe');
   setTimeout(()=>{
-    frame.onload=()=>loader.classList.add('hide');
-    frame.src=cfg.src;
-  },120);
+    frame.onload = ()=>loader.classList.add('hide');
+    frame.src = cfg.src;
+  }, 120);
 }
 
-function showCS(ico,title,sub){
-  document.getElementById('csIco').textContent  =ico;
-  document.getElementById('csTitle').textContent=title;
-  document.getElementById('csSub').textContent  =sub;
+function showCS(ico, title, sub){
+  document.getElementById('csIco').textContent   = ico;
+  document.getElementById('csTitle').textContent = title;
+  document.getElementById('csSub').textContent   = sub;
   showView('cs');
 }
 
 /* ── DASHBOARD ── */
 function buildDashboard(){
-  const d=new Date();
-  const days=['日','一','二','三','四','五','六'];
-  const ds=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（星期${days[d.getDay()]}）`;
-  document.getElementById('dashboard-view').innerHTML=`
+  const d = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  const ds = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（星期${days[d.getDay()]}）`;
+  document.getElementById('dashboard-view').innerHTML = `
 <div class="breadcrumb"><span>學生</span><span>›</span><strong>總覽</strong></div>
 <div class="dash-hello">
   <h1>你好，<em>李老師</em> 👋</h1>
@@ -403,7 +442,6 @@ function buildDashboard(){
   <div class="qs-card qc-r"><div class="qs-lbl">需跟進個案</div><div class="qs-num" style="color:#FCA5A5">0</div><div class="qs-sub">今日</div><div class="qs-ico">⚑</div></div>
   <div class="qs-card qc-p"><div class="qs-lbl">家長通知待發</div><div class="qs-num" style="color:#C4B5FD">0</div><div class="qs-sub">待發送</div><div class="qs-ico">📞</div></div>
 </div>
-
 <div class="sec-ttl">功能模組</div>
 <div class="mod-grid">
   <div class="mod-card" onclick="switchPage('profile')">
@@ -424,10 +462,9 @@ function buildDashboard(){
   <div class="mod-card dim">
     <div class="mod-row"><div class="mod-ico mi-y">🏆</div><div class="mod-info"><h4>記分板</h4><p>行為積分管理</p></div><div class="mod-code">D-04</div></div>
     <div class="mod-desc">行為積分記錄、獎懲排行榜、積分統計報告。</div>
-    <span class="mod-pill pill-wip"✅ 已完成</span>
+    <span class="mod-pill pill-wip">⋯ 開發中</span>
   </div>
 </div>
-
 <div class="sec-ttl">管理模組</div>
 <div class="mod-grid" style="margin-bottom:22px">
   <div class="mod-card" onclick="switchPage('behavior')">
@@ -436,84 +473,180 @@ function buildDashboard(){
     <span class="mod-pill pill-done">✅ 已完成</span>
   </div>
 </div>
-
 <div class="sec-ttl">開發進度</div>
 <div class="act-card">
-  <div class="act-row">
-    <div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div>
-    <div class="act-bd"><strong>D-01 學生檔案</strong><span>個人資料、聯絡資訊、學業與行為記錄管理</span></div>
-    <span class="act-time" style="color:#22C55E">完成</span>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>D-01 學生檔案</strong><span>個人資料、聯絡資訊、學業與行為記錄管理</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>D-02 點名系統</strong><span>六種狀態、上午/下午時段、遲到、原因、通知家長、備注、旗標、鎖定</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(59,130,246,.1)">🚧</div><div class="act-bd"><strong>D-03 成績冊</strong><span>學科成績記錄、測驗分數、科目評分管理</span></div><span class="act-time">開發中</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(245,197,24,.1)">🚧</div><div class="act-bd"><strong>D-04 記分板</strong><span>行為積分記錄、獎懲排行榜、積分統計</span></div><span class="act-time">開發中</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(139,92,246,.1)">🔮</div><div class="act-bd"><strong>D-05（功能待定）</strong><span>模組尚未規劃</span></div><span class="act-time" style="color:#C4B5FD">待確定</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>D-06 行為項目設定</strong><span>管理員統一設定行為類別與分數</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+</div>`;
+  showView('dashboard');
+}
+
+/* ── ADMIN DASHBOARD ── */
+function buildAdminDashboard(){
+  document.getElementById('dashboard-view').innerHTML = `
+<div class="breadcrumb"><span>管理</span><span>›</span><strong>管理總覽</strong></div>
+<div class="dash-hello">
+  <h1>管理系統 <em>F-01 ～ F-05</em> ⚙️</h1>
+  <p>已登入為系統管理員 · 陳南昌紀念學校</p>
+</div>
+<div class="sec-ttl">系統功能模組</div>
+<div class="mod-grid">
+  <div class="mod-card" onclick="switchAdminPage('admin-f02')">
+    <div class="mod-row"><div class="mod-ico mi-g">🏫</div><div class="mod-info"><h4>學校管理</h4><p>教師、學生、班別、學年</p></div><div class="mod-code">F-02</div></div>
+    <div class="mod-desc">管理全校教職員及學生帳戶，設定班別及學年，停用帳戶即時生效。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
   </div>
-  <div class="act-row">
-    <div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div>
-    <div class="act-bd"><strong>D-02 點名系統</strong><span>六種狀態、上午/下午時段、遲到、原因、通知家長、備注、旗標、鎖定</span></div>
-    <span class="act-time" style="color:#22C55E">完成</span>
+  <div class="mod-card dim">
+    <div class="mod-row"><div class="mod-ico mi-b">🤖</div><div class="mod-info"><h4>AI 對話</h4><p>AI 對話介面</p></div><div class="mod-code">F-03</div></div>
+    <div class="mod-desc">AI 對話介面，學生 / 教師互動問答。</div>
+    <span class="mod-pill pill-wip">⋯ 開發中</span>
   </div>
-  <div class="act-row">
-    <div class="act-ico" style="background:rgba(59,130,246,.1)">🚧</div>
-    <div class="act-bd"><strong>D-03 成績冊</strong><span>學科成績記錄、測驗分數、科目評分管理</span></div>
-    <span class="act-time">開發中</span>
+  <div class="mod-card dim">
+    <div class="mod-row"><div class="mod-ico mi-y">🧩</div><div class="mod-info"><h4>示範 Skills</h4><p>全平台 Skill 庫</p></div><div class="mod-code">F-04</div></div>
+    <div class="mod-desc">約 10 個示範 Skills，無需重新部署即時更新。</div>
+    <span class="mod-pill pill-wip">⋯ 開發中</span>
   </div>
-  <div class="act-row">
-    <div class="act-ico" style="background:rgba(245,197,24,.1)">🚧</div>
-    <div class="act-bd"><strong>D-04 記分板</strong><span>行為積分記錄、獎懲排行榜、積分統計</span></div>
-    <span class="act-time">開發中</span>
-  </div>
-  <div class="act-row">
-    <div class="act-ico" style="background:rgba(139,92,246,.1)">🔮</div>
-    <div class="act-bd"><strong>D-05（功能待定）</strong><span>模組尚未規劃，檔案未建立</span></div>
-    <span class="act-time" style="color:#C4B5FD">待確定</span>
-  </div>
-  <div class="act-row">
-    <div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div>
-    <div class="act-bd"><strong>D-06 行為項目設定</strong><span>管理員統一設定行為類別與分數，老師一揀即帶出</span></div>
-    <span class="act-time" style="color:#22C55E">完成</span>
+  <div class="mod-card dim">
+    <div class="mod-row"><div class="mod-ico mi-r">📊</div><div class="mod-info"><h4>用量及額度</h4><p>Token 上限及帳單</p></div><div class="mod-code">F-05</div></div>
+    <div class="mod-desc">每校 / 每人 Token 上限，用量報表，超額即時停用，帳單誤差 &lt;5%。</div>
+    <span class="mod-pill pill-wip">⋯ 開發中</span>
   </div>
 </div>`;
   showView('dashboard');
 }
 
-/* ── NAV ── */
+/* ── TAB NAVIGATION ── */
 function switchTab(tab){
-  curTab=tab;
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
-  ['student','skills','ai','admin'].forEach(s=>document.getElementById('sb-'+s).classList.remove('on'));
-  document.getElementById('sb-'+tab).classList.add('on');
-  if(tab==='student'){
+  // ── Admin auth gate ──
+  if(tab === 'admin' && !adminAuthed){
+    showAdminLogin();
+    return;
+  }
+
+  curTab = tab;
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  ['student','skills','ai','admin'].forEach(s=>{
+    const el = document.getElementById('sb-'+s);
+    el.classList.remove('on');
+    // sb-cs sections use different class logic
+    if(el.classList.contains('sb-cs')){
+      el.style.display = 'none';
+    }
+  });
+
+  const target = document.getElementById('sb-'+tab);
+  if(target.classList.contains('sb-cs')){
+    target.style.display = 'flex';
+  } else {
+    target.classList.add('on');
+  }
+
+  if(tab === 'student'){
     renderStudentPage(curPage);
-  }else{
-    const cs=TAB_CS[tab];
-    showCS(cs.ico,cs.title,cs.sub);
+  } else if(tab === 'admin'){
+    renderAdminPage(curAdminPage);
+  } else {
+    const cs = TAB_CS[tab];
+    showCS(cs.ico, cs.title, cs.sub);
   }
   closeSidebar();
 }
 
 function switchPage(page){
-  curPage=page;
-  document.querySelectorAll('#sb-student .sb-item').forEach(i=>i.classList.toggle('on',i.dataset.page===page));
+  curPage = page;
+  document.querySelectorAll('#sb-student .sb-item').forEach(i=>i.classList.toggle('on', i.dataset.page===page));
   renderStudentPage(page);
   closeSidebar();
 }
 
 function renderStudentPage(page){
-  if(page==='dashboard'){ buildDashboard(); return; }
-  const iframeConf=IFRAME_PAGES[page];
-  if(iframeConf && iframeConf.ready){ loadIframe(page); return; }
-  const cs=CS_PAGES[page];
-  if(cs){ showCS(cs.ico,cs.title,cs.sub); return; }
-  if(iframeConf){ showCS('🚧',iframeConf.label,`${iframeConf.code} · ${iframeConf.label}，開發中，敬請期待。`); }
+  if(page === 'dashboard'){ buildDashboard(); return; }
+  const cfg = IFRAME_PAGES[page];
+  if(cfg && cfg.ready){ loadIframe(page); return; }
+  const cs = CS_PAGES[page];
+  if(cs){ showCS(cs.ico, cs.title, cs.sub); return; }
+  if(cfg){ showCS('🚧', cfg.label, `${cfg.code} · ${cfg.label}，開發中，敬請期待。`); }
+}
+
+/* ── ADMIN PAGE ROUTING ── */
+function switchAdminPage(page){
+  curAdminPage = page;
+  document.querySelectorAll('#sb-admin .sb-item[data-adminpage]').forEach(i=>
+    i.classList.toggle('on', i.dataset.adminpage===page)
+  );
+  renderAdminPage(page);
+  closeSidebar();
+}
+
+function renderAdminPage(page){
+  if(page === 'admin-home'){ buildAdminDashboard(); return; }
+  const cfg = IFRAME_PAGES[page];
+  if(cfg && cfg.ready){ loadIframe(page); return; }
+  const cs = CS_PAGES[page];
+  if(cs){ showCS(cs.ico, cs.title, cs.sub); return; }
+  if(cfg){ showCS('🚧', cfg.label, `${cfg.code} · ${cfg.label}，準備中。`); }
+}
+
+/* ── ADMIN AUTH ── */
+function showAdminLogin(){
+  document.getElementById('loginErr').style.display = 'none';
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPwd').value = '';
+  document.getElementById('m-adminLogin').classList.remove('hide');
+  setTimeout(()=>document.getElementById('loginEmail').focus(), 100);
+}
+
+function closeAdminLogin(){
+  document.getElementById('m-adminLogin').classList.add('hide');
+}
+
+function doAdminLogin(){
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pwd   = document.getElementById('loginPwd').value;
+
+  if(email === 'admin@cncs.edu.hk' && pwd === 'Admin@2526'){
+    sessionStorage.setItem('adminAuthed','1');
+    adminAuthed = true;
+    closeAdminLogin();
+    setAdminChipState(true);
+    switchTab('admin');
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('loginPwd').value = '';
+    document.getElementById('loginPwd').focus();
+  }
+}
+
+function adminLogout(){
+  sessionStorage.removeItem('adminAuthed');
+  adminAuthed = false;
+  setAdminChipState(false);
+  curAdminPage = 'admin-home';
+  switchTab('student');
+}
+
+function setAdminChipState(authed){
+  document.getElementById('adminLockChip').style.display = authed ? 'none'   : '';
+  document.getElementById('adminOkChip').style.display   = authed ? 'inline' : 'none';
 }
 
 /* ── MOBILE ── */
 document.getElementById('mobToggle').addEventListener('click',()=>{
   document.getElementById('sidebar').classList.add('open');
-  document.getElementById('mobOverlay').style.display='block';
+  document.getElementById('mobOverlay').style.display = 'block';
 });
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('mobOverlay').style.display='none';
+  document.getElementById('mobOverlay').style.display = 'none';
 }
 
+/* ── INIT ── */
+// Restore admin chip state if already authed from previous session
+if(adminAuthed) setAdminChipState(true);
 buildDashboard();
 </script>
 </body>
