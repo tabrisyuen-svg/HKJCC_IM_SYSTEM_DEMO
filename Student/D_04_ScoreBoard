@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>加減分 · D-04</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1B6E3C;--gl:#24A05A;--yellow:#F5C518;
+  --dark:#0D1B2A;--card:#162032;--card2:#1E2D42;
+  --border:#2A3D55;--text:#E8EDF3;--muted:#7A90A8;
+  --pos:#22C55E;--neg:#EF4444;
+}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
+.wrap{padding:18px;display:flex;flex-direction:column;gap:14px;}
+
+/* Header */
+.pg-hdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.pg-hdr h1{font-size:20px;font-weight:700;}
+.pg-hdr h1 span{color:var(--yellow);}
+.pg-hdr p{font-size:12px;color:var(--muted);margin-top:2px;}
+.demo-badge{background:var(--yellow);color:#000;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;}
+
+/* Controls */
+.ctrl{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;}
+.cg{display:flex;flex-direction:column;gap:4px;}
+.cg label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.ci{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:13px;outline:none;}
+.ci:focus{border-color:var(--gl);}
+select.ci option{background:var(--card2);}
+
+/* Tabs */
+.tab-bar{display:flex;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content;}
+.tab{padding:9px 20px;font-size:13px;cursor:pointer;color:var(--muted);transition:all .18s;font-weight:500;white-space:nowrap;user-select:none;}
+.tab.on{background:var(--green);color:#fff;}
+.tab:hover:not(.on){background:var(--card2);color:var(--text);}
+
+/* Body layout */
+.cols{display:flex;gap:14px;align-items:flex-start;}
+.left{width:178px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;}
+.right{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;}
+
+/* Slot card */
+.sl{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;user-select:none;}
+.sl:hover{border-color:rgba(36,160,90,.4);}
+.sl.on{border-color:var(--gl);background:rgba(36,160,90,.07);}
+.sl.on::after{content:'';position:absolute;right:0;top:10%;bottom:10%;width:3px;background:var(--gl);border-radius:2px 0 0 2px;}
+.sl-top{display:flex;align-items:center;gap:6px;}
+.sl-ico{font-size:14px;}
+.sl-lbl{font-size:13px;font-weight:600;flex:1;}
+.sl-cnt{font-size:10px;padding:1px 6px;border-radius:20px;background:var(--card2);border:1px solid var(--border);color:var(--muted);flex-shrink:0;}
+.sl-cnt.has{background:rgba(36,160,90,.1);border-color:rgba(36,160,90,.3);color:var(--gl);}
+.sl-time{font-size:10px;color:var(--muted);margin-top:3px;}
+
+/* Section */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.shdr{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.shdr h3{font-size:14px;font-weight:600;}
+.sbdy{padding:14px 16px;}
+
+/* Records table */
+.rt{width:100%;border-collapse:collapse;}
+.rt th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.rt td{padding:8px 10px;font-size:13px;border-bottom:1px solid rgba(42,61,85,.35);vertical-align:middle;}
+.rt tr:last-child td{border-bottom:none;}
+.rt tr:hover td{background:rgba(30,45,66,.5);}
+.pp{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:700;}
+.pp-p{background:rgba(34,197,94,.14);color:#4ADE80;}
+.pp-n{background:rgba(239,68,68,.14);color:#FCA5A5;}
+.ib{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;margin-left:2px;}
+.ib:hover{background:var(--card2);}
+.ib.ed:hover{border-color:var(--yellow);color:var(--yellow);}
+.ib.dl:hover{border-color:var(--neg);color:var(--neg);}
+.empty-st{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px;}
+
+/* Student grid */
+.stu-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;flex-wrap:wrap;gap:8px;}
+.stu-sel-info{font-size:12px;color:var(--muted);}
+.stu-sel-info b{color:var(--text);}
+.mini-btns{display:flex;gap:5px;}
+.mini-btn{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .15s;}
+.mini-btn:hover{background:var(--card2);color:var(--text);}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:6px;}
+.sc{border:1px solid var(--border);border-radius:8px;padding:8px 9px;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:7px;user-select:none;}
+.sc:hover:not(.blk){background:var(--card2);}
+.sc.sel{border-color:var(--gl);background:rgba(36,160,90,.09);}
+.sc.blk{opacity:.42;cursor:not-allowed;border-color:rgba(239,68,68,.25);}
+.sc-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.sc-inf{flex:1;min-width:0;}
+.sc-n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-p{font-size:10px;color:var(--muted);margin-top:1px;}
+.sc-ck{font-size:12px;color:var(--gl);width:14px;text-align:center;flex-shrink:0;}
+
+/* Behavior */
+.beh-sec{margin-top:14px;}
+.beh-cat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+.beh-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px;}
+.bb{padding:7px 11px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all .12s;display:flex;align-items:center;gap:5px;user-select:none;}
+.bb.pos{background:rgba(34,197,94,.07);border-color:rgba(34,197,94,.2);color:#86EFAC;}
+.bb.pos:hover{background:rgba(34,197,94,.14);}
+.bb.pos.sel{background:var(--pos);color:#fff;border-color:var(--pos);}
+.bb.neg{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.2);color:#FCA5A5;}
+.bb.neg:hover{background:rgba(239,68,68,.14);}
+.bb.neg.sel{background:var(--neg);color:#fff;border-color:var(--neg);}
+.bpts{font-size:11px;padding:1px 5px;border-radius:4px;background:rgba(0,0,0,.2);}
+
+/* Alert */
+.alrt{border-radius:8px;padding:9px 13px;font-size:12px;margin-top:10px;display:none;}
+.alrt.show{display:block;}
+.alrt-w{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#FCA5A5;}
+.alrt-g{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);color:#86EFAC;}
+
+/* Submit row */
+.sub-row{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:13px;}
+.note-in{flex:1;min-width:170px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;}
+.note-in:focus{border-color:var(--gl);}
+.btn{padding:9px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid;transition:all .14s;}
+.btn:active{transform:scale(.97);}
+.btn-g{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-g:hover:not(:disabled){background:var(--gl);}
+.btn-g:disabled{opacity:.38;cursor:not-allowed;}
+.btn-o{background:transparent;color:var(--muted);border-color:var(--border);}
+.btn-o:hover{background:var(--card2);color:var(--text);}
+.btn-r{background:rgba(239,68,68,.1);color:#EF4444;border-color:rgba(239,68,68,.3);}
+.btn-r:hover{background:rgba(239,68,68,.2);}
+
+/* Overview */
+.ov-wrap{overflow-x:auto;}
+.ov-t{width:100%;border-collapse:collapse;min-width:820px;}
+.ov-t th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;padding:8px;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;}
+.ov-t th:first-child{text-align:left;min-width:130px;}
+.ov-t td{padding:7px 7px;font-size:13px;border-bottom:1px solid rgba(42,61,85,.28);text-align:center;}
+.ov-t td:first-child{text-align:left;}
+.ov-t tr:last-child td{border-bottom:none;}
+.ov-t tr:hover td{background:rgba(30,45,66,.45);}
+.cv{display:inline-block;min-width:28px;padding:2px 6px;border-radius:5px;font-weight:600;font-size:12px;}
+.cv-p{color:#4ADE80;}
+.cv-n{color:#FCA5A5;}
+.cv-0{color:var(--muted);}
+.cv-cap{color:var(--yellow);background:rgba(245,197,24,.1);}
+.ov-stu{display:flex;align-items:center;gap:7px;}
+.ov-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.ov-tot{font-weight:700;border-left:1px solid var(--border);}
+
+/* Audit */
+.at{width:100%;border-collapse:collapse;}
+.at th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.at td{padding:8px 10px;font-size:12px;border-bottom:1px solid rgba(42,61,85,.28);vertical-align:top;}
+.at tr:last-child td{border-bottom:none;}
+.at tr:hover td{background:rgba(30,45,66,.4);}
+.aa{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px;}
+.aa-c{background:rgba(34,197,94,.14);color:#4ADE80;}
+.aa-e{background:rgba(245,197,24,.14);color:var(--yellow);}
+.aa-d{background:rgba(239,68,68,.14);color:#FCA5A5;}
+.diff del{color:#FCA5A5;}
+.diff ins{color:#4ADE80;text-decoration:none;}
+
+/* Modal */
+.mb-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+.mb-bg.hide{display:none;}
+.mb-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.mh h3{font-size:15px;font-weight:700;}
+.mx{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:var(--card2);}
+.mf{margin-bottom:12px;}
+.mf label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+.mi{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;}
+.mi:focus{border-color:var(--gl);}
+select.mi option{background:var(--card2);}
+.m-info{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.9;margin-bottom:12px;}
+.m-info strong{color:var(--text);}
+.m-danger{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:#FCA5A5;margin-bottom:13px;}
+.m-btns{display:flex;gap:7px;justify-content:flex-end;margin-top:4px;}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 16px;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(0,0,0,.5);z-index:999;transform:translateY(60px);opacity:0;transition:all .24s;pointer-events:none;max-width:300px;}
+.toast.on{transform:none;opacity:1;}
+
+@media(max-width:860px){
+  .cols{flex-direction:column;}
+  .left{width:100%;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:2px;}
+  .sl{min-width:100px;flex-shrink:0;}
+  .sl-time{display:none;}
+}
+@media(max-width:580px){
+  .wrap{padding:10px;}
+  .sg{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="pg-hdr">
+    <div>
+      <h1>加減分 <span>D-04</span></h1>
+      <p>行為記錄 · 8 時段管理 · 每時段每人上限 ±10 分</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="demo-badge">DEMO</span>
+      <span style="font-size:12px;color:var(--muted);">👤 李老師</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="ctrl">
+    <div class="cg">
+      <label>日期</label>
+      <input type="date" class="ci" id="dateIn" value="2026-11-09">
+    </div>
+    <div class="cg">
+      <label>班別</label>
+      <select class="ci" id="classIn">
+        <option>中一 1A</option><option>中一 1B</option>
+        <option selected>中二 2A</option><option>中二 2B</option>
+        <option>中三 3A</option><option>中三 3B</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <div class="tab on" id="tab-pts" onclick="switchTab('pts')">⭐ 加減分</div>
+    <div class="tab" id="tab-ov"  onclick="switchTab('ov')">📊 整日總覽</div>
+    <div class="tab" id="tab-aud" onclick="switchTab('aud')">📜 審計日誌</div>
+  </div>
+
+  <!-- ── TAB: 加減分 ── -->
+  <div id="pane-pts">
+    <div class="cols">
+      <div class="left" id="slotCol"></div>
+      <div class="right">
+
+        <!-- Records for selected slot -->
+        <div class="sec">
+          <div class="shdr">
+            <h3 id="recTitle">← 請先選擇左側時段</h3>
+            <span id="recBadge" style="margin-left:auto;font-size:11px;color:var(--muted);"></span>
+          </div>
+          <div id="recBody"><div class="empty-st">選擇時段後顯示該節記錄</div></div>
+        </div>
+
+        <!-- Add record form -->
+        <div class="sec" id="formSec" style="display:none;">
+          <div class="shdr">
+            <h3>📝 新增記錄</h3>
+            <span id="formSlotLbl" style="font-size:12px;color:var(--muted);"></span>
+          </div>
+          <div class="sbdy">
+
+            <div class="stu-row">
+              <div class="stu-sel-info">學生：已選 <b id="selCnt">0</b> / 15</div>
+              <div class="mini-btns">
+                <button class="mini-btn" onclick="selAll()">全選</button>
+                <button class="mini-btn" onclick="deselAll()">取消全選</button>
+              </div>
+            </div>
+            <div class="sg" id="stuGrid"></div>
+
+            <div class="beh-sec">
+              <div class="beh-cat-lbl">✅ 正面行為</div>
+              <div class="beh-row" id="bPos"></div>
+              <div class="beh-cat-lbl">❌ 負面行為</div>
+              <div class="beh-row" id="bNeg"></div>
+            </div>
+
+            <div class="alrt alrt-w" id="formAlrt"></div>
+
+            <div class="sub-row">
+              <input type="text" class="note-in" id="noteIn" placeholder="備注（選填）…">
+              <button class="btn btn-o" onclick="resetForm()">清除</button>
+              <button class="btn btn-g" id="subBtn" onclick="submitRec()" disabled>✅ 確認記錄</button>
+            </div>
+            <div id="preview"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: 整日總覽 ── -->
+  <div id="pane-ov" style="display:none;">
+    <div class="sec">
+      <div class="shdr">
+        <h3>📊 整日總覽</h3>
+        <span style="font-size:12px;color:var(--muted);margin-left:8px;" id="ovDate"></span>
+        <span style="margin-left:auto;font-size:11px;color:var(--yellow);">🟡 已達 ±10 上限</span>
+      </div>
+      <div><div class="ov-wrap"><table class="ov-t" id="ovTbl"></table></div></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: 審計日誌 ── -->
+  <div id="pane-aud" style="display:none;">
+    <div class="sec">
+      <div class="shdr">
+        <h3>📜 審計日誌</h3>
+        <span id="audBadge" style="font-size:11px;color:var(--muted);background:var(--card2);border:1px solid var(--border);padding:2px 9px;border-radius:20px;margin-left:8px;">0 筆</span>
+      </div>
+      <div style="overflow-x:auto;" id="audBody"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Edit Modal ── -->
+<div class="mb-bg hide" id="editMod">
+  <div class="mb-box">
+    <div class="mh">
+      <h3>✏️ 編輯記錄</h3>
+      <button class="mx" onclick="closeMod('editMod')">✕</button>
+    </div>
+    <div class="m-info" id="editInfo"></div>
+    <div class="mf">
+      <label>行為項目</label>
+      <select class="mi" id="editBeh"></select>
+    </div>
+    <div class="mf">
+      <label>備注</label>
+      <input type="text" class="mi" id="editNote" placeholder="備注（選填）…">
+    </div>
+    <div style="font-size:12px;color:#FCA5A5;display:none;padding:6px 0;" id="editAlrt"></div>
+    <div class="m-btns">
+      <button class="btn btn-o" onclick="closeMod('editMod')">取消</button>
+      <button class="btn btn-g" onclick="confirmEdit()">儲存更改</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete Modal ── -->
+<div class="mb-bg hide" id="delMod">
+  <div class="mb-box">
+    <div class="mh">
+      <h3>🗑 確認刪除</h3>
+      <button class="mx" onclick="closeMod('delMod')">✕</button>
+    </div>
+    <div class="m-info" id="delInfo"></div>
+    <div class="m-danger">⚠️ 此操作將永久寫入審計日誌，記錄不可完全復原。</div>
+    <div class="m-btns">
+      <button class="btn btn-o" onclick="closeMod('delMod')">取消</button>
+      <button class="btn btn-r" onclick="confirmDel()">確認刪除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="tIco"></span><span id="tMsg"></span>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────
+const STUDENTS = [
+  {no:1,  id:'S001', n:'陳大文', bg:'rgba(27,110,60,.25)',  fc:'#4ADE80'},
+  {no:2,  id:'S002', n:'李美玲', bg:'rgba(59,130,246,.2)',  fc:'#93C5FD'},
+  {no:3,  id:'S003', n:'王志明', bg:'rgba(139,92,246,.2)',  fc:'#C4B5FD'},
+  {no:4,  id:'S004', n:'張美儀', bg:'rgba(245,197,24,.2)',  fc:'#FDE68A'},
+  {no:5,  id:'S005', n:'黃偉強', bg:'rgba(249,115,22,.2)',  fc:'#FDB987'},
+  {no:6,  id:'S006', n:'林曉彤', bg:'rgba(236,72,153,.2)',  fc:'#F9A8D4'},
+  {no:7,  id:'S007', n:'趙文龍', bg:'rgba(20,184,166,.2)',  fc:'#5EEAD4'},
+  {no:8,  id:'S008', n:'吳嘉怡', bg:'rgba(234,179,8,.2)',   fc:'#FDE047'},
+  {no:9,  id:'S009', n:'鄭志豪', bg:'rgba(239,68,68,.2)',   fc:'#FCA5A5'},
+  {no:10, id:'S010', n:'何雅詩', bg:'rgba(16,185,129,.2)',  fc:'#6EE7B7'},
+  {no:11, id:'S011', n:'蔡國輝', bg:'rgba(99,102,241,.2)',  fc:'#A5B4FC'},
+  {no:12, id:'S012', n:'梁心怡', bg:'rgba(245,158,11,.2)',  fc:'#FCD34D'},
+  {no:13, id:'S013', n:'許志遠', bg:'rgba(6,182,212,.2)',   fc:'#67E8F9'},
+  {no:14, id:'S014', n:'馮美琪', bg:'rgba(168,85,247,.2)',  fc:'#D8B4FE'},
+  {no:15, id:'S015', n:'盧家明', bg:'rgba(34,197,94,.2)',   fc:'#86EFAC'},
+];
+
+const SLOTS = [
+  {id:'T1', label:'早會',    icon:'🌅', time:'07:45–08:00'},
+  {id:'T2', label:'第 1 節', icon:'📖', time:'08:00–08:45'},
+  {id:'T3', label:'第 2 節', icon:'📖', time:'08:45–09:30'},
+  {id:'T4', label:'第 3 節', icon:'📖', time:'09:30–10:15'},
+  {id:'T5', label:'小息',    icon:'☕', time:'10:15–10:35'},
+  {id:'T6', label:'第 4 節', icon:'📖', time:'10:35–11:20'},
+  {id:'T7', label:'第 5 節', icon:'📖', time:'11:20–12:05'},
+  {id:'T8', label:'午休',    icon:'🍱', time:'12:05–13:00'},
+];
+
+const BEHS = [
+  {id:'B1',  cat:'pos', label:'積極參與課堂',     pts:+2, icon:'👏'},
+  {id:'B2',  cat:'pos', label:'主動協助同學',     pts:+3, icon:'🤝'},
+  {id:'B3',  cat:'pos', label:'表現優異',         pts:+5, icon:'🏆'},
+  {id:'B4',  cat:'pos', label:'準時交齊功課',     pts:+1, icon:'📝'},
+  {id:'B5',  cat:'pos', label:'保持課室整潔',     pts:+2, icon:'✨'},
+  {id:'B6',  cat:'neg', label:'課堂不專注',       pts:-2, icon:'😴'},
+  {id:'B7',  cat:'neg', label:'違反課室規則',     pts:-3, icon:'⚠️'},
+  {id:'B8',  cat:'neg', label:'欺凌不當行為',     pts:-5, icon:'🚫'},
+  {id:'B9',  cat:'neg', label:'沒有完成功課',     pts:-2, icon:'📋'},
+  {id:'B10', cat:'neg', label:'未經許可使用手機', pts:-3, icon:'📵'},
+];
+
+const CAP = 10;
+const TEACHER = '李老師';
+
+// ── State ─────────────────────────────────────────────────────────
+let curSlot = null;
+let selStu  = new Set();
+let selBeh  = null;
+let recs    = [];
+let logs    = [];
+let editId  = null;
+let delId   = null;
+let activeTab = 'pts';
+
+// ── Util ──────────────────────────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function nowStr() {
+  const d = new Date();
+  return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>n.toString().padStart(2,'0')).join(':');
+}
+function slotPts(sid, slotId) {
+  return recs
+    .filter(r => r.slotId === slotId && r.studentIds.includes(sid))
+    .reduce((s, r) => s + r.pts, 0);
+}
+function ps(p)  { return (p > 0 ? '+' : '') + p; }
+function gS(id) { return STUDENTS.find(s => s.id === id); }
+function gSl(id){ return SLOTS.find(s => s.id === id); }
+function gB(id) { return BEHS.find(b => b.id === id); }
+function gR(id) { return recs.find(r => r.id === id); }
+function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+// ── Tabs ──────────────────────────────────────────────────────────
+function switchTab(t) {
+  activeTab = t;
+  ['pts','ov','aud'].forEach(x => {
+    document.getElementById('pane-'+x).style.display = x===t ? '' : 'none';
+    document.getElementById('tab-'+x).classList.toggle('on', x===t);
+  });
+  if (t==='ov')  renderOv();
+  if (t==='aud') renderAud();
+}
+
+// ── Slot column ───────────────────────────────────────────────────
+function renderSlots() {
+  document.getElementById('slotCol').innerHTML = SLOTS.map(sl => {
+    const cnt = recs.filter(r => r.slotId === sl.id).length;
+    return `<div class="sl${curSlot===sl.id?' on':''}" onclick="pickSlot('${sl.id}')">
+      <div class="sl-top">
+        <span class="sl-ico">${sl.icon}</span>
+        <span class="sl-lbl">${sl.label}</span>
+        <span class="sl-cnt${cnt>0?' has':''}">${cnt}</span>
+      </div>
+      <div class="sl-time">${sl.time}</div>
+    </div>`;
+  }).join('');
+}
+
+function pickSlot(id) {
+  curSlot = id;
+  selStu.clear(); selBeh = null;
+  document.getElementById('noteIn').value = '';
+  renderSlots(); renderRecs(); renderForm();
+  document.getElementById('formSec').style.display = '';
+}
+
+// ── Records list ──────────────────────────────────────────────────
+function renderRecs() {
+  if (!curSlot) return;
+  const sl = gSl(curSlot);
+  document.getElementById('recTitle').textContent = sl.icon + ' ' + sl.label + ' — 本節記錄';
+  const sr = recs.filter(r => r.slotId === curSlot);
+  document.getElementById('recBadge').textContent = sr.length + ' 筆';
+  const body = document.getElementById('recBody');
+  if (!sr.length) { body.innerHTML = '<div class="empty-st">本時段暫無記錄</div>'; return; }
+  body.innerHTML = `<div style="overflow-x:auto;"><table class="rt">
+    <thead><tr>
+      <th>時間</th><th>學生</th><th>行為項目</th><th>分數</th><th>備注</th>
+      <th style="text-align:right">操作</th>
+    </tr></thead>
+    <tbody>${sr.map(r => {
+      const b = gB(r.behId);
+      const names = r.studentIds.map(id => gS(id)?.n || id).join('、');
+      return `<tr>
+        <td style="color:var(--muted);white-space:nowrap">${r.time}</td>
+        <td>${names}</td>
+        <td>${b ? b.icon+' '+b.label : '—'}</td>
+        <td><span class="pp ${r.pts>0?'pp-p':'pp-n'}">${ps(r.pts)}</span></td>
+        <td style="color:var(--muted)">${r.note || '—'}</td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="ib ed" onclick="openEdit('${r.id}')" title="編輯">✏️</button>
+          <button class="ib dl" onclick="openDel('${r.id}')"  title="刪除">🗑</button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── Form ──────────────────────────────────────────────────────────
+function renderForm() {
+  if (!curSlot) return;
+  const sl = gSl(curSlot);
+  document.getElementById('formSlotLbl').textContent = '· ' + sl.icon + ' ' + sl.label;
+  renderStuGrid(); renderBehBtns(); updatePreview();
+}
+
+function renderStuGrid() {
+  const bp = selBeh ? (gB(selBeh)?.pts || 0) : 0;
+  document.getElementById('selCnt').textContent = selStu.size;
+  document.getElementById('stuGrid').innerHTML = STUDENTS.map(s => {
+    const cur   = curSlot ? slotPts(s.id, curSlot) : 0;
+    const after = cur + bp;
+    const isSel = selStu.has(s.id);
+    const isBlk = selBeh !== null && (after > CAP || after < -CAP);
+
+    let ptsHtml;
+    if (selBeh !== null) {
+      const cC = cur>0?'color:#4ADE80':cur<0?'color:#FCA5A5':'color:var(--muted)';
+      const aC = isBlk ? 'color:#F59E0B' : after>0?'color:#4ADE80':after<0?'color:#FCA5A5':'color:var(--muted)';
+      ptsHtml = `<span style="${cC}">${ps(cur)}</span> → <span style="${aC}">${ps(after)}${isBlk?' ⚠':''}</span>`;
+    } else {
+      const cC = cur>0?'color:#4ADE80':cur<0?'color:#FCA5A5':'color:var(--muted)';
+      ptsHtml = `<span style="${cC}">${ps(cur)}</span>`;
+    }
+
+    return `<div class="sc${isSel?' sel':''}${isBlk?' blk':''}"
+        onclick="togStu('${s.id}',${isBlk})">
+      <div class="sc-av" style="background:${s.bg};color:${s.fc};">${s.n[0]}</div>
+      <div class="sc-inf">
+        <div class="sc-n">${s.n}</div>
+        <div class="sc-p">${ptsHtml}</div>
+      </div>
+      <div class="sc-ck">${isSel ? '✓' : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderBehBtns() {
+  ['pos','neg'].forEach(cat => {
+    document.getElementById(cat==='pos'?'bPos':'bNeg').innerHTML =
+      BEHS.filter(b => b.cat === cat).map(b =>
+        `<button class="bb ${b.cat}${selBeh===b.id?' sel':''}" onclick="togBeh('${b.id}')">
+          ${b.icon} ${b.label} <span class="bpts">${ps(b.pts)}</span>
+        </button>`
+      ).join('');
+  });
+}
+
+function updatePreview() {
+  const alrt = document.getElementById('formAlrt');
+  const prev = document.getElementById('preview');
+  const sbtn = document.getElementById('subBtn');
+  if (!selStu.size || !selBeh) {
+    alrt.classList.remove('show'); prev.innerHTML = ''; sbtn.disabled = true; return;
+  }
+  const beh     = gB(selBeh);
+  const blocked  = [...selStu].filter(sid => { const a = slotPts(sid,curSlot)+beh.pts; return a>CAP||a<-CAP; });
+  const eligible = [...selStu].filter(sid => { const a = slotPts(sid,curSlot)+beh.pts; return a<=CAP&&a>=-CAP; });
+
+  if (blocked.length) {
+    alrt.classList.add('show');
+    alrt.textContent = '⛔ ' + blocked.map(id=>gS(id)?.n).join('、') +
+      ' 操作後將超出 ±'+CAP+' 分上限，提交時自動略過。';
+  } else { alrt.classList.remove('show'); }
+
+  if (!eligible.length) {
+    sbtn.disabled = true;
+    prev.innerHTML = '<div class="alrt alrt-w show" style="margin-top:8px">所有選中學生均超出本時段上限，無法提交。</div>';
+    return;
+  }
+  sbtn.disabled = false;
+  prev.innerHTML = `<div class="alrt alrt-g show" style="margin-top:8px">
+    將為 <strong>${eligible.map(id=>gS(id)?.n).join('、')}</strong>
+    記錄 <strong>${beh.icon} ${beh.label} (${ps(beh.pts)} 分)</strong>
+    ${blocked.length ? '· ' + blocked.length + ' 人超限略過' : ''}
+  </div>`;
+}
+
+// ── Student / Behavior interactions ──────────────────────────────
+function togStu(id, blk) {
+  if (blk) { toast('⛔', gS(id)?.n + ' 操作後將超出 ±'+CAP+' 分上限'); return; }
+  selStu.has(id) ? selStu.delete(id) : selStu.add(id);
+  renderStuGrid(); updatePreview();
+}
+function togBeh(id) {
+  selBeh = selBeh === id ? null : id;
+  renderStuGrid(); renderBehBtns(); updatePreview();
+}
+function selAll() {
+  const bp = selBeh ? (gB(selBeh)?.pts || 0) : 0;
+  STUDENTS.forEach(s => {
+    const after = slotPts(s.id, curSlot) + bp;
+    if (!selBeh || (after <= CAP && after >= -CAP)) selStu.add(s.id);
+  });
+  renderStuGrid(); updatePreview();
+}
+function deselAll() { selStu.clear(); renderStuGrid(); updatePreview(); }
+function resetForm() {
+  selStu.clear(); selBeh = null;
+  document.getElementById('noteIn').value = '';
+  renderForm();
+}
+
+// ── Submit ────────────────────────────────────────────────────────
+function submitRec() {
+  if (!curSlot || !selBeh || !selStu.size) return;
+  const beh = gB(selBeh);
+  const eligible = [...selStu].filter(sid => {
+    const a = slotPts(sid, curSlot) + beh.pts;
+    return a <= CAP && a >= -CAP;
+  });
+  if (!eligible.length) { toast('⛔','所有學生均已達本時段上限'); return; }
+
+  const note = document.getElementById('noteIn').value.trim();
+  const rec  = {
+    id: uid(), slotId: curSlot, studentIds: eligible,
+    behId: selBeh, pts: beh.pts, note,
+    time: nowStr(), createdBy: TEACHER, createdAt: new Date().toISOString(),
+  };
+  recs.push(rec);
+  addLog('CREATE', rec, null, clone(rec));
+
+  const skip = selStu.size - eligible.length;
+  selStu.clear(); selBeh = null;
+  document.getElementById('noteIn').value = '';
+
+  renderSlots(); renderRecs(); renderForm();
+  toast('✅', `已記錄 ${ps(beh.pts)} 分 · ${eligible.length} 位學生${skip?' ('+skip+'人略過)':''}`);
+}
+
+// ── Edit ──────────────────────────────────────────────────────────
+function openEdit(id) {
+  editId = id;
+  const rec = gR(id); if (!rec) return;
+  const sl = gSl(rec.slotId), beh = gB(rec.behId);
+  const names = rec.studentIds.map(id => gS(id)?.n).join('、');
+  document.getElementById('editInfo').innerHTML =
+    `時段：<strong>${sl?.label}</strong> &nbsp; 記錄時間：<strong>${rec.time}</strong><br>
+     學生：<strong>${names}</strong><br>
+     目前行為：<strong>${beh?.icon} ${beh?.label} (${ps(rec.pts)} 分)</strong>`;
+  document.getElementById('editBeh').innerHTML =
+    BEHS.map(b => `<option value="${b.id}"${b.id===rec.behId?' selected':''}>${b.icon} ${b.label} (${ps(b.pts)})</option>`).join('');
+  document.getElementById('editNote').value = rec.note || '';
+  document.getElementById('editAlrt').style.display = 'none';
+  document.getElementById('editMod').classList.remove('hide');
+}
+
+function confirmEdit() {
+  const rec    = gR(editId); if (!rec) return;
+  const newBId = document.getElementById('editBeh').value;
+  const newNote= document.getElementById('editNote').value.trim();
+  const newBeh = gB(newBId);
+
+  if (newBId !== rec.behId) {
+    const blk = rec.studentIds.filter(sid => {
+      const without = slotPts(sid, rec.slotId) - rec.pts;
+      const after   = without + newBeh.pts;
+      return after > CAP || after < -CAP;
+    });
+    if (blk.length) {
+      const ea = document.getElementById('editAlrt');
+      ea.textContent = '⛔ ' + blk.map(id=>gS(id)?.n).join('、') + ' 更改後將超出 ±'+CAP+' 分上限，無法儲存。';
+      ea.style.display = '';
+      return;
+    }
+  }
+
+  const before = clone(rec);
+  rec.behId    = newBId;
+  rec.pts      = newBeh.pts;
+  rec.note     = newNote;
+  rec.editedAt = new Date().toISOString();
+  rec.editedBy = TEACHER;
+
+  addLog('EDIT', rec, before, clone(rec));
+  closeMod('editMod');
+  renderSlots(); renderRecs();
+  if (activeTab === 'ov') renderOv();
+  toast('✏️','記錄已更新並寫入審計日誌');
+}
+
+// ── Delete ────────────────────────────────────────────────────────
+function openDel(id) {
+  delId = id;
+  const rec = gR(id); if (!rec) return;
+  const sl = gSl(rec.slotId), beh = gB(rec.behId);
+  const names = rec.studentIds.map(id => gS(id)?.n).join('、');
+  document.getElementById('delInfo').innerHTML =
+    `時段：<strong>${sl?.label}</strong> &nbsp; 記錄時間：<strong>${rec.time}</strong><br>
+     學生：<strong>${names}</strong><br>
+     行為：<strong>${beh?.icon} ${beh?.label} (${ps(rec.pts)} 分)</strong><br>
+     備注：${rec.note || '無'}`;
+  document.getElementById('delMod').classList.remove('hide');
+}
+
+function confirmDel() {
+  const rec = gR(delId); if (!rec) return;
+  addLog('DELETE', rec, clone(rec), null);
+  recs = recs.filter(r => r.id !== delId);
+  closeMod('delMod');
+  renderSlots(); renderRecs(); renderForm();
+  if (activeTab === 'ov') renderOv();
+  toast('🗑','記錄已刪除並寫入審計日誌');
+}
+
+// ── Audit log ─────────────────────────────────────────────────────
+function addLog(action, rec, before, after) {
+  const sl    = gSl(rec.slotId);
+  const beh   = gB(rec.behId);
+  const names = rec.studentIds.map(id => gS(id)?.n).join('、');
+
+  let changes = null;
+  if (action === 'EDIT' && before && after) {
+    changes = {};
+    if (before.behId !== after.behId) {
+      const ob = gB(before.behId), nb = gB(after.behId);
+      changes.beh = { f: ob?.label+' ('+ps(before.pts)+')', t: nb?.label+' ('+ps(after.pts)+')' };
+    }
+    if (before.note !== after.note) {
+      changes.note = { f: before.note||'（空）', t: after.note||'（空）' };
+    }
+  }
+
+  const displayPts = (action==='EDIT' && changes?.beh) ? after.pts : rec.pts;
+  logs.unshift({
+    id: uid(), action, recordId: rec.id,
+    ts: nowStr(), op: TEACHER,
+    slotLbl: sl?.label || '?',
+    names, behLbl: beh?.label || '?',
+    pts: displayPts, note: rec.note,
+    changes, before, after,
+  });
+}
+
+function renderAud() {
+  const cnt = logs.length;
+  document.getElementById('audBadge').textContent = cnt + ' 筆';
+  const body = document.getElementById('audBody');
+  if (!cnt) { body.innerHTML = '<div class="empty-st" style="padding:30px">暫無審計日誌</div>'; return; }
+  body.innerHTML = `<table class="at">
+    <thead><tr>
+      <th>時間</th><th>動作</th><th>操作者</th><th>時段</th><th>學生</th>
+      <th>行為 / 變更</th><th>分數</th><th>備注 / 變更</th><th>記錄 ID</th>
+    </tr></thead>
+    <tbody>${logs.map(l => {
+      const ab = {
+        CREATE: '<span class="aa aa-c">新增</span>',
+        EDIT:   '<span class="aa aa-e">編輯</span>',
+        DELETE: '<span class="aa aa-d">刪除</span>',
+      }[l.action];
+      let behCell  = l.behLbl;
+      let noteCell = l.note || '—';
+      if (l.changes?.beh)  behCell  = `<span class="diff"><del>${l.changes.beh.f}</del><br><ins>→ ${l.changes.beh.t}</ins></span>`;
+      if (l.changes?.note) noteCell = `<span class="diff"><del>${l.changes.note.f}</del><br><ins>→ ${l.changes.note.t}</ins></span>`;
+      return `<tr>
+        <td style="white-space:nowrap;color:var(--muted)">${l.ts}</td>
+        <td>${ab}</td>
+        <td>${l.op}</td>
+        <td style="white-space:nowrap">${l.slotLbl}</td>
+        <td>${l.names}</td>
+        <td>${behCell}</td>
+        <td><span class="pp ${l.pts>0?'pp-p':'pp-n'}">${ps(l.pts)}</span></td>
+        <td style="font-size:11px">${noteCell}</td>
+        <td style="font-size:10px;color:var(--muted);font-family:monospace">${l.recordId.slice(0,8)}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+// ── Overview ──────────────────────────────────────────────────────
+function renderOv() {
+  document.getElementById('ovDate').textContent = document.getElementById('dateIn').value;
+  const thead = `<thead><tr>
+    <th>學生</th>
+    ${SLOTS.map(sl => `<th>${sl.icon}<br>${sl.label}</th>`).join('')}
+    <th class="ov-tot">合計</th>
+  </tr></thead>`;
+
+  const rows = STUDENTS.map(s => {
+    const pts = SLOTS.map(sl => slotPts(s.id, sl.id));
+    const tot = pts.reduce((a,b) => a+b, 0);
+    return `<tr>
+      <td><div class="ov-stu">
+        <div class="ov-av" style="background:${s.bg};color:${s.fc};">${s.n[0]}</div>${s.n}
+      </div></td>
+      ${pts.map(p => {
+        const cap = Math.abs(p) >= CAP;
+        return `<td><span class="cv ${p>0?'cv-p':p<0?'cv-n':'cv-0'}${cap?' cv-cap':''}">${p===0?'—':ps(p)}</span></td>`;
+      }).join('')}
+      <td class="ov-tot"><span class="cv ${tot>0?'cv-p':tot<0?'cv-n':'cv-0'}">${ps(tot)}</span></td>
+    </tr>`;
+  }).join('');
+
+  const totals = SLOTS.map(sl => STUDENTS.reduce((s,st) => s + slotPts(st.id, sl.id), 0));
+  const grand  = totals.reduce((a,b) => a+b, 0);
+  const sumRow = `<tr style="border-top:2px solid var(--border);">
+    <td style="color:var(--muted);font-size:12px">全班小計</td>
+    ${totals.map(t => `<td><span class="cv ${t>0?'cv-p':t<0?'cv-n':'cv-0'}">${t===0?'—':ps(t)}</span></td>`).join('')}
+    <td class="ov-tot"><span class="cv ${grand>0?'cv-p':grand<0?'cv-n':'cv-0'}">${ps(grand)}</span></td>
+  </tr>`;
+
+  document.getElementById('ovTbl').innerHTML = thead + '<tbody>' + rows + sumRow + '</tbody>';
+}
+
+// ── Modal / Toast ─────────────────────────────────────────────────
+function closeMod(id) {
+  document.getElementById(id).classList.add('hide');
+  editId = null; delId = null;
+}
+function toast(ico, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('tIco').textContent = ico;
+  document.getElementById('tMsg').textContent = msg;
+  t.classList.add('on'); clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('on'), 3200);
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+renderSlots();
+</script>
+</body>
+</html>
