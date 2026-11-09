@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>陳南昌紀念學校 · 教師系統</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1B6E3C;--green-light:#24A05A;--yellow:#F5C518;
+  --dark:#0D1B2A;--card:#162032;--card2:#1E2D42;
+  --border:#2A3D55;--text:#E8EDF3;--muted:#7A90A8;
+  --red:#EF4444;--blue:#3B82F6;--purple:#8B5CF6;
+}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dark);color:var(--text);display:flex;min-height:100vh;}
+
+/* Sidebar */
+.sidebar{width:240px;min-height:100vh;background:linear-gradient(180deg,#0A1520,#0F1E30);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;}
+.sidebar-logo{padding:18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.logo-badge{width:40px;height:40px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--yellow);font-size:15px;flex-shrink:0;}
+.logo-text h2{font-size:10.5px;color:var(--yellow);font-weight:700;letter-spacing:.4px;}
+.logo-text p{font-size:9px;color:var(--muted);margin-top:2px;}
+.nav-section{padding:10px 8px;}
+.nav-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:4px 12px 8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s;margin-bottom:2px;}
+.nav-item:hover{background:var(--card2);color:var(--text);}
+.nav-item.active{background:var(--green);color:#fff;}
+.nav-item.active .ni{color:var(--yellow);}
+.ni{font-size:16px;width:20px;text-align:center;}
+.sidebar-foot{padding:14px;border-top:1px solid var(--border);margin-top:auto;}
+
+/* Main */
+.main{margin-left:240px;flex:1;padding:24px;min-height:100vh;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.topbar h1{font-size:20px;font-weight:700;}
+.topbar h1 span{color:var(--yellow);}
+.badge-demo{background:var(--yellow);color:#000;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;}
+
+/* Group tabs */
+.gtabs{display:flex;gap:6px;background:var(--card);padding:4px;border-radius:10px;width:fit-content;margin-bottom:20px;}
+.gtab{padding:7px 18px;border-radius:7px;font-size:13px;cursor:pointer;color:var(--muted);transition:all .2s;font-weight:500;}
+.gtab.active{background:var(--green);color:#fff;}
+
+/* Grid */
+.sgrid{display:grid;grid-template-columns:270px 1fr;gap:18px;}
+
+/* Student list */
+.slist{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.phead{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.phead h3{font-size:14px;font-weight:600;}
+.sbox{padding:8px 12px;border-bottom:1px solid var(--border);}
+.sbox input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;}
+.sbox input::placeholder{color:var(--muted);}
+.sitem{display:flex;align-items:center;gap:11px;padding:11px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(42,61,85,.5);}
+.sitem:hover{background:var(--card2);}
+.sitem.active{background:rgba(27,110,60,.2);border-left:3px solid var(--green);}
+.av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
+.si h4{font-size:13px;font-weight:600;}
+.si p{font-size:11px;color:var(--muted);margin-top:2px;}
+.sdot{width:8px;height:8px;border-radius:50%;margin-left:auto;flex-shrink:0;}
+
+/* Profile */
+.ppanel{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.pphdr{background:linear-gradient(135deg,var(--green),#0F4A28);padding:22px;display:flex;align-items:center;gap:18px;position:relative;overflow:hidden;}
+.pphdr::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(245,197,24,.1);}
+.ppav{width:70px;height:70px;border-radius:50%;border:3px solid var(--yellow);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;background:rgba(0,0,0,.3);flex-shrink:0;}
+.pptitle h2{font-size:21px;font-weight:700;}
+.pptitle h3{font-size:13px;color:rgba(255,255,255,.65);margin-top:3px;}
+.ppbadges{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap;}
+.bdg{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.bc{background:var(--yellow);color:#000;}
+.bi{background:rgba(255,255,255,.15);color:#fff;}
+.by{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);}
+.bs{background:rgba(239,68,68,.2);color:#FCA5A5;border:1px solid rgba(239,68,68,.4);}
+.bo{background:rgba(34,197,94,.2);color:#86EFAC;border:1px solid rgba(34,197,94,.3);}
+
+/* Profile tabs */
+.ptabs{display:flex;border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto;}
+.ptab{padding:13px 15px;font-size:13px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
+.ptab.active{color:var(--yellow);border-bottom-color:var(--yellow);}
+.ptab:hover{color:var(--text);}
+
+/* Tab content */
+.tc{padding:22px;display:none;}
+.tc.active{display:block;}
+
+/* Info grid */
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px;}
+.ic{background:var(--card2);border-radius:10px;padding:13px;border:1px solid var(--border);}
+.ic label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.ic p{font-size:14px;font-weight:500;}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.stitle{font-size:13px;font-weight:600;color:var(--yellow);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.ccard{background:var(--card2);border-radius:10px;padding:15px;border:1px solid var(--border);}
+.crow{display:flex;justify-content:space-between;margin-bottom:9px;font-size:13px;}
+.crow:last-child{margin:0;}
+.crow label{color:var(--muted);}
+.crow span{font-weight:500;}
+
+/* Chart */
+.chart-area{display:flex;align-items:center;gap:22px;}
+.cwrap{width:230px;height:230px;flex-shrink:0;}
+.slist2{flex:1;}
+.srow{display:flex;align-items:center;margin-bottom:9px;gap:9px;}
+.sname{width:55px;font-size:12px;color:var(--muted);}
+.sbwrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.sbar{height:100%;border-radius:3px;transition:width .5s ease;}
+.sscore{width:32px;text-align:right;font-size:13px;font-weight:600;}
+
+/* Timeline */
+.tl{position:relative;padding-left:22px;}
+.tl::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--border);}
+.tli{position:relative;margin-bottom:18px;}
+.tldot{position:absolute;left:-18px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--card);}
+.tldate{font-size:11px;color:var(--muted);margin-bottom:3px;}
+.tlcard{background:var(--card2);border-radius:8px;padding:11px;border:1px solid var(--border);}
+.tlcard h4{font-size:13px;font-weight:600;margin-bottom:3px;}
+.tlcard p{font-size:12px;color:var(--muted);}
+
+/* Health */
+.hrow{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;}
+.hcard{background:var(--card2);border-radius:10px;padding:13px;border:1px solid var(--border);}
+.hcard label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:7px;}
+.tag{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;margin:2px;}
+.tr{background:rgba(239,68,68,.15);color:#FCA5A5;border:1px solid rgba(239,68,68,.3);}
+.tb{background:rgba(59,130,246,.15);color:#93C5FD;border:1px solid rgba(59,130,246,.3);}
+.tg{background:rgba(34,197,94,.15);color:#86EFAC;border:1px solid rgba(34,197,94,.3);}
+.tgr{background:rgba(148,163,184,.1);color:var(--muted);border:1px solid var(--border);}
+
+/* Risk */
+.rflag{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:13px;margin-bottom:11px;}
+.rflag h4{font-size:13px;color:#FCA5A5;margin-bottom:3px;}
+.rflag p{font-size:12px;color:var(--muted);}
+
+/* Shortcuts */
+.shorts{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:18px;}
+.sbtn{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;}
+.sbtn:hover{border-color:var(--green);background:rgba(27,110,60,.15);}
+.sbtn .ico{font-size:22px;margin-bottom:5px;}
+.sbtn p{font-size:12px;color:var(--muted);}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-badge">陳</div>
+    <div class="logo-text">
+      <h2>陳南昌紀念學校</h2>
+      <p>Chan Nam Cheong Memorial School</p>
+    </div>
+  </div>
+  <nav style="flex:1;overflow-y:auto;padding:8px;">
+    <div class="nav-section">
+      <div class="nav-label">主選單</div>
+      <div class="nav-item active"><span class="ni">👤</span>學生檔案</div>
+      <div class="nav-item"><span class="ni">📋</span>點名系統</div>
+      <div class="nav-item"><span class="ni">⭐</span>加減分</div>
+      <div class="nav-item"><span class="ni">📊</span>統計報告</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">管理</div>
+      <div class="nav-item"><span class="ni">⚙️</span>行為項目設定</div>
+      <div class="nav-item"><span class="ni">📁</span>匯入 / 匯出</div>
+      <div class="nav-item"><span class="ni">🔒</span>權限管理</div>
+    </div>
+  </nav>
+  <div class="sidebar-foot">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">李</div>
+      <div>
+        <p style="font-size:12px;font-weight:600;">李老師</p>
+        <p style="font-size:10px;color:var(--muted);">班主任 · 2A</p>
+      </div>
+      <div style="margin-left:auto;width:7px;height:7px;border-radius:50%;background:#22C55E;"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <h1>學生檔案 <span>D-01</span></h1>
+      <p style="font-size:12px;color:var(--muted);margin-top:3px;">香港青少年培育會陳南昌紀念學校</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="badge-demo">DEMO</span>
+      <div style="width:7px;height:7px;border-radius:50%;background:#F59E0B;"></div>
+      <span style="font-size:12px;color:var(--muted);">Supabase 待接駁</span>
+    </div>
+  </div>
+
+  <div class="gtabs">
+    <div class="gtab active">個人</div>
+    <div class="gtab">一班 (2A)</div>
+    <div class="gtab">一級 (中二)</div>
+  </div>
+
+  <div class="sgrid">
+
+    <!-- Student List -->
+    <div class="slist">
+      <div class="phead">
+        <h3>學生名單</h3>
+        <span style="font-size:11px;color:var(--muted);">4 位學生</span>
+      </div>
+      <div class="sbox">
+        <input type="text" placeholder="搜尋姓名或編號…" />
+      </div>
+      <div class="sitem active" onclick="showStudent(0)">
+        <div class="av" style="background:rgba(27,110,60,.3);color:#4ADE80;">陳</div>
+        <div class="si"><h4>陳大文</h4><p>Chan Tai Man · 2A · #2024001</p></div>
+        <div class="sdot" style="background:#22C55E;"></div>
+      </div>
+      <div class="sitem" onclick="showStudent(1)">
+        <div class="av" style="background:rgba(59,130,246,.2);color:#93C5FD;">李</div>
+        <div class="si"><h4>李美玲</h4><p>Lee Mei Ling · 2A · #2024002</p></div>
+        <div class="sdot" style="background:#F59E0B;"></div>
+      </div>
+      <div class="sitem" onclick="showStudent(2)">
+        <div class="av" style="background:rgba(139,92,246,.2);color:#C4B5FD;">王</div>
+        <div class="si"><h4>王志明</h4><p>Wong Chi Ming · 3B · #2023015</p></div>
+        <div class="sdot" style="background:#EF4444;"></div>
+      </div>
+      <div class="sitem" onclick="showStudent(3)">
+        <div class="av" style="background:rgba(245,197,24,.2);color:#FDE68A;">張</div>
+        <div class="si"><h4>張美儀</h4><p>Cheung Mei Yi · 1C · #2025003</p></div>
+        <div class="sdot" style="background:#22C55E;"></div>
+      </div>
+    </div>
+
+    <!-- Profile Panel -->
+    <div class="ppanel">
+      <div class="pphdr">
+        <div class="ppav" id="ppav">陳</div>
+        <div class="pptitle">
+          <h2 id="ppname">陳大文</h2>
+          <h3 id="ppnamen">Chan Tai Man</h3>
+          <div class="ppbadges" id="ppbadges">
+            <span class="bdg bc">2A</span>
+            <span class="bdg bi">#2024001</span>
+            <span class="bdg by">2024 入學</span>
+            <span class="bdg bo">✓ 正常跟進</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ptabs">
+        <div class="ptab active" onclick="showTab('basic')">基本資料</div>
+        <div class="ptab" onclick="showTab('academic')">學術表現</div>
+        <div class="ptab" onclick="showTab('health')">健康 / SEN</div>
+        <div class="ptab" onclick="showTab('timeline')">時間軸</div>
+        <div class="ptab" onclick="showTab('risk')">跟進 / 風險</div>
+      </div>
+
+      <!-- Tab: Basic -->
+      <div class="tc active" id="tab-basic">
+        <div class="igrid">
+          <div class="ic"><label>學生編號</label><p id="i-id">#2024001</p></div>
+          <div class="ic"><label>班級</label><p id="i-class">中二 2A</p></div>
+          <div class="ic"><label>入學年份</label><p id="i-year">2024</p></div>
+          <div class="ic"><label>性別</label><p id="i-gender">男</p></div>
+          <div class="ic"><label>出生日期</label><p id="i-dob">2011-03-15</p></div>
+          <div class="ic"><label>年齡</label><p id="i-age">15 歲</p></div>
+        </div>
+        <div class="ic" style="margin-bottom:16px;">
+          <label>登記地址 🔒</label>
+          <p id="i-addr" style="font-size:13px;margin-top:2px;"></p>
+        </div>
+        <div class="twocol">
+          <div>
+            <div class="stitle">👨‍👩‍👦 家長 / 監護人</div>
+            <div class="ccard">
+              <div class="crow"><label>姓名</label><span id="i-parent"></span></div>
+              <div class="crow"><label>聯絡電話</label><span id="i-phone"></span></div>
+              <div class="crow"><label>緊急聯絡</label><span id="i-emg"></span></div>
+              <div class="crow"><label>同校兄弟姊妹</label><span id="i-sib"></span></div>
+            </div>
+          </div>
+          <div>
+            <div class="stitle">🏆 課外活動 / 職銜</div>
+            <div class="ccard" id="i-act"></div>
+          </div>
+        </div>
+        <div class="shorts">
+          <div class="sbtn"><div class="ico">📋</div><p>點名記錄</p></div>
+          <div class="sbtn"><div class="ico">⭐</div><p>加減分記錄</p></div>
+          <div class="sbtn"><div class="ico">📊</div><p>科目成績</p></div>
+        </div>
+      </div>
+
+      <!-- Tab: Academic -->
+      <div class="tc" id="tab-academic">
+        <div class="stitle">📊 科目綜合表現</div>
+        <div class="chart-area">
+          <div class="cwrap"><canvas id="radarChart"></canvas></div>
+          <div class="slist2" id="subjectList"></div>
+        </div>
+        <div style="margin-top:22px;">
+          <div class="stitle">📝 優缺點記錄</div>
+          <div id="swContent"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Health -->
+      <div class="tc" id="tab-health">
+        <div class="stitle">🏥 健康狀況</div>
+        <div class="hrow" id="healthCards"></div>
+      </div>
+
+      <!-- Tab: Timeline -->
+      <div class="tc" id="tab-timeline">
+        <div class="stitle">🕐 時間軸記錄</div>
+        <div class="tl" id="tlContent"></div>
+      </div>
+
+      <!-- Tab: Risk -->
+      <div class="tc" id="tab-risk">
+        <div class="stitle">⚠️ 跟進 / 風險標記</div>
+        <div id="riskContent"></div>
+        <div style="margin-top:20px;">
+          <div class="stitle">📎 文件附件</div>
+          <div id="docsContent"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const students = [
+  {
+    nameChi:'陳大文', nameEng:'Chan Tai Man', cls:'中二 2A', id:'#2024001', year:'2024',
+    gender:'男', dob:'2011-03-15', age:'15 歲',
+    addr:'九龍觀塘翠屏道1號翠屏邨翠樺樓8座301室',
+    parent:'陳志強（父）', phone:'9876 5432', emg:'同上', sib:'—',
+    actList:['班長','籃球隊','環保大使'], actCls:['tg','tb','tgr'],
+    avColor:'rgba(27,110,60,.3)', avText:'#4ADE80',
+    scores:[75,68,82,71,65,88],
+    strengths:['數學解題思維清晰','體育表現突出，具領袖潛質'],
+    weaknesses:['英文閱讀理解需加強','歷史科欠缺組織力'],
+    health:{cond:['—'],allergy:['—'],sen:'—',iep:'否'},
+    timeline:[
+      {date:'2026-11-05',color:'#22C55E',title:'出席記錄',detail:'全週出席，無遲到'},
+      {date:'2026-10-28',color:'#F5C518',title:'加分 +3',detail:'積極參與班會討論'},
+      {date:'2026-10-15',color:'#3B82F6',title:'老師備注',detail:'數學小測成績進步，值得鼓勵'},
+    ],
+    riskFlags:[], social:'—', followup:'無需特別跟進',
+    docs:['在學證明書 (2024).pdf','家長同意書.pdf'],
+    badge:{cls:'bo',txt:'✓ 正常跟進'}
+  },
+  {
+    nameChi:'李美玲', nameEng:'Lee Mei Ling', cls:'中二 2A', id:'#2024002', year:'2024',
+    gender:'女', dob:'2011-07-22', age:'15 歲',
+    addr:'新界沙田沙角邨沙角商場側101室',
+    parent:'李國強（父）', phone:'9123 4567', emg:'李太（母）9234 5678', sib:'李美華 (1A)',
+    actList:['學生會幹事','合唱團'], actCls:['tb','tg'],
+    avColor:'rgba(59,130,246,.2)', avText:'#93C5FD',
+    scores:[88,91,72,85,90,76],
+    strengths:['語文能力強，中英文均表現優秀','歷史科具深度分析能力'],
+    weaknesses:['數學計算粗心，需多練習'],
+    health:{cond:['花粉過敏'],allergy:['花粉'],sen:'讀寫障礙',iep:'是（進行中）'},
+    timeline:[
+      {date:'2026-11-03',color:'#8B5CF6',title:'SEN 跟進',detail:'已完成本學期 IEP 評估'},
+      {date:'2026-10-20',color:'#F59E0B',title:'遲到記錄',detail:'早上第一節遲到 10 分鐘'},
+      {date:'2026-10-01',color:'#F5C518',title:'加分 +5',detail:'代表學校參加作文比賽'},
+    ],
+    riskFlags:['SEN 學生，需額外支援'], social:'已轉介輔導主任', followup:'每月 IEP 跟進',
+    docs:['IEP 計劃書 2026.pdf','醫療證明（讀寫障礙）.pdf','家長同意書.pdf'],
+    badge:{cls:'bs',txt:'⚑ SEN 學生'}
+  },
+  {
+    nameChi:'王志明', nameEng:'Wong Chi Ming', cls:'中三 3B', id:'#2023015', year:'2023',
+    gender:'男', dob:'2010-11-08', age:'16 歲',
+    addr:'香港島灣仔軒尼詩道200號XX大廈5樓A室',
+    parent:'王大偉（父）', phone:'9567 8901', emg:'王太（母）9678 9012', sib:'—',
+    actList:['足球隊隊長','STEM 學會'], actCls:['tg','tb'],
+    avColor:'rgba(139,92,246,.2)', avText:'#C4B5FD',
+    scores:[62,55,90,88,58,92],
+    strengths:['數學及科學能力出眾','運動天份高，具領導力'],
+    weaknesses:['中英文科成績偏低','歷史科出席率不穩定','上課專注力不足'],
+    health:{cond:['哮喘'],allergy:['塵蟎'],sen:'專注力不足（ADHD）',iep:'是（進行中）'},
+    timeline:[
+      {date:'2026-11-04',color:'#EF4444',title:'缺席記錄',detail:'無故缺席，家長已聯絡'},
+      {date:'2026-10-30',color:'#EF4444',title:'扣分 -2',detail:'上課使用手機'},
+      {date:'2026-10-12',color:'#3B82F6',title:'社工跟進',detail:'家庭情況需持續關注'},
+    ],
+    riskFlags:['出席率偏低（本月 70%）','行為問題需關注'], social:'社工定期跟進中', followup:'每兩週社工面談',
+    docs:['哮喘醫療證明.pdf','ADHD 診斷報告.pdf','IEP 計劃書 2026.pdf'],
+    badge:{cls:'bs',txt:'⚑ 需重點跟進'}
+  },
+  {
+    nameChi:'張美儀', nameEng:'Cheung Mei Yi', cls:'中一 1C', id:'#2025003', year:'2025',
+    gender:'女', dob:'2012-05-30', age:'14 歲',
+    addr:'九龍深水埗南昌街123號XX邨XX樓201室',
+    parent:'張偉明（父）', phone:'9765 4321', emg:'張太（母）9876 5432', sib:'—',
+    actList:['班副班長','圖書館大使','管樂團'], actCls:['tg','tgr','tb'],
+    avColor:'rgba(245,197,24,.2)', avText:'#FDE68A',
+    scores:[95,87,79,83,88,80],
+    strengths:['中文語文能力極佳，屢獲老師表揚','學習態度積極，各科均衡發展'],
+    weaknesses:['數學應用題技巧需加強'],
+    health:{cond:['1型糖尿病'],allergy:['—'],sen:'—',iep:'否'},
+    timeline:[
+      {date:'2026-11-06',color:'#F5C518',title:'加分 +4',detail:'中文作文獲全級最高分'},
+      {date:'2026-10-25',color:'#22C55E',title:'出席記錄',detail:'本月全勤'},
+      {date:'2026-10-10',color:'#3B82F6',title:'健康備注',detail:'糖尿病需定時監測血糖，已知會校方'},
+    ],
+    riskFlags:['糖尿病需定時血糖監測'], social:'—', followup:'健康室定期記錄',
+    docs:['糖尿病醫療計劃書.pdf','在學證明書 (2025).pdf'],
+    badge:{cls:'bo',txt:'✓ 正常跟進'}
+  }
+];
+
+const subNames=['中文','英文','數學','科學','歷史','體育'];
+const subColors=['#EF4444','#3B82F6','#8B5CF6','#22C55E','#F59E0B','#06B6D4'];
+let cur=0, chart=null;
+
+function showStudent(i){
+  cur=i; const s=students[i];
+  document.querySelectorAll('.sitem').forEach((el,j)=>el.classList.toggle('active',j===i));
+  // header
+  const av=document.getElementById('ppav');
+  av.textContent=s.nameChi[0]; av.style.color=s.avText;
+  document.getElementById('ppname').textContent=s.nameChi;
+  document.getElementById('ppnamen').textContent=s.nameEng;
+  const cls=s.cls.split(' ')[1];
+  document.getElementById('ppbadges').innerHTML=
+    `<span class="bdg bc">${cls}</span><span class="bdg bi">${s.id}</span><span class="bdg by">${s.year} 入學</span><span class="bdg ${s.badge.cls}">${s.badge.txt}</span>`;
+  // basic
+  document.getElementById('i-id').textContent=s.id;
+  document.getElementById('i-class').textContent=s.cls;
+  document.getElementById('i-year').textContent=s.year;
+  document.getElementById('i-gender').textContent=s.gender;
+  document.getElementById('i-dob').textContent=s.dob;
+  document.getElementById('i-age').textContent=s.age;
+  document.getElementById('i-addr').textContent=s.addr;
+  document.getElementById('i-parent').textContent=s.parent;
+  document.getElementById('i-phone').textContent=s.phone;
+  document.getElementById('i-emg').textContent=s.emg;
+  document.getElementById('i-sib').textContent=s.sib;
+  document.getElementById('i-act').innerHTML=s.actList.map((a,j)=>`<span class="tag ${s.actCls[j]}">${a}</span>`).join('');
+  // health
+  document.getElementById('healthCards').innerHTML=`
+    <div class="hcard"><label>已知病歷</label>${s.health.cond.map(c=>`<span class="tag ${c==='—'?'tgr':'tr'}">${c}</span>`).join('')}</div>
+    <div class="hcard"><label>藥物 / 過敏</label>${s.health.allergy.map(a=>`<span class="tag ${a==='—'?'tgr':'tr'}">${a}</span>`).join('')}</div>
+    <div class="hcard"><label>SEN 特殊學習需要</label><span class="tag ${s.health.sen==='—'?'tgr':'tb'}">${s.health.sen}</span></div>
+    <div class="hcard"><label>個別學習計劃 (IEP)</label><span class="tag ${s.health.iep==='否'?'tgr':'tg'}">${s.health.iep}</span></div>`;
+  // timeline
+  document.getElementById('tlContent').innerHTML=s.timeline.map(t=>`
+    <div class="tli">
+      <div class="tldot" style="background:${t.color};"></div>
+      <div class="tldate">${t.date}</div>
+      <div class="tlcard"><h4 style="color:${t.color};">${t.title}</h4><p>${t.detail}</p></div>
+    </div>`).join('');
+  // risk
+  const rEl=document.getElementById('riskContent');
+  rEl.innerHTML=s.riskFlags.length===0
+    ?`<div class="ccard" style="font-size:13px;color:var(--muted);">✓ 目前無風險標記</div>`
+    :s.riskFlags.map(f=>`<div class="rflag"><h4>⚑ ${f}</h4><p>社工跟進：${s.social}</p></div>`).join('')
+      +`<div class="ccard"><div class="crow"><label>跟進安排</label><span>${s.followup}</span></div></div>`;
+  document.getElementById('docsContent').innerHTML=s.docs.map(d=>`
+    <div class="ccard" style="margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+      <span>📄</span><span style="font-size:13px;">${d}</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;">查看</span>
+    </div>`).join('');
+  // strengths
+  document.getElementById('swContent').innerHTML=`
+    <div class="twocol">
+      <div><div style="font-size:12px;color:#86EFAC;margin-bottom:8px;">✅ 優點</div>
+        ${s.strengths.map(t=>`<div class="tag tg" style="display:block;margin-bottom:6px;">${t}</div>`).join('')}</div>
+      <div><div style="font-size:12px;color:#FCA5A5;margin-bottom:8px;">⚠️ 需改善</div>
+        ${s.weaknesses.map(t=>`<div class="tag tr" style="display:block;margin-bottom:6px;">${t}</div>`).join('')}</div>
+    </div>`;
+  // subject bars
+  document.getElementById('subjectList').innerHTML=s.scores.map((sc,j)=>`
+    <div class="srow">
+      <div class="sname">${subNames[j]}</div>
+      <div class="sbwrap"><div class="sbar" style="width:${sc}%;background:${subColors[j]};"></div></div>
+      <div class="sscore" style="color:${subColors[j]};">${sc}</div>
+    </div>`).join('');
+  updateRadar(s);
+  showTab('basic');
+}
+
+function updateRadar(s){
+  const ctx=document.getElementById('radarChart').getContext('2d');
+  if(chart){chart.destroy();}
+  chart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:subNames,
+      datasets:[{
+        data:s.scores,
+        backgroundColor:'rgba(27,110,60,.25)',
+        borderColor:'#24A05A',borderWidth:2,
+        pointBackgroundColor:'#F5C518',pointBorderColor:'#F5C518',pointRadius:4
+      }]
+    },
+    options:{
+      scales:{r:{min:0,max:100,ticks:{display:false,stepSize:25},
+        grid:{color:'rgba(42,61,85,.8)'},
+        pointLabels:{color:'#7A90A8',font:{size:11}},
+        angleLines:{color:'rgba(42,61,85,.8)'}}},
+      plugins:{legend:{display:false}},
+      elements:{line:{tension:.1}}
+    }
+  });
+}
+
+function showTab(name){
+  const tabs=['basic','academic','health','timeline','risk'];
+  document.querySelectorAll('.ptab').forEach((el,i)=>el.classList.toggle('active',tabs[i]===name));
+  document.querySelectorAll('.tc').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='academic') updateRadar(students[cur]);
+}
+
+document.querySelectorAll('.gtab').forEach(t=>{
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.gtab').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+showStudent(0);
+</script>
+</body>
+</html>
