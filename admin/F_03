@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AI 對話 · F-03</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--g:#1B6E3C;--gl:#24A05A;--y:#F5C518;--dk:#0D1B2A;--c1:#162032;--c2:#1E2D42;--bd:#2A3D55;--tx:#E8EDF3;--mu:#7A90A8;}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh;}
+.topbar{height:56px;background:#07101A;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 18px;gap:12px;position:sticky;top:0;z-index:100;}
+.tb-bdg{width:34px;height:34px;border-radius:8px;background:var(--g);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--y);font-size:13px;flex-shrink:0;}
+.tb-info{flex:1;}.tb-name{font-size:13px;font-weight:700;}.tb-sub{font-size:10px;color:var(--mu);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-chip{display:flex;align-items:center;gap:7px;padding:5px 10px;background:var(--c2);border:1px solid var(--bd);border-radius:8px;}
+.tb-av{width:26px;height:26px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.tb-uname{font-size:12px;font-weight:600;}.tb-role{font-size:10px;color:var(--mu);}
+.content{padding:20px;max-width:1200px;margin:0 auto;}
+.phdr{margin-bottom:24px;}
+.phdr h1{font-size:19px;font-weight:700;}
+.phdr h1 em{color:var(--y);font-style:normal;}
+.phdr p{font-size:12px;color:var(--mu);margin-top:3px;}
+.empty-zone{background:var(--c1);border:2px dashed var(--bd);border-radius:13px;min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+.empty-zone span{font-size:48px;}
+.empty-zone h2{font-size:16px;font-weight:700;color:var(--mu);}
+.empty-zone p{font-size:12px;color:var(--bd);}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="tb-bdg">陳</div>
+  <div class="tb-info">
+    <div class="tb-name">陳南昌紀念學校</div>
+    <div class="tb-sub">管理系統 · F-03 AI 對話</div>
+  </div>
+  <div class="tb-right">
+    <div class="tb-chip">
+      <div class="tb-av">李</div>
+      <div><div class="tb-uname">李主任</div><div class="tb-role">系統管理員</div></div>
+    </div>
+  </div>
+</header>
+<div class="content">
+  <div class="phdr">
+    <h1>AI 對話 <em>F-03</em></h1>
+    <p>AI 對話介面 · 學生 / 教師互動問答</p>
+  </div>
+  <div class="empty-zone">
+    <span>🤖</span>
+    <h2>F-03 · AI 對話</h2>
+    <p>內容建設中</p>
+  </div>
+</div>
+</body>
+</html>
