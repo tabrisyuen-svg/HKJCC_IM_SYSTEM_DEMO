@@ -3,37 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>F_02_學校管理</title>
+<title>學校管理 · F-02</title>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{--g:#1B6E3C;--gl:#24A05A;--y:#F5C518;--dk:#0D1B2A;--c1:#162032;--c2:#1E2D42;--bd:#2A3D55;--tx:#E8EDF3;--mu:#7A90A8;--pos:#22C55E;--neg:#EF4444;--blue:#3B82F6;}
 body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
 
+/* ── Topbar ── */
 .topbar{height:56px;background:#07101A;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 18px;gap:12px;position:sticky;top:0;z-index:100;}
-.tb-bdg{width:34px;height:34px;border-radius:8px;background:var(--g);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--y);font-size:11px;flex-shrink:0;letter-spacing:-.3px;}
+.tb-bdg{width:34px;height:34px;border-radius:8px;background:var(--g);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--y);font-size:13px;flex-shrink:0;}
 .tb-info{flex:1;}.tb-name{font-size:13px;font-weight:700;}.tb-sub{font-size:10px;color:var(--mu);}
 .tb-right{display:flex;align-items:center;gap:8px;}
 .tb-chip{display:flex;align-items:center;gap:7px;padding:5px 10px;background:var(--c2);border:1px solid var(--bd);border-radius:8px;}
 .tb-av{width:26px;height:26px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
 .tb-uname{font-size:12px;font-weight:600;}.tb-role{font-size:10px;color:var(--mu);}
 
+/* ── Layout ── */
 .content{padding:20px;max-width:1200px;margin:0 auto;}
-.phdr{margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.mod-tag{display:inline-flex;align-items:center;padding:4px 10px;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.3);border-radius:7px;font-size:12px;font-weight:800;color:var(--y);letter-spacing:.5px;font-family:'Courier New',monospace;}
-.phdr-r{}.phdr-r h1{font-size:19px;font-weight:700;}
-.phdr-r p{font-size:12px;color:var(--mu);margin-top:3px;}
+.phdr{margin-bottom:16px;}
+.phdr h1{font-size:19px;font-weight:700;}
+.phdr h1 em{color:var(--y);font-style:normal;}
+.phdr p{font-size:12px;color:var(--mu);margin-top:3px;}
 
+/* ── Tabs ── */
 .tabs{display:flex;background:var(--c1);border:1px solid var(--bd);border-radius:10px;overflow-x:auto;width:fit-content;max-width:100%;margin-bottom:18px;}
 .tab{padding:9px 18px;font-size:13px;cursor:pointer;color:var(--mu);font-weight:600;transition:.13s;white-space:nowrap;user-select:none;}
 .tab.on{background:var(--g);color:#fff;}
 .tab:hover:not(.on){background:var(--c2);color:var(--tx);}
 
+/* ── Stats ── */
 .stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
 .scard{background:var(--c1);border:1px solid var(--bd);border-radius:9px;padding:10px 14px;min-width:80px;}
 .sc-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;}
 .sc-num{font-size:22px;font-weight:700;margin-top:3px;line-height:1;}
 
+/* ── Toolbar ── */
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
 .search-box{position:relative;flex:1;min-width:170px;}
 .search-box input{width:100%;background:var(--c1);border:1px solid var(--bd);border-radius:8px;padding:7px 12px 7px 32px;color:var(--tx);font-size:13px;outline:none;transition:.14s;font-family:inherit;}
@@ -46,6 +51,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dk)
 .add-btn{padding:7px 14px;border-radius:8px;background:var(--g);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;transition:.13s;white-space:nowrap;}
 .add-btn:hover{background:var(--gl);}
 
+/* ── Table ── */
 .tbl-wrap{background:var(--c1);border:1px solid var(--bd);border-radius:11px;overflow:hidden;overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
 th{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;padding:10px 13px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap;}
@@ -73,11 +79,12 @@ tbody tr.row-off td{opacity:.5;}
 .tg::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.18s;}
 .tg.on::after{left:18px;}
 .row-acts{display:flex;gap:4px;}
-.ib{width:26px;height:26px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;transition:.12px;}
+.ib{width:26px;height:26px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;transition:.12s;}
 .ib:hover{background:var(--c2);}
 .ib.ed:hover{border-color:var(--y);color:var(--y);}
 .ib.dl:hover{border-color:var(--neg);color:var(--neg);}
 
+/* ── Class Cards ── */
 .yr-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
 .yr-lbl{font-size:11px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
 .cls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:10px;}
@@ -101,6 +108,7 @@ tbody tr.row-off td{opacity:.5;}
 .cls-add-card span{font-size:28px;}
 .cls-add-card p{font-size:12px;color:var(--mu);}
 
+/* ── School Year ── */
 .sy-list{display:flex;flex-direction:column;gap:10px;}
 .sy-card{background:var(--c1);border:1px solid var(--bd);border-radius:11px;padding:16px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;transition:.14s;}
 .sy-card.sy-cur{border-color:rgba(36,160,90,.4);background:rgba(36,160,90,.03);}
@@ -119,6 +127,7 @@ tbody tr.row-off td{opacity:.5;}
 .sy-add{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;background:var(--c1);border:2px dashed var(--bd);border-radius:11px;cursor:pointer;color:var(--mu);font-size:13px;font-weight:600;transition:.18s;}
 .sy-add:hover{border-color:var(--gl);color:#4ADE80;background:rgba(36,160,90,.03);}
 
+/* ── Modals ── */
 .mbg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;}
 .mbg.hide{display:none;}
 .mbox{background:var(--c1);border:1px solid var(--bd);border-radius:13px;padding:22px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
@@ -136,6 +145,7 @@ tbody tr.row-off td{opacity:.5;}
 .btn-o{background:transparent;color:var(--mu);border-color:var(--bd);}
 .btn-o:hover{background:var(--c2);}
 
+/* ── Disable Confirm ── */
 .dis-who{display:flex;align-items:center;gap:11px;background:var(--c2);border:1px solid var(--bd);border-radius:9px;padding:12px 14px;margin-bottom:14px;}
 .dis-warn{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.22);border-radius:9px;padding:13px 15px;}
 .dis-warn h4{font-size:13px;color:#FCA5A5;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
@@ -143,6 +153,7 @@ tbody tr.row-off td{opacity:.5;}
 .dis-warn li{font-size:12px;color:var(--mu);line-height:2.1;list-style:disc;}
 .dis-warn li strong{color:#FCA5A5;}
 
+/* ── Form (modal) ── */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .sp2{grid-column:span 2;}
 .ff{display:flex;flex-direction:column;gap:4px;}
@@ -152,7 +163,9 @@ tbody tr.row-off td{opacity:.5;}
 .fi::placeholder{color:var(--mu);}
 select.fi{cursor:pointer;}
 .rq{color:var(--neg);}
+.msep{height:1px;background:var(--bd);margin:12px 0;}
 
+/* ── Toast ── */
 .toast{position:fixed;bottom:18px;right:18px;background:var(--c1);border:1px solid var(--bd);border-radius:9px;padding:10px 14px;font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 25px rgba(0,0,0,.5);z-index:999;transform:translateY(55px);opacity:0;transition:.22s;pointer-events:none;max-width:330px;line-height:1.55;}
 .toast.on{transform:none;opacity:1;}
 .t-ok{border-color:rgba(34,197,94,.4);}
@@ -172,10 +185,10 @@ select.fi{cursor:pointer;}
 <body>
 
 <header class="topbar">
-  <div class="tb-bdg">F_02</div>
+  <div class="tb-bdg">陳</div>
   <div class="tb-info">
     <div class="tb-name">陳南昌紀念學校</div>
-    <div class="tb-sub">F_02_學校管理 · 管理教師 / 學生 / 班別 / 學年</div>
+    <div class="tb-sub">管理系統 · F-02 學校管理</div>
   </div>
   <div class="tb-right">
     <div class="tb-chip">
@@ -187,11 +200,8 @@ select.fi{cursor:pointer;}
 
 <div class="content">
   <div class="phdr">
-    <div class="mod-tag">F_02_</div>
-    <div class="phdr-r">
-      <h1>學校管理</h1>
-      <p>管理教師 · 學生 · 班別 · 學年 · 停用帳戶後即時無法登入系統</p>
-    </div>
+    <h1>學校管理 <em>F-02</em></h1>
+    <p>管理教師 · 學生 · 班別 · 學年 · 停用帳戶後即時無法登入系統</p>
   </div>
 
   <div class="tabs">
@@ -267,7 +277,7 @@ select.fi{cursor:pointer;}
   </div>
 </div>
 
-<!-- ═══ DISABLE CONFIRM ═══ -->
+<!-- ═══ DISABLE CONFIRM MODAL ═══ -->
 <div class="mbg hide" id="m-dis">
   <div class="mbox" style="max-width:420px">
     <div class="mhdr">
@@ -291,7 +301,7 @@ select.fi{cursor:pointer;}
   </div>
 </div>
 
-<!-- ═══ ADD TEACHER ═══ -->
+<!-- ═══ ADD TEACHER MODAL ═══ -->
 <div class="mbg hide" id="m-addT">
   <div class="mbox">
     <div class="mhdr">
@@ -321,7 +331,7 @@ select.fi{cursor:pointer;}
   </div>
 </div>
 
-<!-- ═══ ADD STUDENT ═══ -->
+<!-- ═══ ADD STUDENT MODAL ═══ -->
 <div class="mbg hide" id="m-addS">
   <div class="mbox">
     <div class="mhdr">
@@ -350,7 +360,7 @@ select.fi{cursor:pointer;}
   </div>
 </div>
 
-<!-- ═══ ADD CLASS ═══ -->
+<!-- ═══ ADD CLASS MODAL ═══ -->
 <div class="mbg hide" id="m-addC">
   <div class="mbox" style="max-width:420px">
     <div class="mhdr">
@@ -377,7 +387,7 @@ select.fi{cursor:pointer;}
   </div>
 </div>
 
-<!-- ═══ ADD YEAR ═══ -->
+<!-- ═══ ADD YEAR MODAL ═══ -->
 <div class="mbg hide" id="m-addY">
   <div class="mbox" style="max-width:380px">
     <div class="mhdr">
@@ -400,6 +410,7 @@ select.fi{cursor:pointer;}
 <div class="toast" id="toastEl"><span id="tIco"></span><span id="tMsg"></span></div>
 
 <script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
 const TEACHERS=[
   {id:'T001',zh:'陳志明',en:'CHAN Chi Ming',role:'校長',dept:'校長室',subj:[],cls:'',email:'chan@cncs.edu.hk',active:true,last:'09/11 09:30'},
   {id:'T002',zh:'李美華',en:'LEE Mei Wah',role:'副校長',dept:'校長室',subj:['中文'],cls:'',email:'lee@cncs.edu.hk',active:true,last:'09/11 08:55'},
@@ -465,6 +476,7 @@ const YEARS=[
 let tF='all',sF='all',cY='2025-2026';
 let pending={type:'',id:''};
 
+// ─── TABS ────────────────────────────────────────────────────────────────────
 function sTab(k){
   ['t','s','c','y'].forEach(x=>{
     document.getElementById('tab-'+x).classList.toggle('on',x===k);
@@ -472,9 +484,10 @@ function sTab(k){
   });
   ({t:()=>{renderT();renderTStat();},
     s:()=>{renderS();renderSStat();},
-    c:renderC,y:renderY})[k]();
+    c:renderC, y:renderY})[k]();
 }
 
+// ─── TEACHER ─────────────────────────────────────────────────────────────────
 function renderTStat(){
   const on=TEACHERS.filter(x=>x.active).length,off=TEACHERS.filter(x=>!x.active).length;
   document.getElementById('tStat').innerHTML=`
@@ -518,6 +531,7 @@ function renderT(){
   </tr>`).join('');
 }
 
+// ─── STUDENT ─────────────────────────────────────────────────────────────────
 function renderSStat(){
   const byG={};
   STUDENTS.forEach(s=>{byG[s.grade]=(byG[s.grade]||0)+1;});
@@ -564,11 +578,13 @@ function renderS(){
   </tr>`).join('');
 }
 
+// ─── TOGGLE + DISABLE MODAL ──────────────────────────────────────────────────
 function togAct(type,id){
   const arr=type==='t'?TEACHERS:STUDENTS;
   const rec=arr.find(x=>x.id===id);
   if(!rec)return;
   if(rec.active){
+    // Disabling → show confirm modal
     pending={type,id};
     document.getElementById('disWho').innerHTML=`
       <div class="av ${type==='t'?'av-t':'av-s'}" style="width:38px;height:38px;font-size:14px">${rec.zh[0]}</div>
@@ -578,6 +594,7 @@ function togAct(type,id){
       </div>`;
     document.getElementById('m-dis').classList.remove('hide');
   } else {
+    // Re-enabling → immediate, no confirm
     rec.active=true;
     if(type==='t'){renderT();renderTStat();}else{renderS();renderSStat();}
     toast('✅',`${rec.zh} 帳戶已啟用，可即時登入系統`,'t-ok');
@@ -594,6 +611,7 @@ function confirmDis(){
   pending={type:'',id:''};
 }
 
+// ─── CLASS ───────────────────────────────────────────────────────────────────
 function setCY(y){
   cY=y;
   document.querySelectorAll('[data-cy]').forEach(b=>b.classList.toggle('on',b.dataset.cy===y));
@@ -634,6 +652,7 @@ function renderC(){
     `<div class="cls-add-card" onclick="openM('addC')"><span>➕</span><p>新增班別</p></div>`;
 }
 
+// ─── SCHOOL YEAR ─────────────────────────────────────────────────────────────
 function renderY(){
   const html=YEARS.map(y=>{
     const sCnt=STUDENTS.filter(s=>s.yr===y.label).length;
@@ -668,6 +687,7 @@ function setYearCur(id){
   toast('📅',YEARS.find(y=>y.id===id).label+' 已設為當前學年','t-ok');
 }
 
+// ─── MODALS ──────────────────────────────────────────────────────────────────
 function openM(k){
   if(k==='addC'){
     const sel=document.getElementById('nC-teacher');
@@ -679,4 +699,36 @@ function openM(k){
 function closeM(k){document.getElementById('m-'+k).classList.add('hide');}
 
 function saveT(){
-  if(!document.getElementById('nT-id
+  if(!document.getElementById('nT-id').value||!document.getElementById('nT-zh').value)
+    {toast('⚠️','請填寫必填欄位（*）','t-warn');return;}
+  toast('💾',document.getElementById('nT-zh').value+' 教師帳戶已新增（示範）','t-ok');
+  closeM('addT');
+}
+function saveS(){
+  if(!document.getElementById('nS-id').value||!document.getElementById('nS-zh').value)
+    {toast('⚠️','請填寫必填欄位（*）','t-warn');return;}
+  toast('💾',document.getElementById('nS-zh').value+' 學生帳戶已新增（示範）','t-ok');
+  closeM('addS');
+}
+function saveC(){toast('💾','班別已新增（示範）','t-ok');closeM('addC');renderC();}
+function saveY(){
+  if(!document.getElementById('nY-id').value){toast('⚠️','請填寫學年代碼','t-warn');return;}
+  toast('📅',document.getElementById('nY-id').value+' 學年已新增（示範）','t-ok');
+  closeM('addY');
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function toast(ico,msg,type=''){
+  const el=document.getElementById('toastEl');
+  document.getElementById('tIco').textContent=ico;
+  document.getElementById('tMsg').textContent=msg;
+  el.className='toast on '+(type||'');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{el.className='toast';},2800);
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderT();renderTStat();
+</script>
+</body>
+</html>
