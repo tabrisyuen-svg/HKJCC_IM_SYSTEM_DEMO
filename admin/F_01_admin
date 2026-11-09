@@ -1,1 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>登入及帳戶 · F-01</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--g:#1B6E3C;--gl:#24A05A;--y:#F5C518;--dk:#0D1B2A;--c1:#162032;--c2:#1E2D42;--bd:#2A3D55;--tx:#E8EDF3;--mu:#7A90A8;--pos:#22C55E;--neg:#EF4444;--blue:#3B82F6;}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
 
+/* ═══ LOGIN ═══ */
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(ellipse at 25% 25%,rgba(27,110,60,.14) 0%,transparent 55%),
+             radial-gradient(ellipse at 75% 75%,rgba(245,197,24,.06) 0%,transparent 55%),var(--dk);}
+.lc{background:var(--c1);border:1px solid var(--bd);border-radius:16px;padding:32px;width:100%;max-width:400px;}
+.lc-top{display:flex;align-items:center;gap:12px;margin-bottom:26px;}
+.lc-bdg{width:42px;height:42px;border-radius:10px;background:var(--g);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--y);font-size:16px;flex-shrink:0;}
+.lc-school h2{font-size:13px;color:var(--y);font-weight:700;}
+.lc-school p{font-size:10px;color:var(--mu);margin-top:2px;}
+.lc h1{font-size:19px;font-weight:700;margin-bottom:4px;}
+.lc-sub{font-size:12px;color:var(--mu);margin-bottom:22px;}
+.sso-row{display:flex;gap:7px;margin-bottom:14px;}
+.sso-btn{flex:1;padding:9px;border-radius:8px;border:1px solid var(--bd);background:var(--c2);color:var(--tx);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.14s;}
+.sso-btn:hover{border-color:var(--gl);}
+.or-div{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--bd);}
+.or-div span{font-size:11px;color:var(--mu);}
+.lf{margin-bottom:12px;}
+.lf label{display:block;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600;}
+.li{width:100%;background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:13px;outline:none;transition:.14s;font-family:inherit;}
+.li:focus{border-color:var(--gl);}
+.li::placeholder{color:var(--mu);}
+.lbtn{width:100%;padding:11px;border-radius:8px;background:var(--g);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;font-family:inherit;transition:.14s;}
+.lbtn:hover{background:var(--gl);}
+.demo-tip{margin-top:14px;padding:10px;border-radius:8px;background:rgba(245,197,24,.06);border:1px dashed rgba(245,197,24,.2);text-align:center;cursor:pointer;transition:.14s;}
+.demo-tip:hover{background:rgba(245,197,24,.1);}
+.demo-tip b{font-size:12px;color:var(--y);}
+.demo-tip p{font-size:10px;color:var(--mu);margin-top:2px;}
+
+/* ═══ MAIN ═══ */
+#mainView{min-height:100vh;flex-direction:column;}
+.topbar{height:56px;background:#07101A;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 18px;gap:12px;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.tb-bdg{width:34px;height:34px;border-radius:8px;background:var(--g);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--y);font-size:13px;flex-shrink:0;}
+.tb-info{flex:1;}
+.tb-name{font-size:13px;font-weight:700;}
+.tb-sub{font-size:10px;color:var(--mu);}
+.tb-right{display:flex;align-items:center;gap:8px;}
+.tb-chip{display:flex;align-items:center;gap:7px;padding:5px 10px;background:var(--c2);border:1px solid var(--bd);border-radius:8px;}
+.tb-av{width:26px;height:26px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.tb-uname{font-size:12px;font-weight:600;}
+.tb-role{font-size:10px;color:var(--mu);}
+.logout-btn{padding:5px 11px;border-radius:7px;background:transparent;border:1px solid var(--bd);color:var(--mu);font-size:11px;cursor:pointer;transition:.13s;font-family:inherit;}
+.logout-btn:hover{border-color:var(--neg);color:var(--neg);}
+
+.content{flex:1;padding:20px;max-width:1100px;margin:0 auto;width:100%;overflow-y:auto;}
+.phdr{margin-bottom:16px;}
+.phdr h1{font-size:19px;font-weight:700;}
+.phdr h1 em{color:var(--y);font-style:normal;}
+.phdr p{font-size:12px;color:var(--mu);margin-top:3px;}
+
+/* Tabs */
+.tabs{display:flex;background:var(--c1);border:1px solid var(--bd);border-radius:10px;overflow:hidden;width:fit-content;margin-bottom:18px;}
+.tab{padding:9px 20px;font-size:13px;cursor:pointer;color:var(--mu);font-weight:600;transition:.13s;white-space:nowrap;user-select:none;}
+.tab.on{background:var(--g);color:#fff;}
+.tab:hover:not(.on){background:var(--c2);color:var(--tx);}
+
+/* Stats */
+.stats-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.scard{background:var(--c1);border:1px solid var(--bd);border-radius:9px;padding:10px 14px;min-width:100px;}
+.sc-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;}
+.sc-num{font-size:22px;font-weight:700;margin-top:3px;line-height:1;}
+
+/* Toolbar */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.search-box{position:relative;flex:1;min-width:180px;}
+.search-box input{width:100%;background:var(--c1);border:1px solid var(--bd);border-radius:8px;padding:7px 12px 7px 32px;color:var(--tx);font-size:13px;outline:none;transition:.14s;font-family:inherit;}
+.search-box input:focus{border-color:var(--gl);}
+.search-box::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;}
+.fbtns{display:flex;gap:4px;}
+.fb{padding:6px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--c1);color:var(--mu);transition:.13s;user-select:none;}
+.fb.on{background:var(--g);color:#fff;border-color:var(--g);}
+.fb:hover:not(.on){background:var(--c2);}
+.add-btn{padding:7px 14px;border-radius:8px;background:var(--g);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px;transition:.13s;}
+.add-btn:hover{background:var(--gl);}
+
+/* Table */
+.tbl-wrap{background:var(--c1);border:1px solid var(--bd);border-radius:11px;overflow:hidden;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;padding:10px 13px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap;}
+td{padding:10px 13px;font-size:13px;border-bottom:1px solid rgba(42,61,85,.3);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(30,45,66,.5);}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.av-s{background:rgba(59,130,246,.18);color:#93C5FD;}
+.av-t{background:rgba(27,110,60,.22);color:#4ADE80;}
+.av-a{background:rgba(245,197,24,.18);color:var(--y);}
+.ncell{display:flex;align-items:center;gap:9px;}
+.nm{font-size:13px;font-weight:600;}
+.nm2{font-size:11px;color:var(--mu);margin-top:1px;}
+.bdg{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.bs{background:rgba(59,130,246,.12);color:#93C5FD;}
+.bt{background:rgba(27,110,60,.15);color:#4ADE80;}
+.ba{background:rgba(245,197,24,.12);color:var(--y);}
+.bon{background:rgba(34,197,94,.12);color:#22C55E;}
+.bof{background:rgba(239,68,68,.12);color:#FCA5A5;}
+.tg{width:32px;height:18px;border-radius:9px;background:var(--bd);cursor:pointer;transition:.18s;position:relative;flex-shrink:0;}
+.tg.on{background:var(--gl);}
+.tg::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.18s;}
+.tg.on::after{left:17px;}
+.ib{width:26px;height:26px;border-radius:5px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:11px;display:inline-flex;align-items:center;justify-content:center;transition:.12s;}
+.ib:hover{background:var(--c2);}
+.ib.ed:hover{border-color:var(--y);color:var(--y);}
+.ib.dl:hover{border-color:var(--neg);color:var(--neg);}
+.row-acts{display:flex;gap:4px;}
+
+/* ═══ ADD USER FORM ═══ */
+.form-wrap{max-width:800px;}
+.type-tog{display:flex;border:1px solid var(--bd);border-radius:9px;overflow:hidden;width:fit-content;margin-bottom:20px;}
+.tt{padding:9px 26px;font-size:13px;font-weight:700;cursor:pointer;transition:.13s;color:var(--mu);user-select:none;}
+.tt.on{background:var(--g);color:#fff;}
+.tt:hover:not(.on){background:var(--c2);}
+
+/* Collapsible form sections */
+.fsec{background:var(--c1);border:1px solid var(--bd);border-radius:11px;margin-bottom:10px;overflow:hidden;}
+.fshdr{padding:12px 15px;display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;transition:.13s;}
+.fshdr:hover{background:rgba(30,45,66,.4);}
+.fshdr.op{border-bottom:1px solid var(--bd);}
+.fs-ico{font-size:15px;width:22px;text-align:center;flex-shrink:0;}
+.fs-ttl{font-size:13px;font-weight:700;flex:1;}
+.fs-req{font-size:10px;color:var(--mu);background:var(--c2);padding:2px 7px;border-radius:20px;white-space:nowrap;}
+.fs-arr{font-size:10px;color:var(--mu);transition:.2s;flex-shrink:0;}
+.fshdr.op .fs-arr{transform:rotate(180deg);}
+.fsbdy{display:none;padding:14px 15px;}
+.fshdr.op + .fsbdy{display:block;}
+
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg3{grid-template-columns:1fr 1fr 1fr;}
+.fg1{grid-template-columns:1fr;}
+.ff label{display:block;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;font-weight:600;}
+.fi{width:100%;background:var(--c2);border:1px solid var(--bd);border-radius:7px;padding:7px 10px;color:var(--tx);font-size:13px;outline:none;transition:.14s;font-family:inherit;}
+.fi:focus{border-color:var(--gl);}
+.fi::placeholder{color:var(--mu);}
+select.fi{cursor:pointer;}
+.rq{color:var(--neg);margin-left:2px;}
+.sp2{grid-column:span 2;}
+.sp3{grid-column:span 3;}
+
+/* Parent blocks */
+.pb{background:var(--c2);border:1px solid var(--bd);border-radius:9px;padding:12px;margin-bottom:10px;}
+.pb-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.pb-lbl{font-size:12px;font-weight:700;color:var(--mu);}
+.rm-btn{padding:3px 9px;border-radius:6px;background:transparent;border:1px solid rgba(239,68,68,.3);color:#FCA5A5;font-size:11px;cursor:pointer;font-family:inherit;}
+.rm-btn:hover{background:rgba(239,68,68,.1);}
+.add-pb-btn{padding:7px 13px;border-radius:8px;background:transparent;border:1px dashed var(--bd);color:var(--mu);font-size:12px;cursor:pointer;font-family:inherit;width:100%;transition:.14s;margin-top:4px;}
+.add-pb-btn:hover{border-color:var(--gl);color:#4ADE80;}
+
+.sep{height:1px;background:var(--bd);margin:12px 0;}
+.hint{font-size:11px;color:var(--mu);margin-top:5px;line-height:1.7;}
+.form-btns{display:flex;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid var(--bd);}
+.btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid;transition:.13s;font-family:inherit;}
+.btn:active{transform:scale(.97);}
+.btn-g{background:var(--g);color:#fff;border-color:var(--g);}
+.btn-g:hover{background:var(--gl);}
+.btn-o{background:transparent;color:var(--mu);border-color:var(--bd);}
+.btn-o:hover{background:var(--c2);}
+
+/* ═══ CSV IMPORT ═══ */
+.csv-wrap{max-width:840px;}
+.tpl-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.tpl-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:var(--c1);border:1px solid var(--bd);color:var(--tx);font-size:12px;font-weight:600;cursor:pointer;transition:.13s;}
+.tpl-btn:hover{border-color:var(--gl);color:#4ADE80;}
+.tpl-note{font-size:11px;color:var(--mu);}
+
+.drop-zone{border:2px dashed var(--bd);border-radius:12px;padding:38px 20px;text-align:center;cursor:pointer;transition:.18s;background:var(--c1);margin-bottom:14px;}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--gl);background:rgba(36,160,90,.04);}
+.dz-ico{font-size:38px;margin-bottom:8px;opacity:.55;}
+.dz-ttl{font-size:14px;font-weight:700;margin-bottom:5px;}
+.dz-sub{font-size:12px;color:var(--mu);}
+.dz-cta{display:inline-flex;margin-top:10px;padding:7px 16px;border-radius:8px;background:var(--c2);border:1px solid var(--bd);color:var(--tx);font-size:12px;font-weight:600;cursor:pointer;transition:.13s;}
+.dz-cta:hover{border-color:var(--gl);}
+
+#csvProgress{display:none;background:var(--c1);border:1px solid var(--bd);border-radius:11px;padding:16px;margin-bottom:14px;}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.prog-top span{font-size:12px;color:var(--mu);}
+.prog-top b{font-size:12px;color:var(--tx);}
+.prog-bg{height:6px;background:var(--c2);border-radius:3px;overflow:hidden;}
+.prog-bar{height:100%;background:var(--gl);border-radius:3px;width:0;transition:width .15s;}
+
+#csvResults{display:none;}
+.res-sum{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--c1);border:1px solid var(--bd);border-radius:11px;padding:16px;margin-bottom:12px;}
+.rsn{text-align:center;}
+.rsn-num{font-size:28px;font-weight:800;line-height:1;}
+.rsn-lbl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;margin-top:3px;}
+.rs-div{width:1px;height:44px;background:var(--bd);flex-shrink:0;}
+.res-note{flex:1;min-width:180px;font-size:12px;color:var(--mu);line-height:1.8;}
+.res-note strong{color:var(--tx);}
+
+/* Error / result panel */
+.rp{background:var(--c1);border:1px solid rgba(239,68,68,.22);border-radius:11px;margin-bottom:12px;overflow:hidden;}
+.rp-hdr{padding:11px 14px;display:flex;align-items:center;gap:9px;cursor:pointer;background:rgba(239,68,68,.05);transition:.14s;}
+.rp-hdr:hover{background:rgba(239,68,68,.09);}
+.rp-bdg{background:var(--neg);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.rp-ttl{font-size:13px;font-weight:700;flex:1;}
+.rp-arr{font-size:11px;color:var(--mu);transition:.2s;}
+.rp-hdr.op .rp-arr{transform:rotate(180deg);}
+.rp-body{display:none;max-height:380px;overflow-y:auto;}
+.rp-hdr.op + .rp-body{display:block;}
+
+.rtbl{width:100%;border-collapse:collapse;}
+.rtbl th{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;padding:8px 13px;text-align:left;border-bottom:1px solid var(--bd);background:var(--c2);white-space:nowrap;}
+.rtbl td{padding:7px 13px;font-size:12px;border-bottom:1px solid rgba(42,61,85,.2);vertical-align:middle;}
+.rtbl tr:last-child td{border-bottom:none;}
+.r-err td{background:rgba(239,68,68,.04);}
+.r-dup td{background:rgba(245,197,24,.03);}
+.ok-mk{color:#22C55E;font-size:11px;font-weight:700;}
+.err-mk{color:#EF4444;font-size:11px;font-weight:700;}
+.dup-mk{color:var(--y);font-size:11px;font-weight:700;}
+.err-rsn{font-size:11px;color:#FCA5A5;}
+.dup-rsn{font-size:11px;color:var(--y);}
+
+.res-acts{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ═══ DUPLICATE MODAL ═══ */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;}
+.mbg.hide{display:none;}
+.mbox{background:var(--c1);border:1px solid var(--bd);border-radius:13px;padding:20px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.mhdr h3{font-size:15px;font-weight:700;}
+.mx{width:26px;height:26px;border-radius:6px;border:1px solid var(--bd);background:transparent;color:var(--mu);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:var(--c2);}
+.dup-info{background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--mu);margin-bottom:14px;line-height:1.9;}
+.dup-info strong{color:var(--tx);}
+.dup-opts{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.dopt{padding:12px 14px;border-radius:9px;border:2px solid var(--bd);cursor:pointer;transition:.14s;background:var(--c2);}
+.dopt:hover{border-color:var(--gl);}
+.dopt.sel{border-color:var(--gl);background:rgba(36,160,90,.08);}
+.dopt h4{font-size:13px;font-weight:700;margin-bottom:3px;}
+.dopt p{font-size:11px;color:var(--mu);line-height:1.6;}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;}
+
+/* Toast */
+.toast{position:fixed;bottom:18px;right:18px;background:var(--c1);border:1px solid var(--bd);border-radius:9px;padding:9px 14px;font-size:12px;display:flex;align-items:center;gap:7px;box-shadow:0 8px 25px rgba(0,0,0,.5);z-index:999;transform:translateY(55px);opacity:0;transition:.22s;pointer-events:none;max-width:300px;}
+.toast.on{transform:none;opacity:1;}
+
+@media(max-width:700px){
+  .fg{grid-template-columns:1fr;}.fg3{grid-template-columns:1fr 1fr;}
+  .sp2,.sp3{grid-column:span 1;}
+  th:nth-child(n+5),td:nth-child(n+5){display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN VIEW ═══ -->
+<div id="loginView">
+  <div class="lc">
+    <div class="lc-top">
+      <div class="lc-bdg">陳</div>
+      <div class="lc-school">
+        <h2>陳南昌紀念學校</h2>
+        <p>Chan Nam Cheong Memorial School</p>
+      </div>
+    </div>
+    <h1>登入系統</h1>
+    <p class="lc-sub">管理系統 · F-01 登入及帳戶</p>
+
+    <div class="sso-row">
+      <button class="sso-btn" onclick="ssoLogin('Google')">
+        <span style="font-weight:900;font-size:14px;color:#4285F4">G</span> Google 登入
+      </button>
+      <button class="sso-btn" onclick="ssoLogin('Microsoft')">
+        <span style="font-size:13px">⊞</span> Microsoft 登入
+      </button>
+    </div>
+
+    <div class="or-div"><span>或使用學校帳號</span></div>
+
+    <div class="lf">
+      <label>學校代碼</label>
+      <input type="text" class="li" placeholder="例：CNCS-2025" id="schoolCode" value="CNCS-2025">
+    </div>
+    <div class="lf">
+      <label>登入名稱</label>
+      <input type="text" class="li" placeholder="老師帳號 / 職員編號" id="loginName" value="admin">
+    </div>
+    <div class="lf">
+      <label>密碼</label>
+      <input type="password" class="li" placeholder="••••••••" id="loginPwd" value="demo1234">
+    </div>
+    <button class="lbtn" onclick="doLogin()">登入</button>
+
+    <div class="demo-tip" onclick="demoLogin()">
+      <b>⚡ DEMO 快速進入</b>
+      <p>無需填寫，直接進入示範模式</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN VIEW ═══ -->
+<div id="mainView" style="display:none;flex-direction:column;min-height:100vh;">
+
+  <header class="topbar">
+    <div class="tb-bdg">陳</div>
+    <div class="tb-info">
+      <div class="tb-name">陳南昌紀念學校</div>
+      <div class="tb-sub">管理系統 · F-01 登入及帳戶</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-chip">
+        <div class="tb-av">李</div>
+        <div>
+          <div class="tb-uname">李主任</div>
+          <div class="tb-role">系統管理員</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">登出</button>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="phdr">
+      <h1>登入及帳戶 <em>F-01</em></h1>
+      <p>用戶管理 · 新增帳戶 · CSV 批量匯入 · 最多 500 筆</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on" id="tab-list" onclick="sTab('list')">👥 用戶列表</div>
+      <div class="tab"    id="tab-add"  onclick="sTab('add')">➕ 新增用戶</div>
+      <div class="tab"    id="tab-csv" onclick="sTab('csv')">📤 CSV 批量匯入</div>
+    </div>
+
+    <!-- ─── TAB: USER LIST ─── -->
+    <div id="pane-list">
+      <div class="stats-row" id="statsRow"></div>
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" placeholder="搜尋姓名、學號、班別…" id="searchInput" oninput="renderTable()">
+        </div>
+        <div class="fbtns">
+          <div class="fb on" data-f="all"     onclick="setFilter('all')">全部</div>
+          <div class="fb"    data-f="student" onclick="setFilter('student')">學生</div>
+          <div class="fb"    data-f="staff"   onclick="setFilter('staff')">教職員</div>
+        </div>
+        <button class="add-btn" onclick="sTab('add')">➕ 新增用戶</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>用戶</th><th>類別 / 職位</th><th>班別 / 部門</th>
+            <th>聯絡</th><th>來源</th><th>狀態</th><th>操作</th>
+          </tr></thead>
+          <tbody id="userTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── TAB: ADD USER ─── -->
+    <div id="pane-add" style="display:none">
+      <div class="form-wrap">
+
+        <div class="type-tog">
+          <div class="tt on" id="tt-s" onclick="setUType('student')">🎒 學生</div>
+          <div class="tt"    id="tt-t" onclick="setUType('staff')">👔 教職員</div>
+        </div>
+
+        <!-- ── STUDENT FORM ── -->
+        <div id="stuForm">
+
+          <div class="fsec">
+            <div class="fshdr op" onclick="togSec(this)">
+              <span class="fs-ico">🔵</span><span class="fs-ttl">基本身份</span>
+              <span class="fs-req">必填欄位</span><span class="fs-arr">▲</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg">
+                <div class="ff"><label>學號 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：2025001"></div>
+                <div class="ff"><label>性別 <span class="rq">*</span></label>
+                  <select class="fi"><option value="">請選擇</option><option>男</option><option>女</option></select></div>
+                <div class="ff"><label>中文姓名 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：陳大文"></div>
+                <div class="ff"><label>英文姓名 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：CHAN Tai Man"></div>
+                <div class="ff"><label>出生日期 <span class="rq">*</span></label><input type="date" class="fi"></div>
+                <div class="ff"><label>出生地點</label>
+                  <select class="fi"><option value="">請選擇</option><option>香港</option><option>內地</option><option>澳門</option><option>台灣</option><option>其他</option></select></div>
+                <div class="ff"><label>國籍</label><input type="text" class="fi" placeholder="例：中國香港"></div>
+                <div class="ff"><label>身份證號碼（部分）</label><input type="text" class="fi" placeholder="例：A123(4)"></div>
+                <div class="ff"><label>宗教</label>
+                  <select class="fi"><option value="">請選擇</option><option>基督教</option><option>天主教</option><option>佛教</option><option>伊斯蘭教</option><option>其他</option><option>無</option></select></div>
+                <div class="ff"><label>慣用語言</label>
+                  <select class="fi"><option value="">請選擇</option><option>廣東話</option><option>普通話</option><option>英語</option><option>其他</option></select></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <div class="fshdr op" onclick="togSec(this)">
+              <span class="fs-ico">🟢</span><span class="fs-ttl">學籍資料</span>
+              <span class="fs-req">必填欄位</span><span class="fs-arr">▲</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg fg3">
+                <div class="ff"><label>年級 <span class="rq">*</span></label>
+                  <select class="fi"><option value="">請選擇</option><option>中一</option><option>中二</option><option>中三</option><option>中四</option><option>中五</option><option>中六</option></select></div>
+                <div class="ff"><label>班別 <span class="rq">*</span></label>
+                  <select class="fi"><option value="">請選擇</option><option>A</option><option>B</option><option>C</option><option>D</option></select></div>
+                <div class="ff"><label>座號 <span class="rq">*</span></label><input type="number" class="fi" placeholder="1–40" min="1" max="40"></div>
+                <div class="ff sp3"><label>學年 <span class="rq">*</span></label>
+                  <select class="fi"><option>2025–2026</option><option>2024–2025</option><option>2023–2024</option></select></div>
+                <div class="ff"><label>入學日期 <span class="rq">*</span></label><input type="date" class="fi"></div>
+                <div class="ff"><label>入學類別</label>
+                  <select class="fi"><option value="">請選擇</option><option>本地直升</option><option>插班</option><option>轉校</option><option>回流</option></select></div>
+                <div class="ff"><label>上一所學校</label><input type="text" class="fi" placeholder="轉校生填寫"></div>
+                <div class="ff sp3"><label>學生狀態</label>
+                  <select class="fi"><option>在讀</option><option>停用</option><option>畢業</option><option>轉校</option></select></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <div class="fshdr" onclick="togSec(this)">
+              <span class="fs-ico">🟡</span><span class="fs-ttl">聯絡資料</span><span class="fs-arr">▼</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg">
+                <div class="ff sp2"><label>住宅地址 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：九龍旺角彌敦道123號A室"></div>
+                <div class="ff"><label>區域</label>
+                  <select class="fi"><option value="">請選擇</option><option>中西區</option><option>灣仔</option><option>東區</option><option>南區</option><option>油尖旺</option><option>深水埗</option><option>九龍城</option><option>黃大仙</option><option>觀塘</option><option>荃灣</option><option>屯門</option><option>元朗</option><option>北區</option><option>大埔</option><option>沙田</option><option>西貢</option><option>葵青</option><option>離島</option></select></div>
+                <div class="ff"><label>住宅電話</label><input type="tel" class="fi" placeholder="2XXX XXXX"></div>
+                <div class="ff"><label>學生手提</label><input type="tel" class="fi" placeholder="9XXX XXXX（中學適用）"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <div class="fshdr" onclick="togSec(this)">
+              <span class="fs-ico">🟠</span><span class="fs-ttl">家長 / 監護人</span>
+              <span class="fs-req">必填欄位</span><span class="fs-arr">▼</span>
+            </div>
+            <div class="fsbdy">
+              <div id="parentBlocks">
+                <div class="pb">
+                  <div class="pb-hdr"><span class="pb-lbl">第一聯絡人（主要）</span></div>
+                  <div class="fg">
+                    <div class="ff"><label>家長姓名 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：陳志明"></div>
+                    <div class="ff"><label>關係 <span class="rq">*</span></label>
+                      <select class="fi"><option value="">請選擇</option><option>父親</option><option>母親</option><option>祖父</option><option>祖母</option><option>外祖父</option><option>外祖母</option><option>監護人</option><option>其他</option></select></div>
+                    <div class="ff"><label>手提電話 <span class="rq">*</span></label><input type="tel" class="fi" placeholder="9XXX XXXX"></div>
+                    <div class="ff"><label>電郵</label><input type="email" class="fi" placeholder="用作通知發送"></div>
+                    <div class="ff"><label>工作電話</label><input type="tel" class="fi" placeholder="2XXX XXXX"></div>
+                    <div class="ff"><label>職業</label><input type="text" class="fi" placeholder="選填"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="add-pb-btn" onclick="addParent()">➕ 新增第二聯絡人</button>
+              <div class="sep"></div>
+              <div class="fg">
+                <div class="ff"><label>緊急聯絡人姓名</label><input type="text" class="fi" placeholder="如與家長不同才填"></div>
+                <div class="ff"><label>緊急聯絡電話</label><input type="tel" class="fi"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <div class="fshdr" onclick="togSec(this)">
+              <span class="fs-ico">🔴</span><span class="fs-ttl">健康及特殊需要</span><span class="fs-arr">▼</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg">
+                <div class="ff"><label>血型</label>
+                  <select class="fi"><option value="">不知道</option><option>A</option><option>B</option><option>AB</option><option>O</option></select></div>
+                <div class="ff"><label>已知病症</label><input type="text" class="fi" placeholder="例：哮喘、糖尿病"></div>
+                <div class="ff"><label>藥物過敏</label><input type="text" class="fi" placeholder="如有請填寫"></div>
+                <div class="ff"><label>食物過敏</label><input type="text" class="fi" placeholder="如有請填寫"></div>
+                <div class="ff"><label>特殊學習需要（SEN）</label>
+                  <select class="fi" id="senSel" onchange="togSEN()"><option value="">無</option><option value="yes">有</option><option value="eval">評估中</option></select></div>
+                <div class="ff" id="senType" style="display:none"><label>SEN 類型</label>
+                  <select class="fi"><option>ADHD</option><option>讀寫困難</option><option>自閉症</option><option>智力障礙</option><option>聽障</option><option>視障</option><option>其他</option></select></div>
+                <div class="ff" id="iepField" style="display:none"><label>個人學習計劃（IEP）</label>
+                  <select class="fi"><option>有</option><option>無</option><option>制定中</option></select></div>
+                <div class="ff"><label>體育豁免</label>
+                  <select class="fi"><option>否</option><option>部分</option><option>全免</option></select></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /stuForm -->
+
+        <!-- ── STAFF FORM ── -->
+        <div id="staForm" style="display:none">
+
+          <div class="fsec">
+            <div class="fshdr op" onclick="togSec(this)">
+              <span class="fs-ico">🔵</span><span class="fs-ttl">基本身份</span>
+              <span class="fs-req">必填欄位</span><span class="fs-arr">▲</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg">
+                <div class="ff"><label>職員編號 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：T001"></div>
+                <div class="ff"><label>性別 <span class="rq">*</span></label>
+                  <select class="fi"><option value="">請選擇</option><option>男</option><option>女</option></select></div>
+                <div class="ff"><label>中文姓名 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：李美華"></div>
+                <div class="ff"><label>英文姓名 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：LEE Mei Wah"></div>
+                <div class="ff"><label>出生日期</label><input type="date" class="fi"></div>
+                <div class="ff"><label>國籍</label><input type="text" class="fi" placeholder="例：中國香港"></div>
+                <div class="ff"><label>身份證號碼（部分）</label><input type="text" class="fi" placeholder="薪酬系統對接用"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <div class="fshdr op" onclick="togSec(this)">
+              <span class="fs-ico">🟢</span><span class="fs-ttl">職位資料</span>
+              <span class="fs-req">必填欄位</span><span class="fs-arr">▲</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg">
+                <div class="ff"><label>角色 / 權限 <span class="rq">*</span></label>
+                  <select class="fi"><option value="">請選擇</option><option>校長</option><option>副校長</option><option>科主任</option><option>班主任</option><option>科任老師</option><option>職員</option><option>系統管理員</option></select></div>
+                <div class="ff"><label>職銜 <span class="rq">*</span></label><input type="text" class="fi" placeholder="例：英文科主任"></div>
+                <div class="ff"><label>受聘類別</label>
+                  <select class="fi"><option>全職</option><option>兼職</option><option>代課</option><option>合約</option></select></div>
+                <div class="ff"><label>入職日期 <span class="rq">*</span></label><input type="date" class="fi"></div>
+                <div class="ff"><label>合約到期日</label><input type="date" class="fi"></div>
+                <div class="ff"><label>職員狀態</label>
+                  <select class="fi"><option>在職</option><option>停用</option><option>離職</option></select></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <div class="fshdr" onclick="togSec(this)">
+              <span class="fs-ico">🟡</span><span class="fs-ttl">聯絡資料</span>
+              <span class="fs-req">必填欄位</span><span class="fs-arr">▼</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg">
+                <div class="ff"><label>學校電郵 <span class="rq">*</span></label><input type="email" class="fi" placeholder="Google / Microsoft 登入對應"></div>
+                <div class="ff"><label>私人電郵</label><input type="email" class="fi" placeholder="備用電郵"></div>
+                <div class="ff"><label>手提電話 <span class="rq">*</span></label><input type="tel" class="fi" placeholder="9XXX XXXX"></div>
+                <div class="ff"><label>住宅電話</label><input type="tel" class="fi" placeholder="2XXX XXXX"></div>
+                <div class="ff sp2"><label>住宅地址</label><input type="text" class="fi" placeholder="選填"></div>
+                <div class="ff"><label>緊急聯絡人姓名</label><input type="text" class="fi"></div>
+                <div class="ff"><label>緊急聯絡電話</label><input type="tel" class="fi"></div>
+                <div class="ff"><label>緊急聯絡人關係</label><input type="text" class="fi" placeholder="例：配偶"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <div class="fshdr" onclick="togSec(this)">
+              <span class="fs-ico">🟠</span><span class="fs-ttl">教學資料</span><span class="fs-arr">▼</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg">
+                <div class="ff"><label>任教科目（可多選）</label>
+                  <select class="fi" multiple style="height:90px"><option>中文</option><option>英文</option><option>數學</option><option>歷史</option><option>地理</option><option>物理</option><option>化學</option><option>生物</option><option>電腦</option><option>體育</option><option>音樂</option><option>視藝</option></select></div>
+                <div class="ff"><label>任教年級（可多選）</label>
+                  <select class="fi" multiple style="height:90px"><option>中一</option><option>中二</option><option>中三</option><option>中四</option><option>中五</option><option>中六</option></select></div>
+                <div class="ff"><label>主任班別</label>
+                  <select class="fi"><option value="">不適用</option><option>中一 1A</option><option>中一 1B</option><option>中二 2A</option><option>中二 2B</option><option>中三 3A</option><option>中三 3B</option></select></div>
+                <div class="ff"><label>兼任職務</label><input type="text" class="fi" placeholder="例：德育組、課外活動組"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fsec">
+            <div class="fshdr" onclick="togSec(this)">
+              <span class="fs-ico">🔐</span><span class="fs-ttl">登入 / 系統權限</span>
+              <span class="fs-req">必填欄位</span><span class="fs-arr">▼</span>
+            </div>
+            <div class="fsbdy">
+              <div class="fg">
+                <div class="ff"><label>登入方式 <span class="rq">*</span></label>
+                  <select class="fi"><option>Google</option><option>Microsoft</option><option>密碼</option></select></div>
+                <div class="ff"><label>可查閱班別</label>
+                  <select class="fi"><option>只能查閱自己班</option><option>全校</option><option>指定年級</option></select></div>
+                <div class="ff sp2"><label>系統權限備注</label>
+                  <input type="text" class="fi" placeholder="按角色自動預設，如有特殊需求請填寫"></div>
+              </div>
+              <p class="hint">🔒 系統權限按所選角色自動設定，管理員可手動調整。登入 IP 及最後登入時間由系統自動記錄。停用帳戶後即時無法登入。</p>
+            </div>
+          </div>
+
+        </div><!-- /staForm -->
+
+        <div class="form-btns">
+          <button class="btn btn-g" onclick="saveUser()">💾 儲存用戶</button>
+          <button class="btn btn-o" onclick="resetForm()">🔄 重設</button>
+        </div>
+      </div>
+    </div><!-- /pane-add -->
+
+    <!-- ─── TAB: CSV IMPORT ─── -->
+    <div id="pane-csv" style="display:none">
+      <div class="csv-wrap">
+
+        <div style="font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px">📥 下載 CSV 範本</div>
+        <div class="tpl-row">
+          <div class="tpl-btn" onclick="dlTpl('student')">📋 學生範本.csv</div>
+          <div class="tpl-btn" onclick="dlTpl('staff')">📋 教職員範本.csv</div>
+          <span class="tpl-note">· 必填欄位標示 * · 最多 500 行 · UTF-8 編碼</span>
+        </div>
+
+        <div class="drop-zone" id="dropZone" onclick="simCSV()">
+          <div class="dz-ico">📂</div>
+          <div class="dz-ttl">拖放 CSV 檔案至此</div>
+          <div class="dz-sub">支援 .csv 格式 · 最多 500 行 · UTF-8 編碼</div>
+          <div class="dz-cta">選擇檔案</div>
+        </div>
+
+        <!-- Progress -->
+        <div id="csvProgress">
+          <div class="prog-top">
+            <span id="progLbl">正在處理…</span>
+            <b id="progPct">0%</b>
+          </div>
+          <div class="prog-bg"><div class="prog-bar" id="progBar"></div></div>
+        </div>
+
+        <!-- Results -->
+        <div id="csvResults">
+          <div class="res-sum">
+            <div class="rsn"><div class="rsn-num" style="color:#4ADE80" id="resOk">0</div><div class="rsn-lbl">成功</div></div>
+            <div class="rs-div"></div>
+            <div class="rsn"><div class="rsn-num" style="color:#FCA5A5" id="resErr">0</div><div class="rsn-lbl">失敗</div></div>
+            <div class="rs-div"></div>
+            <div class="rsn"><div class="rsn-num" style="color:var(--y)" id="resDup">0</div><div class="rsn-lbl">重複</div></div>
+            <div class="rs-div"></div>
+            <div class="res-note" id="resNote"></div>
+          </div>
+
+          <div class="rp">
+            <div class="rp-hdr" id="rpHdr" onclick="togRP()">
+              <span class="rp-bdg" id="rpBdg">1</span>
+              <span class="rp-ttl">展開查看所有 100 行結果</span>
+              <span class="rp-arr" id="rpArr">▼</span>
+            </div>
+            <div class="rp-body" id="rpBody">
+              <table class="rtbl">
+                <thead><tr><th>行</th><th>學號</th><th>姓名</th><th>班別</th><th>狀態</th><th>說明</th></tr></thead>
+                <tbody id="resTbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="res-acts" id="resActs"></div>
+        </div>
+
+      </div>
+    </div><!-- /pane-csv -->
+
+  </div><!-- /content -->
+</div><!-- /mainView -->
+
+<!-- Duplicate Modal -->
+<div class="mbg hide" id="dupModal">
+  <div class="mbox">
+    <div class="mhdr">
+      <h3>⚠️ 發現重複記錄</h3>
+      <button class="mx" onclick="closeDup()">✕</button>
+    </div>
+    <div class="dup-info" id="dupInfo"></div>
+    <div class="dup-opts">
+      <div class="dopt sel" id="dopt1" onclick="selDup(1)">
+        <h4>📄 另開一個新檔案</h4>
+        <p>只匯入全新記錄，重複項目略過不處理，建議日後另行單獨更新。</p>
+      </div>
+      <div class="dopt" id="dopt2" onclick="selDup(2)">
+        <h4>✏️ 補完現有檔案</h4>
+        <p>重複記錄中，現有為空白的欄位才更新，已有資料保持不變。</p>
+      </div>
+      <div class="dopt" id="dopt3" onclick="selDup(3)">
+        <h4>🔄 覆蓋現有檔案</h4>
+        <p>重複記錄全部以新資料替換，現有資料將被覆蓋，操作不可逆。</p>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-o" onclick="closeDup()">取消</button>
+      <button class="btn btn-g" onclick="confirmDup()">確認匯入</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"><span id="tIco"></span><span id="tMsg"></span></div>
+
+<script>
+// ─── DEMO DATA ───────────────────────────────────────────────────────────────
+const USERS=[
+  {id:'2025001',type:'student',zh:'陳大文',en:'CHAN Tai Man',cls:'中二 2A',no:1,role:'',contact:'91234567',src:'CSV匯入',active:true},
+  {id:'2025002',type:'student',zh:'李美玲',en:'LEE Mei Ling',cls:'中二 2A',no:2,role:'',contact:'92345678',src:'CSV匯入',active:true},
+  {id:'2025003',type:'student',zh:'王志強',en:'WONG Chi Keung',cls:'中一 1B',no:5,role:'',contact:'93456789',src:'手動新增',active:true},
+  {id:'2025004',type:'student',zh:'張嘉怡',en:'CHEUNG Ka Yi',cls:'中三 3A',no:8,role:'',contact:'94567890',src:'CSV匯入',active:false},
+  {id:'2025005',type:'student',zh:'黃俊傑',en:'WONG Chun Kit',cls:'中二 2B',no:12,role:'',contact:'95555001',src:'CSV匯入',active:true},
+  {id:'T001',type:'staff',zh:'李老師',en:'LEE Siu Ming',cls:'中二 2A',no:0,role:'班主任',contact:'lee@cncs.edu.hk',src:'手動新增',active:true},
+  {id:'T002',type:'staff',zh:'陳主任',en:'CHAN Wai Kin',cls:'',no:0,role:'英文科主任',contact:'chan@cncs.edu.hk',src:'手動新增',active:true},
+  {id:'T003',type:'staff',zh:'黃老師',en:'WONG Siu Fong',cls:'',no:0,role:'科任老師',contact:'wong@cncs.edu.hk',src:'CSV匯入',active:true},
+  {id:'A001',type:'staff',zh:'李主任',en:'LEE Kwok Wah',cls:'',no:0,role:'系統管理員',contact:'admin@cncs.edu.hk',src:'系統預設',active:true},
+];
+
+let curFilter='all',dupChoice=1,csvData=[];
+
+// ─── LOGIN ───────────────────────────────────────────────────────────────────
+function doLogin(){
+  if(!document.getElementById('schoolCode').value||!document.getElementById('loginName').value||!document.getElementById('loginPwd').value)
+  {toast('⚠️','請填寫所有欄位');return;}
+  enterMain();
+}
+function ssoLogin(p){toast('🔗',`正在跳轉至 ${p} 登入⋯（DEMO）`);setTimeout(enterMain,800);}
+function demoLogin(){enterMain();}
+function doLogout(){
+  document.getElementById('mainView').style.display='none';
+  document.getElementById('loginView').style.display='flex';
+  toast('👋','已登出系統');
+}
+function enterMain(){
+  document.getElementById('loginView').style.display='none';
+  document.getElementById('mainView').style.display='flex';
+  renderStats();renderTable();
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+function sTab(t){
+  ['list','add','csv'].forEach(x=>{
+    document.getElementById('tab-'+x).classList.toggle('on',x===t);
+    document.getElementById('pane-'+x).style.display=x===t?'block':'none';
+  });
+  if(t==='list'){renderStats();renderTable();}
+}
+
+// ─── USER LIST ───────────────────────────────────────────────────────────────
+function renderStats(){
+  const s=USERS.filter(u=>u.type==='student'),t=USERS.filter(u=>u.type==='staff');
+  const on=USERS.filter(u=>u.active),off=USERS.filter(u=>!u.active);
+  document.getElementById('statsRow').innerHTML=`
+    <div class="scard"><div class="sc-lbl">總用戶</div><div class="sc-num" style="color:#93C5FD">${USERS.length}</div></div>
+    <div class="scard"><div class="sc-lbl">學生</div><div class="sc-num" style="color:#4ADE80">${s.length}</div></div>
+    <div class="scard"><div class="sc-lbl">教職員</div><div class="sc-num" style="color:var(--y)">${t.length}</div></div>
+    <div class="scard"><div class="sc-lbl">已啟用</div><div class="sc-num" style="color:#22C55E">${on.length}</div></div>
+    <div class="scard"><div class="sc-lbl">已停用</div><div class="sc-num" style="color:#FCA5A5">${off.length}</div></div>
+  `;
+}
+function setFilter(f){
+  curFilter=f;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('on',b.dataset.f===f));
+  renderTable();
+}
+function renderTable(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  const list=USERS.filter(u=>{
+    if(curFilter==='student'&&u.type!=='student')return false;
+    if(curFilter==='staff'&&u.type!=='staff')return false;
+    if(q&&![u.zh,u.en,u.id,u.cls,u.role].join(' ').toLowerCase().includes(q))return false;
+    return true;
+  });
+  const tb=document.getElementById('userTbody');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--mu);padding:24px">沒有符合的用戶</td></tr>`;return;}
+  tb.innerHTML=list.map(u=>{
+    const isS=u.type==='student';
+    const avc=isS?'av av-s':(u.role==='系統管理員'?'av av-a':'av av-t');
+    const tyBdg=isS?'<span class="bdg bs">學生</span>':'<span class="bdg bt">教職員</span>';
+    const sub=isS?`${u.id} · 座號 ${u.no}`:`${u.id}`;
+    return`<tr>
+      <td><div class="ncell"><div class="${avc}">${u.zh[0]}</div><div><div class="nm">${u.zh}</div><div class="nm2">${sub}</div></div></div></td>
+      <td>${tyBdg}${u.role?`<div style="font-size:11px;color:var(--mu);margin-top:3px">${u.role}</div>`:''}</td>
+      <td style="font-size:12px">${isS?u.cls:(u.cls||'—')}</td>
+      <td style="font-size:12px;color:var(--mu)">${u.contact}</td>
+      <td style="font-size:11px;color:var(--mu)">${u.src}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="tg${u.active?' on':''}" onclick="togUser('${u.id}')" title="${u.active?'點擊停用':'點擊啟用'}"></div>
+          <span class="bdg ${u.active?'bon':'bof'}">${u.active?'啟用':'停用'}</span>
+        </div>
+      </td>
+      <td><div class="row-acts">
+        <button class="ib ed" title="編輯">✏️</button>
+        <button class="ib dl" title="刪除" onclick="delUser('${u.id}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+function togUser(id){
+  const u=USERS.find(x=>x.id===id);if(!u)return;
+  u.active=!u.active;
+  renderStats();renderTable();
+  toast(u.active?'✅':'🔕',`${u.zh} 已${u.active?'啟用（老師可即時登入）':'停用（即時無法登入）'}`);
+}
+function delUser(id){
+  const u=USERS.find(x=>x.id===id);if(!u)return;
+  toast('🗑',`${u.zh} 已刪除（示範）`);
+}
+
+// ─── ADD USER ────────────────────────────────────────────────────────────────
+let uType='student',parentCount=1;
+function setUType(t){
+  uType=t;
+  document.getElementById('tt-s').classList.toggle('on',t==='student');
+  document.getElementById('tt-t').classList.toggle('on',t==='staff');
+  document.getElementById('stuForm').style.display=t==='student'?'block':'none';
+  document.getElementById('staForm').style.display=t==='staff'?'block':'none';
+}
+function togSec(h){
+  h.classList.toggle('op');
+  const a=h.querySelector('.fs-arr');
+  if(a)a.textContent=h.classList.contains('op')?'▲':'▼';
+}
+function togSEN(){
+  const v=document.getElementById('senSel').value;
+  document.getElementById('senType').style.display=v?'block':'none';
+  document.getElementById('iepField').style.display=v==='yes'?'block':'none';
+}
+function addParent(){
+  parentCount++;
+  const n=parentCount;
+  const el=document.createElement('div');
+  el.className='pb';el.id='pb'+n;
+  el.innerHTML=`
+    <div class="pb-hdr">
+      <span class="pb-lbl">第 ${n} 聯絡人</span>
+      <button class="rm-btn" onclick="removeParent(${n})">移除</button>
+    </div>
+    <div class="fg">
+      <div class="ff"><label>家長姓名</label><input type="text" class="fi" placeholder="例：陳美玲"></div>
+      <div class="ff"><label>關係</label><select class="fi"><option value="">請選擇</option><option>父親</option><option>母親</option><option>祖父</option><option>祖母</option><option>監護人</option><option>其他</option></select></div>
+      <div class="ff"><label>手提電話</label><input type="tel" class="fi" placeholder="9XXX XXXX"></div>
+      <div class="ff"><label>電郵</label><input type="email" class="fi"></div>
+      <div class="ff"><label>工作電話</label><input type="tel" class="fi"></div>
+      <div class="ff"><label>職業</label><input type="text" class="fi"></div>
+    </div>`;
+  document.getElementById('parentBlocks').appendChild(el);
+  toast('➕','已新增第 '+n+' 聯絡人欄位');
+}
+function removeParent(n){const el=document.getElementById('pb'+n);if(el){el.remove();toast('🗑','已移除聯絡人欄位');}}
+function saveUser(){toast('💾',uType==='student'?'學生帳戶已建立（示範）':'教職員帳戶已建立（示範）');setTimeout(()=>sTab('list'),600);}
+function resetForm(){document.querySelectorAll('#pane-add .fi').forEach(el=>{if(el.tagName==='SELECT')el.selectedIndex=0;else el.value='';});toast('🔄','表單已重設');}
+
+// ─── CSV IMPORT ──────────────────────────────────────────────────────────────
+const SN=['陳','李','張','王','黃','劉','吳','楊','趙','周','鄧','林','徐','孫','馬','朱','胡'];
+const NM=['志明','美玲','偉強','嘉怡','文龍','曉彤','雅詩','俊傑','婉儀','建華','志豪','慧敏','國強','寶珊','永康','俊熙','詩雯'];
+const CL=['中一 1A','中一 1B','中二 2A','中二 2B','中三 3A','中三 3B'];
+
+function genCSVData(){
+  const rows=[];
+  for(let i=0;i<100;i++){
+    rows.push({
+      row:i+2,
+      id:'2026'+String(i+1).padStart(3,'0'),
+      name:SN[i%SN.length]+NM[Math.floor(i/SN.length)%NM.length],
+      cls:CL[i%CL.length],
+      seat:(i%35)+1,
+      ok:true,err:null,dup:false
+    });
+  }
+  // 1 error at row 43: missing 家長電話
+  rows[42].ok=false;rows[42].err='缺少必填欄位：家長電話';
+  // 2 duplicates with existing system records
+  rows[10].dup=true;rows[28].dup=true;
+  return rows;
+}
+
+function dlTpl(t){toast('📥',`${t==='student'?'學生':'教職員'} CSV 範本已下載（示範）`);}
+
+function simCSV(){
+  csvData=genCSVData();
+  document.getElementById('dropZone').style.display='none';
+  document.getElementById('csvProgress').style.display='block';
+  document.getElementById('csvResults').style.display='none';
+  let pct=0;
+  const bar=document.getElementById('progBar');
+  const lbl=document.getElementById('progLbl');
+  const pEl=document.getElementById('progPct');
+  const iv=setInterval(()=>{
+    pct+=Math.random()*10+4;
+    if(pct>100)pct=100;
+    bar.style.width=pct+'%';
+    pEl.textContent=Math.floor(pct)+'%';
+    lbl.textContent=`正在驗證第 ${Math.min(Math.floor(pct),99)} 行⋯`;
+    if(pct>=100){clearInterval(iv);lbl.textContent='驗證完成';setTimeout(showRes,400);}
+  },70);
+}
+
+function showRes(){
+  document.getElementById('csvProgress').style.display='none';
+  document.getElementById('csvResults').style.display='block';
+  const ok=csvData.filter(r=>r.ok).length;
+  const err=csvData.filter(r=>!r.ok).length;
+  const dup=csvData.filter(r=>r.ok&&r.dup).length;
+  const clean=ok-dup;
+  document.getElementById('resOk').textContent=clean;
+  document.getElementById('resErr').textContent=err;
+  document.getElementById('resDup').textContent=dup;
+  document.getElementById('rpBdg').textContent=err;
+  document.getElementById('resNote').innerHTML=
+    `<strong>處理完成 · 共 100 行</strong><br>
+     <span style="color:#4ADE80">✓ ${clean} 筆</span> 可直接匯入 ·
+     <span style="color:#FCA5A5">✕ ${err} 筆</span> 有錯誤需修正 ·
+     <span style="color:var(--y)">△ ${dup} 筆</span> 與現有記錄重複`;
+
+  document.getElementById('resTbody').innerHTML=csvData.map(r=>{
+    const cls=!r.ok?'r-err':(r.dup?'r-dup':'');
+    const stat=!r.ok?`<span class="err-mk">✕ 失敗</span>`:
+                r.dup?`<span class="dup-mk">△ 重複</span>`:
+                `<span class="ok-mk">✓ 成功</span>`;
+    const rsn=!r.ok?`<span class="err-rsn">${r.err}</span>`:
+              r.dup?`<span class="dup-rsn">學號已存在於系統</span>`:'—';
+    return`<tr class="${cls}">
+      <td style="color:var(--mu)">${r.row}</td>
+      <td>${r.id}</td><td>${r.name}</td>
+      <td style="font-size:11px">${r.cls}</td>
+      <td>${stat}</td><td>${rsn}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('resActs').innerHTML=`
+    <button class="btn btn-g" onclick="importClean()">✅ 匯入成功的 ${clean} 個</button>
+    <button class="btn" style="background:rgba(245,197,24,.07);border-color:rgba(245,197,24,.2);color:var(--y)" onclick="openDup()">⚠️ 處理 ${dup} 個重複項目</button>
+    <button class="btn btn-o" onclick="resetCSV()">🔄 重新上載</button>
+  `;
+}
+
+function togRP(){
+  const h=document.getElementById('rpHdr');h.classList.toggle('op');
+  document.getElementById('rpBody').style.display=h.classList.contains('op')?'block':'none';
+  document.getElementById('rpArr').textContent=h.classList.contains('op')?'▲':'▼';
+}
+
+function importClean(){toast('✅','已成功匯入 97 位學生帳戶');setTimeout(()=>sTab('list'),700);}
+function resetCSV(){
+  document.getElementById('csvResults').style.display='none';
+  document.getElementById('csvProgress').style.display='none';
+  document.getElementById('dropZone').style.display='block';
+  document.getElementById('progBar').style.width='0';
+  document.getElementById('rpHdr').classList.remove('op');
+  document.getElementById('rpBody').style.display='none';
+}
+
+// ─── DUPLICATE MODAL ─────────────────────────────────────────────────────────
+function openDup(){
+  const dups=csvData.filter(r=>r.ok&&r.dup);
+  document.getElementById('dupInfo').innerHTML=
+    `發現 <strong>${dups.length} 筆</strong>重複記錄（學號已存在系統）：<br>
+     <strong>${dups.map(r=>r.id+' '+r.name).join(' · ')}</strong><br><br>
+     請選擇處理方式：`;
+  document.getElementById('dupModal').classList.remove('hide');
+}
+function closeDup(){document.getElementById('dupModal').classList.add('hide');}
+function selDup(n){
+  dupChoice=n;
+  [1,2,3].forEach(i=>document.getElementById('dopt'+i).classList.toggle('sel',i===n));
+}
+function confirmDup(){
+  const msgs=['','只匯入新記錄，重複的已略過','重複記錄空白欄位已補完','重複記錄已全部覆蓋'];
+  closeDup();toast('✅',msgs[dupChoice]+'（示範）');
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function toast(ico,msg){
+  const t=document.getElementById('toastEl');
+  document.getElementById('tIco').textContent=ico;
+  document.getElementById('tMsg').textContent=msg;
+  t.classList.add('on');clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('on'),2800);
+}
+</script>
+</body>
+</html>
