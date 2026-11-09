@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>陳南昌紀念學校 · 管理系統</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1B6E3C;--gl:#24A05A;--yellow:#F5C518;
+  --dark:#0D1B2A;--card:#162032;--card2:#1E2D42;
+  --border:#2A3D55;--text:#E8EDF3;--muted:#7A90A8;
+}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  height:58px;background:#07101A;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 16px;gap:0;
+}
+.mob-toggle{
+  display:none;width:34px;height:34px;border-radius:8px;
+  background:var(--card2);border:1px solid var(--border);
+  align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;flex-shrink:0;margin-right:10px;
+}
+.logo-wrap{
+  display:flex;align-items:center;gap:10px;
+  padding-right:20px;border-right:1px solid var(--border);
+  margin-right:14px;flex-shrink:0;
+}
+.logo-badge{
+  width:36px;height:36px;border-radius:9px;
+  background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;color:var(--yellow);font-size:14px;
+}
+.logo-txt h2{font-size:10.5px;color:var(--yellow);font-weight:700;white-space:nowrap;}
+.logo-txt p{font-size:9px;color:var(--muted);margin-top:2px;white-space:nowrap;}
+
+.main-nav{display:flex;gap:3px;flex:1;}
+.nav-tab{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:8px;
+  cursor:pointer;font-size:13px;font-weight:600;
+  color:var(--muted);transition:all .2s;
+  user-select:none;white-space:nowrap;
+}
+.nav-tab:hover{background:var(--card2);color:var(--text);}
+.nav-tab.active{background:var(--green);color:#fff;}
+.nav-tab.active .ni{color:var(--yellow);}
+.ni{font-size:15px;}
+.coming-chip{
+  font-size:9px;padding:2px 6px;border-radius:10px;
+  background:rgba(122,144,168,.12);color:var(--muted);
+}
+
+.top-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.notif-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--card2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:14px;position:relative;
+}
+.notif-dot{
+  position:absolute;top:7px;right:7px;
+  width:6px;height:6px;background:#EF4444;
+  border-radius:50%;border:1.5px solid #07101A;
+}
+.user-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 10px;background:var(--card2);
+  border:1px solid var(--border);border-radius:8px;cursor:pointer;
+}
+.user-av{
+  width:27px;height:27px;border-radius:50%;
+  background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;
+}
+.user-name{font-size:12px;font-weight:600;}
+.user-role{font-size:10px;color:var(--muted);}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;margin-top:58px;min-height:calc(100vh - 58px);}
+
+/* ── LEFT SIDEBAR ── */
+.sidebar{
+  width:220px;position:fixed;
+  top:58px;bottom:0;left:0;
+  background:#09141F;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;z-index:200;transition:transform .3s;
+}
+.sb-sec{display:none;flex-direction:column;flex:1;}
+.sb-sec.on{display:flex;}
+.sb-hdr{padding:14px 14px 10px;border-bottom:1px solid var(--border);}
+.sb-hdr-tag{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+.sb-hdr-name{font-size:13px;font-weight:700;color:var(--text);margin-top:4px;}
+.sb-nav{padding:8px;}
+.sb-item{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 10px;border-radius:8px;
+  cursor:pointer;font-size:13px;color:var(--muted);
+  transition:all .2s;margin-bottom:2px;
+  border:1px solid transparent;
+}
+.sb-item:hover{background:var(--card2);color:var(--text);}
+.sb-item.on{background:rgba(27,110,60,.2);color:#4ADE80;border-color:rgba(27,110,60,.3);}
+.sb-item.on .si{color:var(--yellow);}
+.si{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.sb-badge{
+  margin-left:auto;font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:10px;
+}
+.bd-done{background:rgba(34,197,94,.15);color:#22C55E;}
+.bd-wip{background:rgba(122,144,168,.1);color:var(--muted);}
+/* Sidebar coming soon */
+.sb-cs{
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  flex:1;padding:32px 20px;text-align:center;gap:12px;
+}
+.sb-cs.on{display:flex;}
+.sb-cs-ico{font-size:36px;opacity:.25;}
+.sb-cs p{font-size:12px;color:var(--muted);line-height:1.8;}
+
+/* ── MAIN ── */
+.main{flex:1;margin-left:220px;padding:24px;min-width:0;overflow-y:auto;}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--muted);margin-bottom:18px;
+}
+.breadcrumb span{color:var(--muted);}
+.breadcrumb strong{color:var(--text);font-weight:500;}
+
+/* ── DASHBOARD ── */
+.dash-hello{margin-bottom:18px;}
+.dash-hello h1{font-size:21px;font-weight:700;}
+.dash-hello h1 em{color:var(--yellow);font-style:normal;}
+.dash-hello p{font-size:12px;color:var(--muted);margin-top:4px;}
+
+.qs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:11px;margin-bottom:20px;}
+.qs-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:15px 14px;position:relative;overflow:hidden;
+}
+.qs-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.qc-g::after{background:var(--gl);}
+.qc-y::after{background:var(--yellow);}
+.qc-b::after{background:#3B82F6;}
+.qc-r::after{background:#EF4444;}
+.qc-p::after{background:#8B5CF6;}
+.qs-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.qs-num{font-size:26px;font-weight:700;margin:5px 0 3px;line-height:1;}
+.qs-sub{font-size:11px;color:var(--muted);}
+.qs-ico{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:26px;opacity:.1;}
+
+.sec-ttl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:12px;margin-bottom:22px;}
+.mod-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:16px;
+  cursor:pointer;transition:all .18s;
+  display:flex;flex-direction:column;gap:10px;
+}
+.mod-card:hover{border-color:var(--gl);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.mod-card.dim{opacity:.5;cursor:default;}
+.mod-card.dim:hover{border-color:var(--border);transform:none;box-shadow:none;}
+.mod-row{display:flex;align-items:center;gap:10px;}
+.mod-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.mi-g{background:rgba(27,110,60,.25);}
+.mi-b{background:rgba(59,130,246,.2);}
+.mi-y{background:rgba(245,197,24,.2);}
+.mi-p{background:rgba(139,92,246,.2);}
+.mod-info h4{font-size:14px;font-weight:600;}
+.mod-info p{font-size:11px;color:var(--muted);margin-top:1px;}
+.mod-code{margin-left:auto;font-size:10px;color:var(--yellow);font-weight:700;}
+.mod-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.mod-pill{align-self:flex-start;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.pill-done{background:rgba(34,197,94,.12);color:#22C55E;}
+.pill-wip{background:rgba(122,144,168,.1);color:var(--muted);}
+
+.act-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.act-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(42,61,85,.4);font-size:13px;}
+.act-row:last-child{border-bottom:none;}
+.act-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.act-bd{flex:1;}
+.act-bd strong{display:block;font-size:13px;font-weight:500;}
+.act-bd span{display:block;font-size:11px;color:var(--muted);margin-top:2px;}
+.act-time{font-size:11px;color:var(--muted);flex-shrink:0;}
+
+/* ── PLACEHOLDER ── */
+.ph-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:62vh;text-align:center;gap:13px;}
+.ph-ico{font-size:52px;opacity:.2;}
+.ph-code{font-size:11px;color:var(--yellow);font-weight:700;letter-spacing:1px;}
+.ph-title{font-size:20px;font-weight:700;}
+.ph-desc{font-size:13px;color:var(--muted);max-width:300px;line-height:1.7;}
+.ph-pill{background:rgba(122,144,168,.1);border:1px solid rgba(122,144,168,.2);color:var(--muted);padding:7px 18px;border-radius:20px;font-size:12px;font-weight:600;}
+
+/* ── D-02 ATTENDANCE PAGE ── */
+.att-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.att-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px;margin-top:14px;}
+.att-feat{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:12px;}
+.att-ft{font-size:11px;color:var(--yellow);font-weight:600;margin-bottom:4px;}
+.att-fd{font-size:11px;color:var(--muted);}
+.att-note{margin-top:14px;padding:13px 16px;background:rgba(245,197,24,.05);border:1px solid rgba(245,197,24,.15);border-radius:9px;font-size:12px;color:var(--muted);line-height:1.8;}
+
+/* ── COMING SOON (main) ── */
+.cs-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:68vh;text-align:center;gap:16px;}
+.cs-ico{font-size:64px;opacity:.2;}
+.cs-title{font-size:22px;font-weight:700;color:var(--muted);}
+.cs-sub{font-size:13px;color:var(--muted);max-width:340px;line-height:1.8;}
+.cs-pill{background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);color:var(--yellow);padding:7px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.5px;}
+
+/* ── MOBILE ── */
+.mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:190;}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-220px);}
+  .sidebar.open{transform:none;}
+  .main{margin-left:0;}
+  .mob-toggle{display:flex;}
+}
+@media(max-width:640px){
+  .main{padding:14px;}
+  .logo-txt{display:none;}
+  .user-name,.user-role{display:none;}
+  .coming-chip{display:none;}
+  .nav-tab{padding:8px 10px;font-size:12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<header class="topbar">
+  <button class="mob-toggle" id="mobToggle">☰</button>
+  <div class="logo-wrap">
+    <div class="logo-badge">陳</div>
+    <div class="logo-txt">
+      <h2>陳南昌紀念學校</h2>
+      <p>Chan Nam Cheong Memorial School</p>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <div class="nav-tab on" data-tab="student" onclick="switchTab('student')">
+      <span class="ni">👤</span>學生
+    </div>
+    <div class="nav-tab" data-tab="skills" onclick="switchTab('skills')">
+      <span class="ni">⭐</span>技能系統<span class="coming-chip">即將推出</span>
+    </div>
+    <div class="nav-tab" data-tab="ai" onclick="switchTab('ai')">
+      <span class="ni">🤖</span>AI 教練<span class="coming-chip">即將推出</span>
+    </div>
+    <div class="nav-tab" data-tab="admin" onclick="switchTab('admin')">
+      <span class="ni">⚙️</span>管理<span class="coming-chip">即將推出</span>
+    </div>
+  </nav>
+  <div class="top-right">
+    <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+    <div class="user-chip">
+      <div class="user-av">李</div>
+      <div>
+        <div class="user-name">李老師</div>
+        <div class="user-role">班主任 · 中二 2A</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── BODY ── -->
+<div class="body-wrap">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- 學生 -->
+    <div class="sb-sec on" id="sb-student">
+      <div class="sb-hdr">
+        <div class="sb-hdr-tag">SECTION</div>
+        <div class="sb-hdr-name">學生管理</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-item on" data-page="dashboard" onclick="switchPage('dashboard')">
+          <span class="si">🏠</span>總覽
+        </div>
+        <div class="sb-item" data-page="profile" onclick="switchPage('profile')">
+          <span class="si">👤</span>學生檔案
+          <span class="sb-badge bd-wip">D-01</span>
+        </div>
+        <div class="sb-item" data-page="attendance" onclick="switchPage('attendance')">
+          <span class="si">📋</span>點名系統
+          <span class="sb-badge bd-done">D-02</span>
+        </div>
+        <div class="sb-item" data-page="report" onclick="switchPage('report')">
+          <span class="si">📊</span>出席統計報告
+          <span class="sb-badge bd-wip">即將</span>
+        </div>
+        <div class="sb-item" data-page="parent" onclick="switchPage('parent')">
+          <span class="si">📞</span>家長通訊記錄
+          <span class="sb-badge bd-wip">即將</span>
+        </div>
+      </nav>
+    </div>
+
+    <!-- 技能系統 -->
+    <div class="sb-cs" id="sb-skills">
+      <div class="sb-cs-ico">⭐</div>
+      <p><strong style="color:var(--text)">技能系統</strong><br>即將推出</p>
+    </div>
+
+    <!-- AI 教練 -->
+    <div class="sb-cs" id="sb-ai">
+      <div class="sb-cs-ico">🤖</div>
+      <p><strong style="color:var(--text)">AI 教練</strong><br>即將推出</p>
+    </div>
+
+    <!-- 管理 -->
+    <div class="sb-cs" id="sb-admin">
+      <div class="sb-cs-ico">⚙️</div>
+      <p><strong style="color:var(--text)">管理</strong><br>即將推出</p>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main"></main>
+
+</div>
+
+<div class="mob-overlay" id="mobOverlay" onclick="closeSidebar()"></div>
+
+<script>
+let curTab = 'student', curPage = 'dashboard';
+
+/* ── CONTENT ── */
+
+function buildDashboard() {
+  const d = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  const ds = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（星期${days[d.getDay()]}）`;
+  return `
+<div class="breadcrumb"><span>學生</span><span>›</span><strong>總覽</strong></div>
+<div class="dash-hello">
+  <h1>你好，<em>李老師</em> 👋</h1>
+  <p>${ds} · 中二 2A 班主任</p>
+</div>
+<div class="qs-grid">
+  <div class="qs-card qc-g"><div class="qs-lbl">總學生人數</div><div class="qs-num" style="color:#4ADE80">15</div><div class="qs-sub">中二 2A</div><div class="qs-ico">👤</div></div>
+  <div class="qs-card qc-y"><div class="qs-lbl">今日出席率</div><div class="qs-num" style="color:var(--yellow)">—</div><div class="qs-sub">點名未完成</div><div class="qs-ico">📋</div></div>
+  <div class="qs-card qc-b"><div class="qs-lbl">本月出席率</div><div class="qs-num" style="color:#93C5FD">—</div><div class="qs-sub">資料不足</div><div class="qs-ico">📊</div></div>
+  <div class="qs-card qc-r"><div class="qs-lbl">需跟進個案</div><div class="qs-num" style="color:#FCA5A5">0</div><div class="qs-sub">今日</div><div class="qs-ico">⚑</div></div>
+  <div class="qs-card qc-p"><div class="qs-lbl">家長通知待發</div><div class="qs-num" style="color:#C4B5FD">0</div><div class="qs-sub">待發送</div><div class="qs-ico">📞</div></div>
+</div>
+<div class="sec-ttl">功能模組</div>
+<div class="mod-grid">
+  <div class="mod-card dim">
+    <div class="mod-row"><div class="mod-ico mi-g">👤</div><div class="mod-info"><h4>學生檔案</h4><p>個人資料管理</p></div><div class="mod-code">D-01</div></div>
+    <div class="mod-desc">學生個人資料、聯絡資訊、學業與行為記錄。</div>
+    <span class="mod-pill pill-wip">⋯ 開發中</span>
+  </div>
+  <div class="mod-card" onclick="switchPage('attendance')">
+    <div class="mod-row"><div class="mod-ico mi-g">📋</div><div class="mod-info"><h4>點名系統</h4><p>出席記錄</p></div><div class="mod-code">D-02</div></div>
+    <div class="mod-desc">上午 / 下午點名，六種出席狀態，備注、家長通知、鎖定。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card dim">
+    <div class="mod-row"><div class="mod-ico mi-b">📊</div><div class="mod-info"><h4>出席統計報告</h4><p>數據分析</p></div><div class="mod-code">D-03</div></div>
+    <div class="mod-desc">班級整體出席率、月度趨勢圖表、個別學生報告。</div>
+    <span class="mod-pill pill-wip">⋯ 開發中</span>
+  </div>
+  <div class="mod-card dim">
+    <div class="mod-row"><div class="mod-ico mi-y">📞</div><div class="mod-info"><h4>家長通訊記錄</h4><p>溝通管理</p></div><div class="mod-code">D-04</div></div>
+    <div class="mod-desc">家長聯絡記錄、缺席通知發送、溝通歷史存檔。</div>
+    <span class="mod-pill pill-wip">⋯ 開發中</span>
+  </div>
+</div>
+<div class="sec-ttl">開發進度</div>
+<div class="act-card">
+  <div class="act-row">
+    <div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div>
+    <div class="act-bd"><strong>D-02 點名系統</strong><span>六種狀態、上午/下午時段、遲到分鐘、原因選擇、通知家長、備注、旗標、鎖定保護</span></div>
+    <span class="act-time" style="color:#22C55E">完成</span>
+  </div>
+  <div class="act-row">
+    <div class="act-ico" style="background:rgba(245,197,24,.1)">🚧</div>
+    <div class="act-bd"><strong>D-01 學生檔案</strong><span>學生個人資料、聯絡資訊、學業記錄</span></div>
+    <span class="act-time">待開始</span>
+  </div>
+  <div class="act-row">
+    <div class="act-ico" style="background:rgba(59,130,246,.1)">🚧</div>
+    <div class="act-bd"><strong>D-03 出席統計報告</strong><span>月度統計、趨勢圖表、個別報告</span></div>
+    <span class="act-time">待開始</span>
+  </div>
+  <div class="act-row">
+    <div class="act-ico" style="background:rgba(139,92,246,.1)">🚧</div>
+    <div class="act-bd"><strong>D-04 家長通訊記錄</strong><span>聯絡記錄、通知發送、溝通歷史</span></div>
+    <span class="act-time">待開始</span>
+  </div>
+</div>`;
+}
+
+function buildAttendance() {
+  const feats = [
+    ['六種出席狀態','出席、遲到、病假、事假、缺席、早退'],
+    ['上午 / 下午時段','各自獨立記錄，互不影響'],
+    ['遲到詳細記錄','分鐘數 + 原因選擇 + 自行輸入'],
+    ['家長通知勾選','缺席 / 遲到 / 早退即時標記'],
+    ['備注 + 旗標','個別學生附加備注及跟進旗標'],
+    ['鎖定 / 解鎖','完成後防誤改保護'],
+    ['即時統計','六項人數 + 完成進度條'],
+    ['自動儲存','草稿儲存狀態指示器'],
+  ];
+  return `
+<div class="breadcrumb"><span>學生</span><span>›</span><strong>點名系統</strong></div>
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
+  <div>
+    <h1 style="font-size:20px;font-weight:700;">點名系統 <span style="color:var(--yellow)">D-02</span></h1>
+    <p style="font-size:12px;color:var(--muted);margin-top:3px;">上午 / 下午出席記錄</p>
+  </div>
+  <span style="background:rgba(34,197,94,.12);color:#22C55E;border:1px solid rgba(34,197,94,.25);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;">✅ 已完成</span>
+</div>
+<div class="att-card">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:44px;height:44px;background:rgba(27,110,60,.25);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📋</div>
+    <div>
+      <h3 style="font-size:15px;font-weight:600;">D-02 點名系統</h3>
+      <p style="font-size:12px;color:var(--muted);margin-top:2px;">完整版已於獨立 HTML 檔案完成</p>
+    </div>
+  </div>
+  <div class="att-grid">
+    ${feats.map(([t,d])=>`<div class="att-feat"><div class="att-ft">${t}</div><div class="att-fd">${d}</div></div>`).join('')}
+  </div>
+  <div class="att-note">
+    💡 此頁面整合後將直接載入 D-02 點名介面。<br>
+    目前請開啟獨立的 <strong style="color:var(--yellow)">D_02_Attendance.html</strong> 使用完整功能。
+  </div>
+</div>`;
+}
+
+function buildPlaceholder(ico, code, title, desc, crumb) {
+  return `
+<div class="breadcrumb"><span>學生</span><span>›</span><strong>${crumb}</strong></div>
+<div class="ph-wrap">
+  <div class="ph-ico">${ico}</div>
+  <div class="ph-code">${code}</div>
+  <div class="ph-title">${title}</div>
+  <div class="ph-desc">${desc}</div>
+  <span class="ph-pill">⋯ 開發中</span>
+</div>`;
+}
+
+function buildComingSoon(ico, title, sub) {
+  return `<div class="cs-wrap">
+    <div class="cs-ico">${ico}</div>
+    <div class="cs-title">${title}</div>
+    <div class="cs-sub">${sub}</div>
+    <span class="cs-pill">Coming Soon</span>
+  </div>`;
+}
+
+/* ── NAV ── */
+
+function switchTab(tab) {
+  curTab = tab;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
+  ['student','skills','ai','admin'].forEach(s => {
+    document.getElementById('sb-' + s).classList.remove('on');
+  });
+  document.getElementById('sb-' + tab).classList.add('on');
+  if (tab === 'student') {
+    renderPage(curPage);
+  } else {
+    const map = {
+      skills: ['⭐','技能系統即將推出','加減分、行為記錄、技能評分功能正在開發中，敬請期待。'],
+      ai:     ['🤖','AI 教練即將推出','班級整體分析、個別學生建議、異常預警功能正在開發中。'],
+      admin:  ['⚙️','管理功能即將推出','班別管理、老師帳號、匯入匯出、權限管理功能正在開發中。'],
+    };
+    const [ico, ttl, sub] = map[tab];
+    document.getElementById('main').innerHTML = buildComingSoon(ico, ttl, sub);
+  }
+  closeSidebar();
+}
+
+function switchPage(page) {
+  curPage = page;
+  document.querySelectorAll('#sb-student .sb-item').forEach(i => i.classList.toggle('on', i.dataset.page === page));
+  renderPage(page);
+  closeSidebar();
+}
+
+function renderPage(page) {
+  const el = document.getElementById('main');
+  switch(page) {
+    case 'dashboard':  el.innerHTML = buildDashboard(); break;
+    case 'attendance': el.innerHTML = buildAttendance(); break;
+    case 'profile':    el.innerHTML = buildPlaceholder('👤','D-01','學生檔案','學生個人資料、聯絡資訊、學業與行為記錄管理。','學生檔案'); break;
+    case 'report':     el.innerHTML = buildPlaceholder('📊','D-03','出席統計報告','班級整體出席率、月度趨勢圖表、個別學生報告。','出席統計報告'); break;
+    case 'parent':     el.innerHTML = buildPlaceholder('📞','D-04','家長通訊記錄','家長聯絡記錄、缺席通知發送、溝通歷史存檔。','家長通訊記錄'); break;
+    default:           el.innerHTML = buildDashboard();
+  }
+}
+
+/* ── MOBILE ── */
+document.getElementById('mobToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('mobOverlay').style.display = 'block';
+});
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobOverlay').style.display = 'none';
+}
+
+renderPage('dashboard');
+</script>
+</body>
+</html>
