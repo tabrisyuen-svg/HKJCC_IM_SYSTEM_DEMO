@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>陳南昌紀念學校 · 教師系統</title>
+<title>學生檔案 · D-01</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -13,25 +13,10 @@
   --border:#2A3D55;--text:#E8EDF3;--muted:#7A90A8;
   --red:#EF4444;--blue:#3B82F6;--purple:#8B5CF6;
 }
-body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dark);color:var(--text);display:flex;min-height:100vh;}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
 
-/* Sidebar */
-.sidebar{width:240px;min-height:100vh;background:linear-gradient(180deg,#0A1520,#0F1E30);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;}
-.sidebar-logo{padding:18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.logo-badge{width:40px;height:40px;background:var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--yellow);font-size:15px;flex-shrink:0;}
-.logo-text h2{font-size:10.5px;color:var(--yellow);font-weight:700;letter-spacing:.4px;}
-.logo-text p{font-size:9px;color:var(--muted);margin-top:2px;}
-.nav-section{padding:10px 8px;}
-.nav-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:4px 12px 8px;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s;margin-bottom:2px;}
-.nav-item:hover{background:var(--card2);color:var(--text);}
-.nav-item.active{background:var(--green);color:#fff;}
-.nav-item.active .ni{color:var(--yellow);}
-.ni{font-size:16px;width:20px;text-align:center;}
-.sidebar-foot{padding:14px;border-top:1px solid var(--border);margin-top:auto;}
-
-/* Main */
-.main{margin-left:240px;flex:1;padding:24px;min-height:100vh;}
+/* ── MAIN ── */
+.main{padding:24px;min-height:100vh;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
 .topbar h1{font-size:20px;font-weight:700;}
 .topbar h1 span{color:var(--yellow);}
@@ -52,15 +37,15 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .sbox{padding:8px 12px;border-bottom:1px solid var(--border);}
 .sbox input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;}
 .sbox input::placeholder{color:var(--muted);}
-.sitem{display:flex;align-items:center;gap:11px;padding:11px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(42,61,85,.5);}
+.sitem{display:flex;align-items:center;gap:11px;padding:11px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(42,61,85,.5);border-left:3px solid transparent;}
 .sitem:hover{background:var(--card2);}
-.sitem.active{background:rgba(27,110,60,.2);border-left:3px solid var(--green);}
+.sitem.active{background:rgba(27,110,60,.2);border-left-color:var(--green);}
 .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
 .si h4{font-size:13px;font-weight:600;}
 .si p{font-size:11px;color:var(--muted);margin-top:2px;}
 .sdot{width:8px;height:8px;border-radius:50%;margin-left:auto;flex-shrink:0;}
 
-/* Profile */
+/* Profile panel */
 .ppanel{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;}
 .pphdr{background:linear-gradient(135deg,var(--green),#0F4A28);padding:22px;display:flex;align-items:center;gap:18px;position:relative;overflow:hidden;}
 .pphdr::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(245,197,24,.1);}
@@ -146,43 +131,6 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 </head>
 <body>
 
-<!-- Sidebar -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-badge">陳</div>
-    <div class="logo-text">
-      <h2>陳南昌紀念學校</h2>
-      <p>Chan Nam Cheong Memorial School</p>
-    </div>
-  </div>
-  <nav style="flex:1;overflow-y:auto;padding:8px;">
-    <div class="nav-section">
-      <div class="nav-label">主選單</div>
-      <div class="nav-item active"><span class="ni">👤</span>學生檔案</div>
-      <div class="nav-item"><span class="ni">📋</span>點名系統</div>
-      <div class="nav-item"><span class="ni">⭐</span>加減分</div>
-      <div class="nav-item"><span class="ni">📊</span>統計報告</div>
-    </div>
-    <div class="nav-section">
-      <div class="nav-label">管理</div>
-      <div class="nav-item"><span class="ni">⚙️</span>行為項目設定</div>
-      <div class="nav-item"><span class="ni">📁</span>匯入 / 匯出</div>
-      <div class="nav-item"><span class="ni">🔒</span>權限管理</div>
-    </div>
-  </nav>
-  <div class="sidebar-foot">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:34px;height:34px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">李</div>
-      <div>
-        <p style="font-size:12px;font-weight:600;">李老師</p>
-        <p style="font-size:10px;color:var(--muted);">班主任 · 2A</p>
-      </div>
-      <div style="margin-left:auto;width:7px;height:7px;border-radius:50%;background:#22C55E;"></div>
-    </div>
-  </div>
-</aside>
-
-<!-- Main -->
 <main class="main">
   <div class="topbar">
     <div>
@@ -425,7 +373,6 @@ let cur=0, chart=null;
 function showStudent(i){
   cur=i; const s=students[i];
   document.querySelectorAll('.sitem').forEach((el,j)=>el.classList.toggle('active',j===i));
-  // header
   const av=document.getElementById('ppav');
   av.textContent=s.nameChi[0]; av.style.color=s.avText;
   document.getElementById('ppname').textContent=s.nameChi;
@@ -433,7 +380,6 @@ function showStudent(i){
   const cls=s.cls.split(' ')[1];
   document.getElementById('ppbadges').innerHTML=
     `<span class="bdg bc">${cls}</span><span class="bdg bi">${s.id}</span><span class="bdg by">${s.year} 入學</span><span class="bdg ${s.badge.cls}">${s.badge.txt}</span>`;
-  // basic
   document.getElementById('i-id').textContent=s.id;
   document.getElementById('i-class').textContent=s.cls;
   document.getElementById('i-year').textContent=s.year;
@@ -446,20 +392,17 @@ function showStudent(i){
   document.getElementById('i-emg').textContent=s.emg;
   document.getElementById('i-sib').textContent=s.sib;
   document.getElementById('i-act').innerHTML=s.actList.map((a,j)=>`<span class="tag ${s.actCls[j]}">${a}</span>`).join('');
-  // health
   document.getElementById('healthCards').innerHTML=`
     <div class="hcard"><label>已知病歷</label>${s.health.cond.map(c=>`<span class="tag ${c==='—'?'tgr':'tr'}">${c}</span>`).join('')}</div>
     <div class="hcard"><label>藥物 / 過敏</label>${s.health.allergy.map(a=>`<span class="tag ${a==='—'?'tgr':'tr'}">${a}</span>`).join('')}</div>
     <div class="hcard"><label>SEN 特殊學習需要</label><span class="tag ${s.health.sen==='—'?'tgr':'tb'}">${s.health.sen}</span></div>
     <div class="hcard"><label>個別學習計劃 (IEP)</label><span class="tag ${s.health.iep==='否'?'tgr':'tg'}">${s.health.iep}</span></div>`;
-  // timeline
   document.getElementById('tlContent').innerHTML=s.timeline.map(t=>`
     <div class="tli">
       <div class="tldot" style="background:${t.color};"></div>
       <div class="tldate">${t.date}</div>
       <div class="tlcard"><h4 style="color:${t.color};">${t.title}</h4><p>${t.detail}</p></div>
     </div>`).join('');
-  // risk
   const rEl=document.getElementById('riskContent');
   rEl.innerHTML=s.riskFlags.length===0
     ?`<div class="ccard" style="font-size:13px;color:var(--muted);">✓ 目前無風險標記</div>`
@@ -470,7 +413,6 @@ function showStudent(i){
       <span>📄</span><span style="font-size:13px;">${d}</span>
       <span style="margin-left:auto;font-size:11px;color:var(--muted);cursor:pointer;">查看</span>
     </div>`).join('');
-  // strengths
   document.getElementById('swContent').innerHTML=`
     <div class="twocol">
       <div><div style="font-size:12px;color:#86EFAC;margin-bottom:8px;">✅ 優點</div>
@@ -478,7 +420,6 @@ function showStudent(i){
       <div><div style="font-size:12px;color:#FCA5A5;margin-bottom:8px;">⚠️ 需改善</div>
         ${s.weaknesses.map(t=>`<div class="tag tr" style="display:block;margin-bottom:6px;">${t}</div>`).join('')}</div>
     </div>`;
-  // subject bars
   document.getElementById('subjectList').innerHTML=s.scores.map((sc,j)=>`
     <div class="srow">
       <div class="sname">${subNames[j]}</div>
