@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>功課管理 · T-02</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Segoe UI', 'PingFang HK', sans-serif; background: #f1f5f9; }
+    .badge-done    { background:#dcfce7; color:#16a34a; }
+    .badge-pending { background:#fef9c3; color:#b45309; }
+    .badge-late    { background:#fee2e2; color:#dc2626; }
+    .tab-active   { border-bottom:3px solid #6366f1; color:#6366f1; font-weight:700; }
+    .tab-inactive { color:#94a3b8; border-bottom:3px solid transparent; }
+    .card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+    .progress-bar-bg   { background:#e2e8f0; border-radius:99px; height:8px; }
+    .progress-bar-fill { background:#6366f1; border-radius:99px; height:8px; transition:width 0.4s; }
+    input[type="file"] { display:none; }
+    .upload-btn { cursor:pointer; display:inline-block; padding:5px 12px; background:#ede9fe; color:#6366f1; border-radius:8px; font-size:12px; }
+    .upload-btn:hover { background:#ddd6fe; }
+    .student-row { cursor:pointer; transition:background 0.15s; }
+    .student-row:hover { background:#f8f7ff !important; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- Top Bar -->
+<div class="bg-white shadow-sm px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">📋</span>
+    <div>
+      <p class="text-xs text-slate-400">TeachingResources / T_02_Homework</p>
+      <h1 class="text-lg font-bold text-slate-800">功課管理</h1>
+    </div>
+  </div>
+  <a href="T_01_Resource.html" class="text-xs text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full hover:bg-indigo-100 transition">📁 教學資源 T-01</a>
+</div>
+
+<!-- View Toggle Tabs -->
+<div class="max-w-5xl mx-auto px-4 mt-6">
+  <div class="flex gap-0 border-b border-slate-200 mb-6">
+    <button onclick="switchView('class')"   id="tab-class"   class="tab-active   px-6 py-3 text-sm transition">🏫 一班 View</button>
+    <button onclick="switchView('student')" id="tab-student" class="tab-inactive px-6 py-3 text-sm transition">👤 個人 View</button>
+  </div>
+
+  <!-- ===================== CLASS VIEW ===================== -->
+  <div id="view-class">
+
+    <!-- Summary + Action -->
+    <div class="flex items-center justify-between mb-5">
+      <div class="flex gap-4">
+        <div class="card px-5 py-3 text-center">
+          <p class="text-xl font-bold text-indigo-600">32</p>
+          <p class="text-xs text-slate-500 mt-0.5">全班人數</p>
+        </div>
+        <div class="card px-5 py-3 text-center">
+          <p class="text-xl font-bold text-slate-700">4</p>
+          <p class="text-xs text-slate-500 mt-0.5">派發中功課</p>
+        </div>
+        <div class="card px-5 py-3 text-center">
+          <p class="text-xl font-bold text-red-500">7</p>
+          <p class="text-xs text-slate-500 mt-0.5">逾期未交人次</p>
+        </div>
+      </div>
+      <button onclick="openAddModal()" class="bg-indigo-600 text-white text-sm px-4 py-2 rounded-xl hover:bg-indigo-700 transition shadow">＋ 派發新功課</button>
+    </div>
+
+    <!-- Homework Completion Overview -->
+    <div class="card p-5 mb-6">
+      <h2 class="font-semibold text-slate-700 mb-4 text-sm">📊 功課完成概況</h2>
+      <div class="space-y-4">
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-700 font-medium">第三章練習題 <span class="text-slate-400">· 數學科</span></span>
+            <span class="text-slate-500">25 / 32 已交</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:78%"></div></div>
+          <p class="text-xs text-slate-400 mt-1">發放：11月05日 · 截止：11月15日</p>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-700 font-medium">閱讀報告：第二冊 <span class="text-slate-400">· 中文科</span></span>
+            <span class="text-slate-500">16 / 32 已交</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:50%"></div></div>
+          <p class="text-xs text-slate-400 mt-1">發放：11月06日 · 截止：11月18日</p>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-700 font-medium">英文作文 Unit 4 <span class="text-slate-400">· 英文科</span></span>
+            <span class="text-slate-500">28 / 32 已交</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:88%"></div></div>
+          <p class="text-xs text-red-400 mt-1">發放：10月28日 · 截止：11月08日 · 已逾期</p>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-slate-700 font-medium">科學實驗報告 <span class="text-slate-400">· 科學科</span></span>
+            <span class="text-slate-500">29 / 32 已交</span>
+          </div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:91%"></div></div>
+          <p class="text-xs text-red-400 mt-1">發放：10月25日 · 截止：11月05日 · 已逾期</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Student List Table -->
+    <div class="card p-5 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-slate-700 text-sm">👥 學生名單 — 點擊查看個人情況</h2>
+        <div class="flex gap-2">
+          <button onclick="filterStudents('all')"     class="stu-filter text-xs px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 font-semibold">全部</button>
+          <button onclick="filterStudents('overdue')" class="stu-filter text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500">有逾期</button>
+          <button onclick="filterStudents('perfect')" class="stu-filter text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500">全部已交</button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-xs text-slate-400 border-b border-slate-100">
+              <th class="text-left py-2 pr-4">學生姓名</th>
+              <th class="text-center py-2 px-2">已交</th>
+              <th class="text-center py-2 px-2">未交</th>
+              <th class="text-center py-2 px-2">逾期</th>
+              <th class="text-left py-2 pl-4">狀態</th>
+            </tr>
+          </thead>
+          <tbody id="student-table-body">
+            <!-- js rendered -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== STUDENT INDIVIDUAL VIEW ===================== -->
+  <div id="view-student" class="hidden">
+
+    <!-- Back + Student Info -->
+    <div class="flex items-center gap-3 mb-5">
+      <button onclick="backToClass()" class="text-sm text-indigo-500 bg-indigo-50 px-3 py-2 rounded-xl hover:bg-indigo-100 flex items-center gap-1">
+        ← 返回一班
+      </button>
+      <div>
+        <h2 class="font-bold text-slate-800 text-base" id="student-detail-name">—</h2>
+        <p class="text-xs text-slate-400">個人功課詳情</p>
+      </div>
+    </div>
+
+    <!-- Summary Row -->
+    <div class="grid grid-cols-4 gap-3 mb-6">
+      <div class="card p-3 text-center">
+        <p class="text-xl font-bold text-indigo-600" id="sd-total">—</p>
+        <p class="text-xs text-slate-500 mt-0.5">總功課</p>
+      </div>
+      <div class="card p-3 text-center">
+        <p class="text-xl font-bold text-green-600" id="sd-done">—</p>
+        <p class="text-xs text-slate-500 mt-0.5">已交</p>
+      </div>
+      <div class="card p-3 text-center">
+        <p class="text-xl font-bold text-yellow-500" id="sd-pending">—</p>
+        <p class="text-xs text-slate-500 mt-0.5">待交</p>
+      </div>
+      <div class="card p-3 text-center">
+        <p class="text-xl font-bold text-red-500" id="sd-late">—</p>
+        <p class="text-xs text-slate-500 mt-0.5">逾期</p>
+      </div>
+    </div>
+
+    <!-- Homework Detail Table -->
+    <div class="card p-5 mb-8">
+      <h2 class="font-semibold text-slate-700 text-sm mb-4">📄 功課紀錄</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-xs text-slate-400 border-b border-slate-100">
+              <th class="text-left py-2 pr-3">功課名稱</th>
+              <th class="text-left py-2 px-2">科目</th>
+              <th class="text-center py-2 px-2">發放日期</th>
+              <th class="text-center py-2 px-2">截止日期</th>
+              <th class="text-center py-2 px-2">逾期日數</th>
+              <th class="text-center py-2 pl-2">狀態</th>
+            </tr>
+          </thead>
+          <tbody id="student-hw-detail-body">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== ADD HW MODAL ===================== -->
+<div id="add-modal" class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+    <h2 class="font-bold text-slate-800 text-base mb-4">＋ 派發新功課</h2>
+    <div class="space-y-3">
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">功課標題</label>
+        <input type="text" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="例：第五章練習題"/>
+      </div>
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">科目</label>
+        <select class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          <option>數學科</option>
+          <option>中文科</option>
+          <option>英文科</option>
+          <option>科學科</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-slate-500 mb-1 block">發放日期</label>
+          <input type="date" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+        </div>
+        <div>
+          <label class="text-xs text-slate-500 mb-1 block">截止日期</label>
+          <input type="date" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">附上教學資源（來自 T-01）</label>
+        <select class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          <option value="">不附資源</option>
+          <option>📄 Chapter 3 Worksheet.pdf</option>
+          <option>📄 Unit 4 Reading Material.pdf</option>
+          <option>🎬 Science Lab Demo.mp4</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">備註（選填）</label>
+        <textarea rows="2" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" placeholder="例：請以 A4 作答..."></textarea>
+      </div>
+    </div>
+    <div class="flex gap-3 mt-5">
+      <button onclick="closeAddModal()" class="flex-1 bg-slate-100 text-slate-600 py-2 rounded-xl text-sm hover:bg-slate-200">取消</button>
+      <button onclick="closeAddModal()" class="flex-1 bg-indigo-600 text-white py-2 rounded-xl text-sm hover:bg-indigo-700">確認派發</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ── DATA ──────────────────────────────────────────────
+const homeworks = [
+  { id:1, name:'第三章練習題',   subject:'數學科', assigned:'2026-11-05', due:'2026-11-15' },
+  { id:2, name:'閱讀報告：第二冊', subject:'中文科', assigned:'2026-11-06', due:'2026-11-18' },
+  { id:3, name:'英文作文 Unit 4', subject:'英文科', assigned:'2026-10-28', due:'2026-11-08' },
+  { id:4, name:'科學實驗報告',   subject:'科學科', assigned:'2026-10-25', due:'2026-11-05' },
+];
+
+const students = [
+  { name:'陳大文',  hw:{ 1:'done',    2:'done',    3:'done',    4:'done'    } },
+  { name:'李小明',  hw:{ 1:'done',    2:'pending', 3:'late',    4:'done'    } },
+  { name:'黃美儀',  hw:{ 1:'done',    2:'done',    3:'done',    4:'done'    } },
+  { name:'張志偉',  hw:{ 1:'pending', 2:'pending', 3:'late',    4:'late'    } },
+  { name:'吳嘉欣',  hw:{ 1:'done',    2:'done',    3:'done',    4:'done'    } },
+  { name:'劉建華',  hw:{ 1:'done',    2:'pending', 3:'done',    4:'done'    } },
+  { name:'何俊傑',  hw:{ 1:'pending', 2:'pending', 3:'late',    4:'pending' } },
+  { name:'林家豪',  hw:{ 1:'pending', 2:'pending', 3:'done',    4:'done'    } },
+  { name:'鄭詠琳',  hw:{ 1:'pending', 2:'done',    3:'done',    4:'done'    } },
+  { name:'周子浩',  hw:{ 1:'pending', 2:'pending', 3:'late',    4:'late'    } },
+];
+
+const today = new Date('2026-11-12');
+
+function daysOverdue(dueStr) {
+  const due = new Date(dueStr);
+  const diff = Math.floor((today - due) / (1000*60*60*24));
+  return diff > 0 ? diff : 0;
+}
+
+function fmtDate(str) {
+  const d = new Date(str);
+  return `${d.getMonth()+1}月${d.getDate()}日`;
+}
+
+// ── BUILD STUDENT TABLE ──────────────────────────────
+function buildStudentTable(filter='all') {
+  const tbody = document.getElementById('student-table-body');
+  tbody.innerHTML = '';
+
+  students.forEach(s => {
+    const vals = Object.values(s.hw);
+    const done    = vals.filter(v=>v==='done').length;
+    const pending = vals.filter(v=>v==='pending').length;
+    const late    = vals.filter(v=>v==='late').length;
+
+    if (filter === 'overdue' && late === 0) return;
+    if (filter === 'perfect' && (pending > 0 || late > 0)) return;
+
+    let statusBadge = '';
+    if (late > 0)         statusBadge = `<span class="badge-late    text-xs px-2 py-0.5 rounded-full font-medium">⚠ 有逾期</span>`;
+    else if (pending > 0) statusBadge = `<span class="badge-pending text-xs px-2 py-0.5 rounded-full font-medium">⏳ 待交</span>`;
+    else                  statusBadge = `<span class="badge-done    text-xs px-2 py-0.5 rounded-full font-medium">✓ 全部已交</span>`;
+
+    const tr = document.createElement('tr');
+    tr.className = 'student-row border-b border-slate-50';
+    tr.innerHTML = `
+      <td class="py-3 pr-4">
+        <span class="text-indigo-600 font-semibold hover:underline">${s.name}</span>
+      </td>
+      <td class="text-center py-3 px-2 text-green-600 font-semibold">${done}</td>
+      <td class="text-center py-3 px-2 text-yellow-500 font-semibold">${pending}</td>
+      <td class="text-center py-3 px-2 text-red-500 font-semibold">${late > 0 ? late : '—'}</td>
+      <td class="py-3 pl-4">${statusBadge}</td>
+    `;
+    tr.addEventListener('click', () => openStudentDetail(s));
+    tbody.appendChild(tr);
+  });
+}
+
+// ── STUDENT DETAIL VIEW ──────────────────────────────
+function openStudentDetail(s) {
+  document.getElementById('student-detail-name').textContent = `👤 ${s.name}`;
+
+  const vals    = Object.values(s.hw);
+  const done    = vals.filter(v=>v==='done').length;
+  const pending = vals.filter(v=>v==='pending').length;
+  const late    = vals.filter(v=>v==='late').length;
+
+  document.getElementById('sd-total').textContent   = vals.length;
+  document.getElementById('sd-done').textContent    = done;
+  document.getElementById('sd-pending').textContent = pending;
+  document.getElementById('sd-late').textContent    = late > 0 ? late : '0';
+
+  const tbody = document.getElementById('student-hw-detail-body');
+  tbody.innerHTML = '';
+
+  homeworks.forEach(hw => {
+    const status   = s.hw[hw.id];
+    const overdue  = daysOverdue(hw.due);
+    const isLate   = status === 'late';
+
+    let statusCell = '';
+    if      (status === 'done')    statusCell = `<span class="badge-done    text-xs px-2 py-0.5 rounded-full font-medium">✓ 已交</span>`;
+    else if (status === 'pending') statusCell = `<span class="badge-pending text-xs px-2 py-0.5 rounded-full font-medium">⏳ 待交</span>`;
+    else                           statusCell = `<span class="badge-late    text-xs px-2 py-0.5 rounded-full font-medium">⚠ 逾期</span>`;
+
+    const overdueCell = isLate
+      ? `<span class="text-red-500 font-semibold">+${overdue} 日</span>`
+      : `<span class="text-slate-300">—</span>`;
+
+    const rowBg = isLate ? 'bg-red-50' : '';
+
+    const tr = document.createElement('tr');
+    tr.className = `border-b border-slate-50 ${rowBg}`;
+    tr.innerHTML = `
+      <td class="py-3 pr-3 font-medium text-slate-800">${hw.name}</td>
+      <td class="py-3 px-2 text-slate-500 text-xs whitespace-nowrap">${hw.subject}</td>
+      <td class="py-3 px-2 text-center text-slate-500 text-xs whitespace-nowrap">${fmtDate(hw.assigned)}</td>
+      <td class="py-3 px-2 text-center text-slate-500 text-xs whitespace-nowrap">${fmtDate(hw.due)}</td>
+      <td class="py-3 px-2 text-center text-xs">${overdueCell}</td>
+      <td class="py-3 pl-2 text-center">${statusCell}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  switchView('student');
+}
+
+function backToClass() {
+  switchView('class');
+}
+
+// ── FILTER STUDENTS ──────────────────────────────────
+function filterStudents(type) {
+  document.querySelectorAll('.stu-filter').forEach(b => {
+    b.className = 'stu-filter text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500';
+  });
+  event.target.className = 'stu-filter text-xs px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 font-semibold';
+  buildStudentTable(type);
+}
+
+// ── TAB SWITCH ──────────────────────────────────────
+function switchView(v) {
+  document.getElementById('view-class').classList.toggle('hidden',   v !== 'class');
+  document.getElementById('view-student').classList.toggle('hidden', v !== 'student');
+  document.getElementById('tab-class').className   = v === 'class'   ? 'tab-active   px-6 py-3 text-sm transition' : 'tab-inactive px-6 py-3 text-sm transition';
+  document.getElementById('tab-student').className = v === 'student' ? 'tab-active   px-6 py-3 text-sm transition' : 'tab-inactive px-6 py-3 text-sm transition';
+}
+
+// ── MODAL ────────────────────────────────────────────
+function openAddModal() {
+  const m = document.getElementById('add-modal');
+  m.classList.remove('hidden'); m.classList.add('flex');
+}
+function closeAddModal() {
+  const m = document.getElementById('add-modal');
+  m.classList.add('hidden'); m.classList.remove('flex');
+}
+document.getElementById('add-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddModal();
+});
+
+// ── INIT ─────────────────────────────────────────────
+buildStudentTable();
+
+</script>
+</body>
+</html>
