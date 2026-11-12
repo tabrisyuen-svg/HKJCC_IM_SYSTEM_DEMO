@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教學資源管理 · T-01</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1B6E3C;--green-light:#24A05A;--yellow:#F5C518;
+  --dark:#0D1B2A;--card:#162032;--card2:#1E2D42;
+  --border:#2A3D55;--text:#E8EDF3;--muted:#7A90A8;
+  --red:#EF4444;--blue:#3B82F6;--purple:#8B5CF6;
+}
+body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
+.main{padding:24px;min-height:100vh;}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.topbar h1{font-size:20px;font-weight:700;}
+.topbar h1 span{color:var(--yellow);}
+.badge-demo{background:var(--yellow);color:#000;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;}
+
+.filterbar{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+.gtabs{display:flex;gap:6px;background:var(--card);padding:4px;border-radius:10px;width:fit-content;}
+.gtab{padding:7px 18px;border-radius:7px;font-size:13px;cursor:pointer;color:var(--muted);transition:all .2s;font-weight:500;border:none;background:none;}
+.gtab.active{background:var(--green);color:#fff;}
+.fselect{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:12px;outline:none;cursor:pointer;}
+.upload-btn{background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;font-weight:600;transition:background .2s;}
+.upload-btn:hover{background:var(--green-light);}
+.gen-btn{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;font-weight:600;transition:opacity .2s;display:flex;align-items:center;gap:6px;}
+.gen-btn:hover{opacity:.85;}
+
+.sgrid{display:grid;grid-template-columns:300px 1fr;gap:18px;}
+.slist{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.phead{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.phead h3{font-size:14px;font-weight:600;}
+.sbox{padding:8px 12px;border-bottom:1px solid var(--border);}
+.sbox input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;}
+.sbox input::placeholder{color:var(--muted);}
+
+.ritem{display:flex;align-items:flex-start;gap:11px;padding:12px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(42,61,85,.5);border-left:3px solid transparent;}
+.ritem:hover{background:var(--card2);}
+.ritem.active{background:rgba(27,110,60,.2);border-left-color:var(--green);}
+.rico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ri{flex:1;min-width:0;}
+.ri h4{font-size:13px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ri p{font-size:11px;color:var(--muted);}
+.rtags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+
+.ppanel{background:var(--card);border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.hdr-teach{background:linear-gradient(135deg,var(--green),#0F4A28);}
+.hdr-material{background:linear-gradient(135deg,#1a3a6e,#0d2040);}
+.hdr-worksheet{background:linear-gradient(135deg,#5a3a00,#3d2600);}
+.pphdr{padding:22px;display:flex;align-items:flex-start;gap:16px;position:relative;overflow:hidden;}
+.pphdr::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(245,197,24,.1);}
+.phico{width:60px;height:60px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;background:rgba(0,0,0,.3);flex-shrink:0;border:2px solid rgba(245,197,24,.3);}
+.pptitle{flex:1;}
+.pptitle h2{font-size:18px;font-weight:700;margin-bottom:4px;}
+.pptitle h3{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:8px;}
+.ppbadges{display:flex;gap:7px;flex-wrap:wrap;}
+.bdg{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.bc{background:var(--yellow);color:#000;}.bi{background:rgba(255,255,255,.15);color:#fff;}.by{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);}
+
+.ptabs{display:flex;border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto;}
+.ptab{padding:13px 15px;font-size:13px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
+.ptab.active{color:var(--yellow);border-bottom-color:var(--yellow);}
+.ptab:hover{color:var(--text);}
+.tc{padding:22px;display:none;}
+.tc.active{display:block;}
+
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px;}
+.ic{background:var(--card2);border-radius:10px;padding:13px;border:1px solid var(--border);}
+.ic label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.ic p{font-size:14px;font-weight:500;}
+.stitle{font-size:13px;font-weight:600;color:var(--yellow);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.ccard{background:var(--card2);border-radius:10px;padding:15px;border:1px solid var(--border);}
+.crow{display:flex;justify-content:space-between;margin-bottom:9px;font-size:13px;}
+.crow:last-child{margin:0;}
+.crow label{color:var(--muted);}
+
+.tag{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;margin:2px;}
+.tr{background:rgba(239,68,68,.15);color:#FCA5A5;border:1px solid rgba(239,68,68,.3);}
+.tb{background:rgba(59,130,246,.15);color:#93C5FD;border:1px solid rgba(59,130,246,.3);}
+.tg{background:rgba(34,197,94,.15);color:#86EFAC;border:1px solid rgba(34,197,94,.3);}
+.tgr{background:rgba(148,163,184,.1);color:var(--muted);border:1px solid var(--border);}
+.ty{background:rgba(245,197,24,.15);color:#FDE68A;border:1px solid rgba(245,197,24,.3);}
+.tp{background:rgba(139,92,246,.15);color:#C4B5FD;border:1px solid rgba(139,92,246,.3);}
+
+.action-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+.abtn{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;}
+.abtn:hover{border-color:var(--green);background:rgba(27,110,60,.15);}
+.abtn .ico{font-size:20px;margin-bottom:5px;}
+.abtn p{font-size:12px;color:var(--muted);}
+
+.relcard{background:var(--card2);border-radius:10px;padding:13px;border:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .2s;}
+.relcard:hover{border-color:var(--green);}
+.relcard-ico{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+
+.logrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.logrow:last-child{border:none;padding-bottom:0;}
+.logav{width:32px;height:32px;border-radius:50%;background:rgba(27,110,60,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#4ADE80;flex-shrink:0;}
+.loginfo{flex:1;}
+.loginfo h4{font-size:13px;font-weight:600;}
+.loginfo p{font-size:11px;color:var(--muted);}
+
+/* ── MODAL (upload) ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:100;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:28px;width:480px;max-width:92vw;max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:20px;color:var(--yellow);display:flex;justify-content:space-between;align-items:center;}
+.mfield{margin-bottom:14px;}
+.mfield label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px;}
+.mfield input,.mfield select,.mfield textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;font-family:inherit;}
+.mfield textarea{height:80px;resize:none;}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dropzone{border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s;margin-top:5px;}
+.dropzone:hover{border-color:var(--green);}
+.dropzone .dico{font-size:28px;margin-bottom:6px;}
+.dropzone p{font-size:13px;color:var(--muted);}
+.mbtn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+.mbtn{padding:9px 20px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600;border:none;}
+.mbtn-cancel{background:var(--card2);color:var(--muted);}
+.mbtn-ok{background:var(--green);color:#fff;}
+.mbtn-ok:hover{background:var(--green-light);}
+
+/* ── GENERATOR ── */
+.gen-overlay{position:fixed;inset:0;background:rgba(5,12,22,.97);z-index:150;display:none;flex-direction:column;padding:16px;}
+.gen-overlay.show{display:flex;}
+.gen-modal{flex:1;background:var(--dark);border-radius:16px;border:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+.gen-hdr{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.gen-hdr h2{font-size:16px;font-weight:700;color:var(--text);}
+.gen-hdr h2 span{color:var(--yellow);}
+.gen-hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.gen-close{background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;transition:all .2s;}
+.gen-close:hover{border-color:var(--red);color:#FCA5A5;}
+.gen-body{display:grid;grid-template-columns:390px 1fr;flex:1;overflow:hidden;min-height:0;}
+.gen-left{border-right:1px solid var(--border);overflow-y:auto;padding:18px;}
+.gen-right{overflow-y:auto;padding:20px;background:rgba(10,18,28,.5);}
+
+/* Settings */
+.sec-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;margin-top:4px;}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;}
+.set-full{grid-column:span 2;}
+.sfield{display:flex;flex-direction:column;gap:4px;}
+.sfield label{font-size:11px;color:var(--muted);}
+.sfield input,.sfield select{background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;outline:none;font-family:inherit;}
+.sfield input:focus,.sfield select:focus{border-color:var(--green);}
+
+/* Presets */
+.preset-row{display:flex;gap:7px;margin-bottom:16px;flex-wrap:wrap;}
+.preset-btn{background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.preset-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+
+/* Difficulty summary */
+.diff-summary{display:flex;gap:6px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
+.dsm{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;}
+.dsm-e{background:rgba(34,197,94,.15);color:#86EFAC;border:1px solid rgba(34,197,94,.3);}
+.dsm-m{background:rgba(245,159,24,.15);color:#FDE68A;border:1px solid rgba(245,159,24,.3);}
+.dsm-h{background:rgba(239,68,68,.15);color:#FCA5A5;border:1px solid rgba(239,68,68,.3);}
+.dsm-t{background:rgba(59,130,246,.15);color:#93C5FD;border:1px solid rgba(59,130,246,.3);}
+.dsm-pts{background:rgba(139,92,246,.15);color:#C4B5FD;border:1px solid rgba(139,92,246,.3);}
+
+/* Question rows */
+.qrow{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;transition:border-color .2s;}
+.qrow:hover{border-color:rgba(27,110,60,.5);}
+.qrow-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.qnum{width:22px;height:22px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:#fff;}
+.qtype-lbl{font-size:11px;color:var(--muted);flex:1;}
+.diff-group{display:flex;gap:3px;}
+.diff-btn{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);transition:all .15s;line-height:1;}
+.diff-btn:hover{opacity:.8;}
+.diff-btn.d-easy.on{background:rgba(34,197,94,.2);border-color:#22C55E;color:#86EFAC;}
+.diff-btn.d-mid.on{background:rgba(245,159,24,.2);border-color:#F59E0B;color:#FDE68A;}
+.diff-btn.d-hard.on{background:rgba(239,68,68,.2);border-color:#EF4444;color:#FCA5A5;}
+.qtext{font-size:12px;color:var(--text);line-height:1.55;margin-bottom:8px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.qrow-bot{display:flex;align-items:center;gap:5px;}
+.qmeta span{font-size:11px;color:var(--muted);margin-right:5px;}
+.qact{margin-left:auto;display:flex;gap:4px;}
+.qact-btn{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s;}
+.qact-btn:hover{border-color:var(--green-light);color:var(--text);}
+.del-btn:hover{border-color:var(--red)!important;color:#FCA5A5!important;}
+
+.add-q-btn{width:100%;background:rgba(27,110,60,.1);border:1px dashed rgba(27,110,60,.5);border-radius:10px;padding:11px;color:#4ADE80;font-size:13px;cursor:pointer;transition:background .2s;margin-top:6px;}
+.add-q-btn:hover{background:rgba(27,110,60,.22);}
+
+/* Preview */
+.preview-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.preview-topbar h3{font-size:14px;font-weight:600;color:var(--yellow);}
+.pbtn-row{display:flex;gap:8px;}
+.pbtn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;gap:5px;transition:opacity .2s;}
+.pbtn:hover{opacity:.85;}
+.pbtn-print{background:var(--green);color:#fff;}
+.pbtn-save{background:var(--card2);color:var(--text);border:1px solid var(--border);}
+
+.preview-paper{background:#fff;color:#111;border-radius:10px;padding:36px 40px;max-width:680px;margin:0 auto;box-shadow:0 4px 24px rgba(0,0,0,.4);}
+.pp-school{font-size:11px;text-align:center;color:#555;margin-bottom:3px;letter-spacing:.3px;}
+.pp-title{font-size:20px;font-weight:800;text-align:center;margin-bottom:3px;}
+.pp-subtitle{font-size:11px;text-align:center;color:#777;margin-bottom:14px;}
+.pp-info-bar{display:flex;gap:0;border-top:2px solid #222;border-bottom:1px solid #bbb;padding:9px 0;margin-bottom:18px;}
+.pp-info-bar span{flex:1;font-size:12px;border-right:1px solid #ddd;padding:0 12px;}
+.pp-info-bar span:first-child{padding-left:0;}
+.pp-info-bar span:last-child{border-right:none;}
+.pp-info-bar span b{display:block;font-size:10px;color:#888;font-weight:500;margin-bottom:2px;}
+.pp-infobar-blank{display:inline-block;border-bottom:1px solid #aaa;width:80px;margin-left:4px;}
+.pp-q{margin-bottom:16px;}
+.pp-q-hdr{display:flex;align-items:flex-start;gap:8px;}
+.pp-q-num{font-size:13px;font-weight:800;width:24px;flex-shrink:0;padding-top:1px;}
+.pp-q-text{font-size:13px;line-height:1.65;flex:1;}
+.pp-q-mark{font-size:11px;color:#888;white-space:nowrap;padding-top:2px;flex-shrink:0;}
+.pp-q-ans{margin-left:32px;margin-top:8px;}
+.ans-line{border-bottom:1px solid #ccc;height:26px;margin-bottom:6px;}
+.diff-pill{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:800;margin-left:5px;vertical-align:middle;}
+.dp-e{background:#dcfce7;color:#15803d;}
+.dp-m{background:#fef9c3;color:#78350f;}
+.dp-h{background:#fee2e2;color:#991b1b;}
+.pp-divider{border:none;border-top:1px dashed #ccc;margin:12px 0;}
+.pp-total{text-align:right;font-size:12px;font-weight:700;color:#333;border-top:2px solid #222;padding-top:10px;margin-top:6px;}
+.pp-empty{text-align:center;padding:40px;color:#bbb;font-size:14px;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;z-index:300;display:none;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+.toast.show{display:flex;}
+
+@media print{
+  body > .main,.modal-overlay,.gen-overlay ~ *{display:none!important;}
+  .gen-overlay{position:static!important;background:none!important;padding:0!important;display:block!important;}
+  .gen-modal{border:none!important;display:block!important;}
+  .gen-hdr,.gen-left,.preview-topbar{display:none!important;}
+  .gen-body{display:block!important;}
+  .gen-right{overflow:visible!important;background:none!important;padding:0!important;}
+  .preview-paper{box-shadow:none!important;border-radius:0!important;padding:20px!important;}
+}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <h1>教學資源管理 <span>T-01</span></h1>
+      <p style="font-size:12px;color:var(--muted);margin-top:3px;">香港青少年培育會陳南昌紀念學校</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="badge-demo">DEMO</span>
+      <div style="width:7px;height:7px;border-radius:50%;background:#F59E0B;"></div>
+      <span style="font-size:12px;color:var(--muted);">Supabase 待接駁</span>
+    </div>
+  </div>
+
+  <div class="filterbar">
+    <div class="gtabs" id="typeTabs">
+      <button class="gtab active" onclick="filterType('全部',this)">全部</button>
+      <button class="gtab" onclick="filterType('教案',this)">教案</button>
+      <button class="gtab" onclick="filterType('教材',this)">教材</button>
+      <button class="gtab" onclick="filterType('工作紙',this)">工作紙</button>
+    </div>
+    <select class="fselect" id="subjectFilter" onchange="applyFilters()">
+      <option value="">所有科目</option>
+      <option>中文</option><option>英文</option><option>數學</option>
+      <option>科學</option><option>歷史</option><option>體育</option>
+    </select>
+    <select class="fselect" id="gradeFilter" onchange="applyFilters()">
+      <option value="">所有年級</option>
+      <option>中一</option><option>中二</option><option>中三</option>
+    </select>
+    <button class="gen-btn" onclick="openGenerator()">📝 出卷生成</button>
+    <button class="upload-btn" onclick="showModal()">＋ 上傳資源</button>
+  </div>
+
+  <div class="sgrid">
+    <div class="slist">
+      <div class="phead">
+        <h3>資源庫</h3>
+        <span style="font-size:11px;color:var(--muted);" id="countLabel">6 項資源</span>
+      </div>
+      <div class="sbox">
+        <input type="text" id="searchInput" placeholder="搜尋資源名稱…" oninput="applyFilters()"/>
+      </div>
+      <div id="resourceList"></div>
+    </div>
+
+    <div class="ppanel">
+      <div id="detailHdr" class="pphdr hdr-teach">
+        <div class="phico" id="detailIco">📄</div>
+        <div class="pptitle">
+          <h2 id="detailName"></h2>
+          <h3 id="detailSub"></h3>
+          <div class="ppbadges" id="detailBadges"></div>
+        </div>
+      </div>
+      <div class="ptabs">
+        <div class="ptab active" onclick="showTab('info')">詳情</div>
+        <div class="ptab" onclick="showTab('related')">相關資源</div>
+        <div class="ptab" onclick="showTab('log')">共享記錄</div>
+      </div>
+      <div class="tc active" id="tab-info"></div>
+      <div class="tc" id="tab-related"></div>
+      <div class="tc" id="tab-log"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <div class="modal-title">
+      📤 上傳教學資源
+      <span style="cursor:pointer;color:var(--muted);font-size:20px;line-height:1;" onclick="hideModal()">✕</span>
+    </div>
+    <div class="mfield">
+      <label>資源名稱</label>
+      <input type="text" placeholder="例：中二說明文寫作教案"/>
+    </div>
+    <div class="mrow">
+      <div class="mfield"><label>資源類型</label><select><option>教案</option><option>教材</option><option>工作紙</option></select></div>
+      <div class="mfield"><label>科目</label><select><option>中文</option><option>英文</option><option>數學</option><option>科學</option><option>歷史</option><option>體育</option></select></div>
+    </div>
+    <div class="mrow">
+      <div class="mfield"><label>年級</label><select><option>中一</option><option>中二</option><option>中三</option></select></div>
+      <div class="mfield"><label>單元</label><input type="text" placeholder="例：第三單元"/></div>
+    </div>
+    <div class="mfield"><label>資源描述</label><textarea placeholder="簡述此資源的內容與用途…"></textarea></div>
+    <div class="mfield">
+      <label>上傳檔案</label>
+      <div class="dropzone" onclick="showToast('📁 DEMO 模式，檔案上傳功能待接駁')">
+        <div class="dico">📁</div>
+        <p>點擊選擇檔案，或拖放至此</p>
+        <p style="font-size:11px;margin-top:4px;">支援 PDF · DOCX · PPTX（最大 20 MB）</p>
+      </div>
+    </div>
+    <div class="mbtn-row">
+      <button class="mbtn mbtn-cancel" onclick="hideModal()">取消</button>
+      <button class="mbtn mbtn-ok" onclick="hideModal();showToast('✅ DEMO：上傳功能待接駁 Supabase')">確認上傳</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── GENERATOR OVERLAY ── -->
+<div class="gen-overlay" id="genOverlay">
+  <div class="gen-modal">
+    <div class="gen-hdr">
+      <span style="font-size:22px;">📝</span>
+      <h2>出卷 <span>/</span> 工作紙生成</h2>
+      <span style="font-size:12px;color:var(--muted);background:var(--card2);padding:3px 10px;border-radius:20px;border:1px solid var(--border);">DEMO</span>
+      <div class="gen-hdr-right">
+        <button class="gen-close" onclick="closeGenerator()">✕ 關閉</button>
+      </div>
+    </div>
+    <div class="gen-body">
+
+      <!-- LEFT: Settings + Question Builder -->
+      <div class="gen-left">
+        <div class="sec-label">📋 試卷設定</div>
+        <div class="set-grid">
+          <div class="sfield set-full">
+            <label>試卷標題</label>
+            <input type="text" id="gTitle" placeholder="例：中二數學第三單元測驗" oninput="renderPreview()"/>
+          </div>
+          <div class="sfield">
+            <label>科目</label>
+            <select id="gSubject" onchange="onSubjectChange()">
+              <option>數學</option><option>中文</option><option>英文</option><option>科學</option><option>歷史</option>
+            </select>
+          </div>
+          <div class="sfield">
+            <label>年級</label>
+            <select id="gGrade" onchange="renderPreview()">
+              <option>中一</option><option selected>中二</option><option>中三</option>
+            </select>
+          </div>
+          <div class="sfield">
+            <label>班別（選填）</label>
+            <input type="text" id="gClass" placeholder="例：2A" oninput="renderPreview()"/>
+          </div>
+          <div class="sfield">
+            <label>作答時間（分鐘）</label>
+            <input type="number" id="gTime" value="45" min="10" max="180" oninput="renderPreview()"/>
+          </div>
+        </div>
+
+        <div class="sec-label">⚡ 快速預設</div>
+        <div class="preset-row">
+          <button class="preset-btn" onclick="applyPreset([['易','易','易','易'],['易','易']])">全易 (6 題)</button>
+          <button class="preset-btn" onclick="applyPreset([['易','易'],['中','中'],['難','難']])">均衡 (6 題)</button>
+          <button class="preset-btn" onclick="applyPreset([['易','易','易'],['中','中','中'],['難','難','難','難']])">考試卷 (10 題)</button>
+          <button class="preset-btn" onclick="applyPreset([['難','難','難','難','難']])">全難 (5 題)</button>
+          <button class="preset-btn" onclick="applyPreset([['易'],['中'],['中'],['難']])">精簡 (4 題)</button>
+        </div>
+
+        <div class="sec-label" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>📚 題目列表</span>
+          <span id="qCountLabel" style="color:var(--muted);font-size:11px;font-weight:400;"></span>
+        </div>
+        <div id="diffSummary" class="diff-summary"></div>
+        <div id="qRows"></div>
+        <button class="add-q-btn" onclick="addQuestion('中')">＋ 加入題目（預設：中）</button>
+      </div>
+
+      <!-- RIGHT: Preview -->
+      <div class="gen-right">
+        <div class="preview-topbar">
+          <h3>📄 工作紙預覽</h3>
+          <div class="pbtn-row">
+            <button class="pbtn pbtn-save" onclick="showToast('💾 DEMO：PDF 匯出功能待接駁')">💾 儲存 PDF</button>
+            <button class="pbtn pbtn-print" onclick="doPrint()">🖨 列印工作紙</button>
+          </div>
+        </div>
+        <div id="previewPaper"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+/* ══════════════════════════════════════
+   RESOURCE LIBRARY
+══════════════════════════════════════ */
+const subjectColors={'中文':'#EF4444','英文':'#3B82F6','數學':'#8B5CF6','科學':'#22C55E','歷史':'#F59E0B','體育':'#06B6D4'};
+const subjectBg={'中文':'rgba(239,68,68,.2)','英文':'rgba(59,130,246,.2)','數學':'rgba(139,92,246,.2)','科學':'rgba(34,197,94,.2)','歷史':'rgba(245,159,24,.2)','體育':'rgba(6,182,212,.2)'};
+const typeIco={'教案':'📝','教材':'📚','工作紙':'📋'};
+const typeHdrCls={'教案':'hdr-teach','教材':'hdr-material','工作紙':'hdr-worksheet'};
+const formatIco={'PDF':'📄','DOCX':'📝','PPTX':'📊'};
+function subjTagCls(s){return{'中文':'tr','英文':'tb','數學':'tp','科學':'tg','歷史':'ty','體育':'tgr'}[s]||'tgr';}
+function typeTagCls(t){return{'教案':'tg','教材':'tb','工作紙':'ty'}[t]||'tgr';}
+
+const resources=[
+  {id:'T-2024-001',name:'說明文寫作技巧教案',type:'教案',subject:'中文',grade:'中二',unit:'第三單元',uploader:'陳老師',date:'2026-11-01',size:'2.3 MB',format:'PDF',desc:'涵蓋說明文的結構、語言特點及寫作步驟，附有例文分析及課堂活動設計，適合 55 分鐘課堂使用。',shared:['2A','2B','2C'],tags:['寫作','說明文','語文'],related:[1,4],log:[{user:'李老師',date:'2026-11-05',action:'下載'},{user:'王老師',date:'2026-11-03',action:'查看'},{user:'張老師',date:'2026-10-28',action:'共享到 2C'}]},
+  {id:'T-2024-002',name:'二次方程工作紙（練習一）',type:'工作紙',subject:'數學',grade:'中三',unit:'第二單元',uploader:'黃老師',date:'2026-10-28',size:'1.1 MB',format:'PDF',desc:'含 20 題由易到難的二次方程練習，涵蓋因式分解、公式法及配方法，附答案頁供老師參考。',shared:['3A','3B'],tags:['練習','二次方程','代數'],related:[5,2],log:[{user:'陳老師',date:'2026-11-02',action:'下載'},{user:'劉老師',date:'2026-10-30',action:'查看'}]},
+  {id:'T-2024-003',name:'Reading Comprehension Strategies',type:'教材',subject:'英文',grade:'中一',unit:'Unit 4',uploader:'Miss Chan',date:'2026-10-22',size:'3.7 MB',format:'PPTX',desc:'互動式 PowerPoint，講解閱讀理解三大策略：skimming、scanning 及 inferencing，含即時練習題。',shared:['1A','1B','1C'],tags:['Reading','Comprehension','Strategies'],related:[0,4],log:[{user:'Mr. Wong',date:'2026-11-01',action:'下載'},{user:'Miss Lee',date:'2026-10-25',action:'共享到 1C'}]},
+  {id:'T-2024-004',name:'酸鹼中和實驗工作紙',type:'工作紙',subject:'科學',grade:'中二',unit:'第五單元',uploader:'林老師',date:'2026-10-15',size:'0.9 MB',format:'PDF',desc:'實驗前後均有填寫欄位，包含假設、觀察記錄、數據分析及反思問題，符合 STEM 教育目標。',shared:['2A','2B'],tags:['實驗','酸鹼','STEM'],related:[1,5],log:[{user:'陳老師',date:'2026-10-18',action:'下載'}]},
+  {id:'T-2024-005',name:'清末改革運動教案',type:'教案',subject:'歷史',grade:'中三',unit:'第一單元',uploader:'吳老師',date:'2026-10-10',size:'1.8 MB',format:'DOCX',desc:'以戊戌變法為核心，設計三節課時的教學計劃，包含資料分析題、討論問題及評估建議。',shared:['3A','3B','3C'],tags:['清末','改革','資料分析'],related:[0,2],log:[{user:'黃老師',date:'2026-10-14',action:'查看'},{user:'林老師',date:'2026-10-12',action:'下載'}]},
+  {id:'T-2024-006',name:'函數與圖像互動教材',type:'教材',subject:'數學',grade:'中二',unit:'第四單元',uploader:'黃老師',date:'2026-10-05',size:'5.2 MB',format:'PPTX',desc:'互動式 PowerPoint，含動態圖像演示，學生可即時調整參數觀察函數變化，適合投影課堂使用。',shared:['2A','2B','2C'],tags:['函數','圖像','互動'],related:[1,3],log:[{user:'陳老師',date:'2026-10-10',action:'下載'},{user:'張老師',date:'2026-10-08',action:'共享到 2C'}]}
+];
+
+let currentType='全部', currentIdx=0;
+function applyFilters(){
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const subj=document.getElementById('subjectFilter').value;
+  const grade=document.getElementById('gradeFilter').value;
+  const filtered=resources.filter(r=>(currentType==='全部'||r.type===currentType)&&(r.name.toLowerCase().includes(search)||r.subject.includes(search))&&(!subj||r.subject===subj)&&(!grade||r.grade===grade));
+  renderList(filtered);
+}
+function renderList(list){
+  document.getElementById('countLabel').textContent=list.length+' 項資源';
+  const el=document.getElementById('resourceList');
+  if(!list.length){el.innerHTML='<div style="padding:28px;text-align:center;color:var(--muted);font-size:13px;">沒有符合條件的資源</div>';return;}
+  el.innerHTML=list.map(r=>{const ri=resources.indexOf(r);return`<div class="ritem${ri===currentIdx?' active':''}" onclick="showResource(${ri})"><div class="rico" style="background:${subjectBg[r.subject]}">${typeIco[r.type]}</div><div class="ri"><h4>${r.name}</h4><p>${r.grade} · ${r.unit} · ${r.uploader}</p><div class="rtags"><span class="tag ${subjTagCls(r.subject)}" style="font-size:10px;padding:2px 7px;">${r.subject}</span><span class="tag ${typeTagCls(r.type)}" style="font-size:10px;padding:2px 7px;">${r.type}</span><span class="tag tgr" style="font-size:10px;padding:2px 7px;">${r.format}</span></div></div></div>`;}).join('');
+}
+function showResource(i){
+  currentIdx=i; const r=resources[i];
+  document.getElementById('detailHdr').className='pphdr '+typeHdrCls[r.type];
+  document.getElementById('detailIco').textContent=formatIco[r.format]||'📄';
+  document.getElementById('detailName').textContent=r.name;
+  document.getElementById('detailSub').textContent=`${r.subject} · ${r.grade} · ${r.unit}`;
+  document.getElementById('detailBadges').innerHTML=`<span class="bdg bc">${r.type}</span><span class="bdg bi">${r.id}</span><span class="bdg by">${r.format} · ${r.size}</span><span class="bdg bi">${r.uploader}</span>`;
+  document.getElementById('tab-info').innerHTML=`<div class="igrid"><div class="ic"><label>資源編號</label><p>${r.id}</p></div><div class="ic"><label>年級</label><p>${r.grade}</p></div><div class="ic"><label>單元</label><p>${r.unit}</p></div><div class="ic"><label>科目</label><p style="color:${subjectColors[r.subject]}">${r.subject}</p></div><div class="ic"><label>格式</label><p>${r.format}</p></div><div class="ic"><label>大小</label><p>${r.size}</p></div></div><div class="ic" style="margin-bottom:14px;"><label>資源描述</label><p style="font-size:13px;line-height:1.65;margin-top:5px;">${r.desc}</p></div><div class="ccard" style="margin-bottom:12px;"><div class="stitle">🏷 關鍵詞標籤</div>${r.tags.map(t=>`<span class="tag tgr">${t}</span>`).join('')}</div><div class="ccard" style="margin-bottom:14px;"><div class="stitle">📢 已共享班別</div>${r.shared.map(c=>`<span class="tag tg">${c}</span>`).join('')}</div><div class="action-btns"><div class="abtn" onclick="showToast('⬇️ DEMO：下載功能待接駁')"><div class="ico">⬇️</div><p>下載檔案</p></div><div class="abtn" onclick="showToast('📤 DEMO：共享功能待接駁')"><div class="ico">📤</div><p>共享至班別</p></div><div class="abtn" onclick="showToast('✏️ DEMO：編輯功能待接駁')"><div class="ico">✏️</div><p>編輯資料</p></div></div>`;
+  document.getElementById('tab-related').innerHTML=`<div class="stitle">🔗 相關資源</div>${r.related.map(ri=>{const rel=resources[ri];return`<div class="relcard" onclick="showResource(${ri})"><div class="relcard-ico" style="background:${subjectBg[rel.subject]}">${typeIco[rel.type]}</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;margin-bottom:2px;">${rel.name}</div><div style="font-size:11px;color:var(--muted);">${rel.subject} · ${rel.grade} · ${rel.unit}</div><div style="margin-top:5px;"><span class="tag ${subjTagCls(rel.subject)}" style="font-size:10px;padding:2px 7px;">${rel.subject}</span><span class="tag ${typeTagCls(rel.type)}" style="font-size:10px;padding:2px 7px;">${rel.type}</span></div></div><span style="color:var(--muted);font-size:18px;padding-left:8px;">›</span></div>`;}).join('')}`;
+  document.getElementById('tab-log').innerHTML=`<div class="stitle">📋 共享 / 存取記錄</div><div class="ccard" style="margin-bottom:14px;">${r.log.map(l=>`<div class="logrow"><div class="logav">${l.user[0]}</div><div class="loginfo"><h4>${l.user}</h4><p>${l.date}</p></div><span class="tag ${l.action.includes('下載')?'tg':l.action.includes('共享')?'tb':'tgr'}">${l.action}</span></div>`).join('')}</div><div class="ccard"><div class="crow"><label>上傳者</label><span>${r.uploader}</span></div><div class="crow"><label>上傳日期</label><span>${r.date}</span></div><div class="crow"><label>存取次數</label><span>${r.log.length} 次</span></div></div>`;
+  showTab('info'); applyFilters();
+}
+function showTab(name){
+  const tabs=['info','related','log'];
+  document.querySelectorAll('.ptab').forEach((el,i)=>el.classList.toggle('active',tabs[i]===name));
+  document.querySelectorAll('.tc').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+function filterType(type,btn){
+  currentType=type;
+  document.querySelectorAll('#typeTabs .gtab').forEach(el=>el.classList.remove('active'));
+  btn.classList.add('active'); applyFilters();
+}
+function showModal(){document.getElementById('uploadModal').classList.add('show');}
+function hideModal(){document.getElementById('uploadModal').classList.remove('show');}
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+}
+showResource(0);
+
+/* ══════════════════════════════════════
+   QUESTION BANK
+══════════════════════════════════════ */
+const qBank={
+  '數學':{
+    '易':[
+      {q:'計算：2x + 4 = 10，求 x 的值。',type:'填充',marks:2},
+      {q:'計算 3² + 4²，並說明這組數字的特性。',type:'填充',marks:2},
+      {q:'化簡以下代數式：6x − 2x + 4。',type:'填充',marks:2},
+      {q:'若 y = 5，計算 3y − 8 的值。',type:'填充',marks:2},
+      {q:'一個長方形長 8 cm，寬 5 cm，求其面積及周長。',type:'計算',marks:3},
+    ],
+    '中':[
+      {q:'解聯立方程：x + y = 7；2x − y = 2，求 x 和 y 的值。',type:'計算',marks:4},
+      {q:'求直線 y = 3x − 2 的斜率及 y 軸截距，並在坐標軸上繪出該直線。',type:'計算',marks:4},
+      {q:'一個圓的半徑為 7 cm，求其面積及周長（答案以 π 表示）。',type:'計算',marks:3},
+      {q:'解方程：x² − 5x + 6 = 0，並驗算答案。',type:'計算',marks:4},
+      {q:'等差數列首項為 3，公差為 4，求第 10 項及前 10 項之和。',type:'計算',marks:4},
+    ],
+    '難':[
+      {q:'二次函數 y = 2x² − 4x + 1，（i）求其頂點坐標；（ii）寫出對稱軸方程；（iii）判斷開口方向。',type:'計算',marks:6},
+      {q:'甲、乙兩地相距 120 km。甲以 40 km/h 出發，乙 1 小時後以 50 km/h 相向而行，問兩人在何時何處相遇？',type:'計算',marks:6},
+      {q:'若 sin θ = 3/5，且 0° < θ < 90°，求 cos θ、tan θ 的值，並計算 sin²θ + cos²θ。',type:'計算',marks:6},
+      {q:'以數學歸納法證明：對任何正整數 n，1 + 2 + 3 + … + n = n(n+1)/2。',type:'證明',marks:7},
+      {q:'解不等式：2x² − 3x − 2 > 0，在數線上標示解集，並以集合符號表示。',type:'計算',marks:6},
+    ],
+  },
+  '中文':{
+    '易':[
+      {q:'解釋成語「望梅止渴」的意思，並造句一次。',type:'解釋造句',marks:3},
+      {q:'判斷下列各句的標點符號是否正確，錯誤者加以改正。（i）「你好嗎？我很好。」（ii）「她說；我今天不舒服。」',type:'改錯',marks:2},
+      {q:'以下哪一項是說明文的特點？（A）抒情性強　（B）語言客觀　（C）主要用來敘述故事　（D）多以第一人稱寫成',type:'選擇',marks:1},
+      {q:'在下列各句中，找出錯別字並改正：（i）「她的精誠所致，感動了全班同學。」（ii）「他力排衆議，最終取得成功。」',type:'改錯',marks:2},
+      {q:'閱讀以下短文，用不超過 20 字概括其主旨。（短文另附）',type:'簡答',marks:2},
+    ],
+    '中':[
+      {q:'閱讀以下短文，分析作者運用比喻的修辭手法及其表達效果，並舉出文中例子加以說明。（短文另附）',type:'分析',marks:5},
+      {q:'試比較記敘文與說明文在語言風格及寫作目的上的分別。（不少於 60 字）',type:'比較',marks:4},
+      {q:'仿照例句句式，各造一句：例：「春天的花朵，點綴了整個山野。」（i）以夏天為題　（ii）以城市為題',type:'造句',marks:4},
+      {q:'解釋以下文言文句子的意思，並指出其語法特點：「學而時習之，不亦說乎？」',type:'文言',marks:4},
+      {q:'根據所提供的資料，撰寫一段不少於 80 字的介紹短文，介紹中秋節的由來及習俗。',type:'寫作',marks:5},
+    ],
+    '難':[
+      {q:'試評論本文的敘事手法，包括人稱選用、時序安排及伏筆運用，並舉例說明各手法的效果。（不少於 150 字）',type:'評論',marks:9},
+      {q:'閱讀兩篇關於「自然與人」的文章，比較兩位作者的觀點異同，並說明你認同哪位作者的立場及原因。（文章另附）',type:'比較',marks:8},
+      {q:'以「城市中的孤獨」為題，寫一篇不少於 250 字的記敘文，須包含一個具體事件。',type:'寫作',marks:10},
+      {q:'分析《背影》中父親形象的塑造方法，探討作者如何透過動作、神態及細節描寫，表達對父親的複雜情感。',type:'分析',marks:8},
+      {q:'論述現代社會中傳統文化保育的重要性。你的文章須包括：（i）至少兩個論據；（ii）一個反駁論點及回應；（iii）結論。（不少於 200 字）',type:'議論',marks:10},
+    ],
+  },
+  '英文':{
+    '易':[
+      {q:'Fill in the blank with the correct tense: She _____ (go) to school every day. Yesterday, she _____ (not go) because she was sick.',type:'Fill-in',marks:2},
+      {q:'Write the plural form of the following nouns: (i) child　(ii) tooth　(iii) mouse　(iv) woman',type:'Fill-in',marks:2},
+      {q:'Underline all the adjectives in the following sentence: "The tall, cheerful boy wore a bright red shirt and carried a heavy bag."',type:'Identification',marks:2},
+      {q:'Complete each sentence with the correct article (a / an / the): (i) _____ apple a day keeps _____ doctor away. (ii) She plays _____ piano beautifully.',type:'Fill-in',marks:3},
+      {q:'Choose the correct word: (i) I (affect / effect) the plan by suggesting changes. (ii) The (affect / effect) of the medicine was immediate.',type:'MC',marks:2},
+    ],
+    '中':[
+      {q:'Read the passage and answer: (i) What is the main idea of the paragraph? (ii) Identify ONE piece of evidence that supports your answer. (Passage attached)',type:'Comprehension',marks:5},
+      {q:'Rewrite the following sentences in the passive voice: (i) "The students completed the project last week." (ii) "Someone has stolen my wallet."',type:'Grammar',marks:4},
+      {q:'Write a topic sentence and TWO supporting details for a paragraph about the importance of regular exercise for teenagers.',type:'Writing',marks:4},
+      {q:'Identify and correct the THREE grammatical errors in the following paragraph. (Paragraph attached)',type:'Error Correction',marks:3},
+      {q:'Explain the difference between "imply" and "infer" and use each word correctly in a sentence of your own.',type:'Vocabulary',marks:4},
+    ],
+    '難':[
+      {q:'Compare and contrast the attitudes of the two speakers in the following poems. Support your analysis with specific quotations and explain the effect of the language used. (Poems attached)',type:'Analysis',marks:9},
+      {q:'Write a formal letter (180–220 words) to your school principal proposing a new environmental initiative. Your letter must include: purpose, benefits, and a specific plan of action.',type:'Writing',marks:10},
+      {q:'Analyse how the author uses language to create tension in the extract. In your response, consider: (i) word choice, (ii) sentence structure, and (iii) use of imagery. (Extract attached)',type:'Analysis',marks:9},
+      {q:'Write a balanced discursive essay (200–250 words) on the advantages and disadvantages of social media for teenagers. Conclude with your own justified opinion.',type:'Essay',marks:10},
+      {q:'Evaluate the effectiveness of the argument presented in the following editorial. Is the evidence convincing? Identify at least ONE weakness in the argument and suggest an improvement. (Article attached)',type:'Critical Thinking',marks:9},
+    ],
+  },
+  '科學':{
+    '易':[
+      {q:'寫出水和二氧化碳的化學式，並說明兩者在自然界中的重要作用各一項。',type:'簡答',marks:2},
+      {q:'列出植物進行光合作用所需的三個條件，及兩種產物。',type:'簡答',marks:3},
+      {q:'以下哪一項是良導體？（A）木材　（B）橡膠　（C）銅　（D）塑膠。解釋你的選擇。',type:'選擇',marks:2},
+      {q:'酸性、鹼性及中性溶液分別令石蕊試紙變成什麼顏色？',type:'簡答',marks:2},
+      {q:'說出細胞進行有氧呼吸的方程式，並列出呼吸作用釋放的能量如何在人體中使用的兩個例子。',type:'簡答',marks:3},
+    ],
+    '中':[
+      {q:'解釋中和反應的原理，並寫出鹽酸（HCl）與氫氧化鈉（NaOH）反應的化學方程式，說明產物的性質。',type:'計算',marks:5},
+      {q:'描述植物細胞與動物細胞的三個主要分別，並解釋這些差異如何與各自的功能有關。',type:'簡答',marks:5},
+      {q:'一物體質量為 5 kg，受 15 N 的合力作用，求其加速度（F = ma）。若合力加倍，加速度如何變化？',type:'計算',marks:4},
+      {q:'繪圖說明一個含有生產者、初級消費者、次級消費者及分解者的食物鏈，並說明能量流動的方向。',type:'繪圖',marks:5},
+      {q:'解釋什麼是「元素」與「化合物」的分別，並各舉三個例子加以說明。',type:'簡答',marks:4},
+    ],
+    '難':[
+      {q:'設計一個完整的實驗，探討溫度對酵素活性的影響。你的答案須包括：（i）研究假設；（ii）自變量、因變量、控制變量；（iii）實驗步驟；（iv）預期結果及圖表呈現方式。',type:'實驗設計',marks:9},
+      {q:'利用龐尼特方格，預測以下遺傳雜交的後代基因型及表現型比例：父 Aa × 母 Aa（A 為顯性）。解釋顯性與隱性特徵的含義。',type:'計算',marks:7},
+      {q:'一個質量 3 kg 的物體置於傾角 30° 的斜面上，動摩擦係數為 0.2，g = 10 m/s²。求：（i）沿斜面分力；（ii）摩擦力；（iii）物體的加速度。',type:'計算',marks:8},
+      {q:'比較有性生殖與無性生殖的優缺點，從進化角度分析兩者如何各自有利於物種生存，並各舉兩個生物例子。',type:'分析',marks:7},
+      {q:'解釋全球暖化的成因與後果，分析人類活動如何透過碳循環影響大氣中的氣體平衡，並提出兩項可行的解決方案。',type:'分析',marks:9},
+    ],
+  },
+  '歷史':{
+    '易':[
+      {q:'香港在哪一年、哪一天正式回歸中國？並說明「一國兩制」的基本含義。',type:'簡答',marks:2},
+      {q:'以下哪一項是第一次工業革命的重要特徵？（A）農業生產大幅增加　（B）蒸汽機的廣泛應用　（C）手工業興盛　（D）人口向農村移動。解釋你的選擇。',type:'選擇',marks:2},
+      {q:'第一次世界大戰的直接導火線是什麼事件？說出事件發生的時間及地點。',type:'簡答',marks:2},
+      {q:'列出《南京條約》（1842）的三項主要內容，並說明其中一項對中國的影響。',type:'簡答',marks:3},
+      {q:'「五四運動」發生於哪一年？列出兩個引發這場運動的歷史背景。',type:'簡答',marks:3},
+    ],
+    '中':[
+      {q:'解釋「門戶開放政策」的提出背景及主要內容，並分析它對中國主權的影響。',type:'簡答',marks:5},
+      {q:'比較戊戌變法與辛亥革命在推動中國現代化方面的方式及成效，指出兩者的主要分別。',type:'比較',marks:5},
+      {q:'分析第二次世界大戰爆發的三個主要原因，並說明每個原因如何促使衝突發生。',type:'分析',marks:5},
+      {q:'根據以下史料，（i）指出其史料類型；（ii）判斷其可信性；（iii）解釋理由。（史料另附）',type:'史料分析',marks:5},
+      {q:'解釋「冷戰」的成因及主要特徵，並列舉兩個重要事件說明美蘇兩國的對立。',type:'簡答',marks:5},
+    ],
+    '難':[
+      {q:'全面評估清朝洋務運動（1861–1895）的成效，並深入分析其最終失敗的根本原因。你的答案須包括政治、經濟及軍事三方面的論據。（不少於 200 字）',type:'論述',marks:10},
+      {q:'「工業革命是近代世界最重要的轉捩點。」你在多大程度上同意此說法？請從政治、社會及經濟三方面援引史實加以論證，並提出反論及回應。',type:'論述',marks:10},
+      {q:'分析 1949 年後中國共產黨如何通過土地改革、三反五反及文化大革命三項政策鞏固其政治權力，評估每項政策的社會影響。',type:'分析',marks:9},
+      {q:'比較二十世紀初中國與日本的現代化進程，從領導層、制度改革及對外政策三方面分析兩國成敗的原因。',type:'比較',marks:9},
+      {q:'評論殖民主義對亞洲國家長遠發展的影響，以兩個具體國家為例，分析殖民統治遺留的政治、經濟及文化問題。',type:'評論',marks:10},
+    ],
+  },
+};
+
+/* ══════════════════════════════════════
+   GENERATOR STATE
+══════════════════════════════════════ */
+let paperQuestions=[];    // [{diff, qObj}]
+let usedIdxMap={};        // {subject_diff: Set}
+
+function resetUsed(){usedIdxMap={};}
+
+function sampleQ(subject, diff){
+  const pool=qBank[subject]?.[diff];
+  if(!pool||!pool.length) return null;
+  const key=subject+'_'+diff;
+  if(!usedIdxMap[key]) usedIdxMap[key]=new Set();
+  let avail=pool.map((_,i)=>i).filter(i=>!usedIdxMap[key].has(i));
+  if(!avail.length){usedIdxMap[key].clear(); avail=pool.map((_,i)=>i);}
+  const idx=avail[Math.floor(Math.random()*avail.length)];
+  usedIdxMap[key].add(idx);
+  return{...pool[idx],_poolIdx:idx};
+}
+
+function openGenerator(){
+  resetUsed();
+  paperQuestions=[];
+  document.getElementById('gTitle').value='';
+  document.getElementById('gClass').value='';
+  document.getElementById('gTime').value='45';
+  document.getElementById('gSubject').value='數學';
+  document.getElementById('gGrade').value='中二';
+  // default: 2 easy, 2 mid, 2 hard
+  applyPreset([['易','易'],['中','中'],['難','難']]);
+  document.getElementById('genOverlay').classList.add('show');
+}
+function closeGenerator(){
+  document.getElementById('genOverlay').classList.remove('show');
+}
+
+function onSubjectChange(){
+  resetUsed();
+  paperQuestions=paperQuestions.map(pq=>{
+    pq.qObj=sampleQ(getSubject(), pq.diff);
+    return pq;
+  });
+  renderQRows();
+  renderPreview();
+}
+
+function applyPreset(groups){
+  resetUsed();
+  paperQuestions=[];
+  groups.forEach(diffs=>diffs.forEach(d=>paperQuestions.push({diff:d,qObj:sampleQ(getSubject(),d)})));
+  renderQRows();
+  renderPreview();
+}
+
+function addQuestion(diff){
+  const q=sampleQ(getSubject(), diff);
+  paperQuestions.push({diff, qObj:q});
+  renderQRows();
+  renderPreview();
+}
+
+function setDiff(idx, diff){
+  paperQuestions[idx].diff=diff;
+  paperQuestions[idx].qObj=sampleQ(getSubject(), diff);
+  renderQRows();
+  renderPreview();
+}
+
+function resampleQ(idx){
+  const diff=paperQuestions[idx].diff;
+  paperQuestions[idx].qObj=sampleQ(getSubject(), diff);
+  renderQRows();
+  renderPreview();
+}
+
+function removeQ(idx){
+  paperQuestions.splice(idx,1);
+  renderQRows();
+  renderPreview();
+}
+
+function getSubject(){return document.getElementById('gSubject').value;}
+
+const diffLabel={'易':'易','中':'中','難':'難'};
+const diffCls={'易':'d-easy','中':'d-mid','難':'d-hard'};
+const diffPillCls={'易':'dp-e','中':'dp-m','難':'dp-h'};
+
+function renderQRows(){
+  const easy=paperQuestions.filter(q=>q.diff==='易').length;
+  const mid=paperQuestions.filter(q=>q.diff==='中').length;
+  const hard=paperQuestions.filter(q=>q.diff==='難').length;
+  const total=paperQuestions.length;
+  const totalMark=paperQuestions.reduce((a,q)=>a+(q.qObj?q.qObj.marks:0),0);
+
+  document.getElementById('qCountLabel').textContent=`共 ${total} 題`;
+  document.getElementById('diffSummary').innerHTML=
+    `<span class="dsm dsm-e">易 ${easy}</span>`+
+    `<span class="dsm dsm-m">中 ${mid}</span>`+
+    `<span class="dsm dsm-h">難 ${hard}</span>`+
+    `<span class="dsm dsm-t">合計 ${total} 題</span>`+
+    `<span class="dsm dsm-pts">共 ${totalMark} 分</span>`;
+
+  document.getElementById('qRows').innerHTML=paperQuestions.map((pq,i)=>{
+    const q=pq.qObj;
+    const diffs=['易','中','難'];
+    return`<div class="qrow">
+      <div class="qrow-top">
+        <div class="qnum">${i+1}</div>
+        <span class="qtype-lbl">${q?q.type:'—'}</span>
+        <div class="diff-group">
+          ${diffs.map(d=>`<button class="diff-btn ${diffCls[d]}${pq.diff===d?' on':''}" onclick="setDiff(${i},'${d}')">${d}</button>`).join('')}
+        </div>
+      </div>
+      <div class="qtext">${q?q.q:'（此程度暫無題目）'}</div>
+      <div class="qrow-bot">
+        <div class="qmeta">
+          ${q?`<span>${q.type}</span><span style="color:${pq.diff==='易'?'#86EFAC':pq.diff==='中'?'#FDE68A':'#FCA5A5'}">${q.marks} 分</span>`:''}
+        </div>
+        <div class="qact">
+          <button class="qact-btn" onclick="resampleQ(${i})" title="重新取樣">🔄 重取</button>
+          <button class="qact-btn del-btn" onclick="removeQ(${i})" title="移除此題">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPreview(){
+  const title=document.getElementById('gTitle').value||'（未命名試卷）';
+  const subject=getSubject();
+  const grade=document.getElementById('gGrade').value;
+  const cls=document.getElementById('gClass').value;
+  const time=document.getElementById('gTime').value;
+  const totalMark=paperQuestions.reduce((a,q)=>a+(q.qObj?q.qObj.marks:0),0);
+
+  if(!paperQuestions.length){
+    document.getElementById('previewPaper').innerHTML=`<div class="preview-paper"><div class="pp-empty">尚未加入任何題目<br><span style="font-size:12px;margin-top:6px;display:block;">請在左方選擇快速預設，或手動加入題目</span></div></div>`;
+    return;
+  }
+
+  const qHTML=paperQuestions.map((pq,i)=>{
+    const q=pq.qObj;
+    if(!q) return`<div class="pp-q"><div class="pp-q-hdr"><span class="pp-q-num">${i+1}.</span><span class="pp-q-text" style="color:#aaa;">（此程度暫無題目）</span></div></div>`;
+    const ansLines=q.marks<=2?1:q.marks<=5?2:3;
+    const lines=Array(ansLines).fill('<div class="ans-line"></div>').join('');
+    return`<div class="pp-q">
+      <div class="pp-q-hdr">
+        <span class="pp-q-num">${i+1}.</span>
+        <span class="pp-q-text">${q.q}<span class="diff-pill ${diffPillCls[pq.diff]}">${pq.diff}</span></span>
+        <span class="pp-q-mark">（${q.marks} 分）</span>
+      </div>
+      <div class="pp-q-ans">${lines}</div>
+    </div><hr class="pp-divider">`;
+  }).join('');
+
+  document.getElementById('previewPaper').innerHTML=`
+    <div class="preview-paper" id="printTarget">
+      <div class="pp-school">香港青少年培育會陳南昌紀念學校</div>
+      <div class="pp-title">${title}</div>
+      <div class="pp-subtitle">${grade} · ${subject} · 作答時間：${time} 分鐘 · 滿分：${totalMark} 分</div>
+      <div class="pp-info-bar">
+        <span><b>班別</b>${cls||'______'}</span>
+        <span><b>姓名</b>________________</span>
+        <span><b>學號</b>________</span>
+        <span><b>日期</b>________________</span>
+        <span><b>分數</b>______ / ${totalMark}</span>
+      </div>
+      ${qHTML}
+      <div class="pp-total">Total / 總分：______ / ${totalMark} 分</div>
+    </div>`;
+}
+
+function doPrint(){
+  const content=document.getElementById('printTarget');
+  if(!content){showToast('⚠️ 請先加入題目再列印');return;}
+  const w=window.open('','_blank','width=800,height=900');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>工作紙</title><style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;padding:32px;background:#fff;color:#111;}
+    .pp-school{font-size:11px;text-align:center;color:#555;margin-bottom:3px;}
+    .pp-title{font-size:20px;font-weight:800;text-align:center;margin-bottom:3px;}
+    .pp-subtitle{font-size:11px;text-align:center;color:#777;margin-bottom:14px;}
+    .pp-info-bar{display:flex;gap:0;border-top:2px solid #222;border-bottom:1px solid #bbb;padding:9px 0;margin-bottom:18px;}
+    .pp-info-bar span{flex:1;font-size:12px;border-right:1px solid #ddd;padding:0 12px;}
+    .pp-info-bar span:first-child{padding-left:0;}
+    .pp-info-bar span:last-child{border-right:none;}
+    .pp-info-bar span b{display:block;font-size:10px;color:#888;font-weight:500;margin-bottom:2px;}
+    .pp-q{margin-bottom:14px;}
+    .pp-q-hdr{display:flex;align-items:flex-start;gap:8px;}
+    .pp-q-num{font-size:13px;font-weight:800;width:24px;flex-shrink:0;padding-top:1px;}
+    .pp-q-text{font-size:13px;line-height:1.65;flex:1;}
+    .pp-q-mark{font-size:11px;color:#888;white-space:nowrap;padding-top:2px;flex-shrink:0;}
+    .pp-q-ans{margin-left:32px;margin-top:8px;}
+    .ans-line{border-bottom:1px solid #ccc;height:26px;margin-bottom:6px;}
+    .diff-pill{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:800;margin-left:5px;vertical-align:middle;}
+    .dp-e{background:#dcfce7;color:#15803d;}.dp-m{background:#fef9c3;color:#78350f;}.dp-h{background:#fee2e2;color:#991b1b;}
+    .pp-divider{border:none;border-top:1px dashed #ccc;margin:10px 0;}
+    .pp-total{text-align:right;font-size:12px;font-weight:700;border-top:2px solid #222;padding-top:10px;margin-top:6px;}
+  </style></head><body>${content.outerHTML}</body></html>`);
+  w.document.close();
+  setTimeout(()=>{w.print();},400);
+}
+</script>
+</body>
+</html>
