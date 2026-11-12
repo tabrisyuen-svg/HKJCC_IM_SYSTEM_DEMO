@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-07 · Health</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang HK',sans-serif;background:#f7f7f5;color:#1a1a1a;min-height:100vh;}
+
+/* Header */
+.header{background:#1a1a1a;color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.header-left{display:flex;align-items:center;gap:14px;}
+.logo{font-size:12px;font-weight:700;letter-spacing:.08em;color:#d4ff6e;}
+.header-title{font-size:15px;font-weight:600;}
+.role-badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.04em;cursor:pointer;border:none;transition:.2s;}
+.role-admin{background:#d4ff6e;color:#1a1a1a;}
+.role-nurse{background:#93c5fd;color:#1a1a1a;}
+.role-teacher{background:#fca5a5;color:#1a1a1a;}
+.role-label{font-size:11px;color:#888;margin-right:4px;}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 57px);}
+@media(max-width:700px){.layout{grid-template-columns:1fr;}}
+
+/* Sidebar */
+.sidebar{background:#fff;border-right:1px solid #ebebeb;padding:16px 0;}
+.sidebar-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:#bbb;padding:8px 20px 6px;text-transform:uppercase;}
+.student-item{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;transition:.15s;border-left:3px solid transparent;}
+.student-item:hover{background:#f9f9f9;}
+.student-item.active{background:#f0f6ff;border-left-color:#3b82f6;}
+.s-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.s-name{font-size:13px;font-weight:600;color:#1a1a1a;}
+.s-class{font-size:11px;color:#aaa;}
+.s-alert{width:7px;height:7px;border-radius:50%;background:#ef4444;margin-left:auto;flex-shrink:0;}
+
+/* Main */
+.main{padding:24px;overflow-y:auto;}
+.main-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.main-name{font-size:20px;font-weight:700;}
+.main-sub{font-size:12px;color:#999;margin-top:2px;}
+.btn{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.2s;white-space:nowrap;}
+.btn:hover{opacity:.8;}
+.btn-add{background:#1a1a1a;color:#fff;}
+.btn-pdf{background:#ef4444;color:#fff;}
+.btn-edit{background:#f0f0f0;color:#555;}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid #ebebeb;flex-wrap:wrap;}
+.tab{padding:9px 16px;font-size:13px;font-weight:500;color:#888;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:.15s;white-space:nowrap;}
+.tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;font-weight:700;}
+
+/* Cards */
+.card{background:#fff;border-radius:14px;border:1px solid #e8e8e8;padding:20px;margin-bottom:16px;}
+.card-title{font-size:12px;font-weight:700;letter-spacing:.06em;color:#aaa;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title span{font-size:15px;}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+.info-item label{font-size:10px;color:#bbb;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px;}
+.info-item p{font-size:13px;color:#1a1a1a;font-weight:500;}
+
+/* Tags */
+.tag-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.tag-red{background:#fef2f2;color:#ef4444;}
+.tag-orange{background:#fff7ed;color:#f97316;}
+.tag-blue{background:#eff6ff;color:#3b82f6;}
+.tag-green{background:#f0fdf4;color:#22c55e;}
+.tag-gray{background:#f5f5f5;color:#888;}
+
+/* Alert box */
+.alert-box{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;}
+.alert-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:13px;color:#b91c1c;line-height:1.55;}
+.alert-text strong{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;margin-bottom:3px;}
+
+/* Contact cards */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.contact-card{background:#f9f9f9;border-radius:12px;padding:14px 16px;border:1px solid #f0f0f0;}
+.contact-card .priority{font-size:10px;font-weight:700;color:#f97316;letter-spacing:.06em;margin-bottom:6px;}
+.contact-card .c-name{font-size:14px;font-weight:700;margin-bottom:2px;}
+.contact-card .c-rel{font-size:12px;color:#888;margin-bottom:8px;}
+.contact-card .c-phone{font-size:14px;font-weight:600;color:#3b82f6;}
+.contact-card .c-phone a{color:inherit;text-decoration:none;}
+
+/* Med table */
+.med-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #f5f5f5;}
+.med-item:last-child{border-bottom:none;}
+.med-dot{width:8px;height:8px;border-radius:50%;background:#8b5cf6;margin-top:5px;flex-shrink:0;}
+.med-name{font-size:14px;font-weight:600;margin-bottom:3px;}
+.med-detail{font-size:12px;color:#888;line-height:1.55;}
+.med-confirm{margin-left:auto;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;border:none;cursor:pointer;}
+.med-done{background:#f0fdf4;color:#22c55e;}
+.med-pending{background:#fff7ed;color:#f97316;}
+
+/* Event log */
+.event-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f5f5f5;align-items:flex-start;}
+.event-item:last-child{border-bottom:none;}
+.event-date{font-size:11px;color:#bbb;white-space:nowrap;min-width:70px;margin-top:2px;}
+.event-type{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:5px;}
+.ev-injury{background:#fef2f2;color:#ef4444;}
+.ev-allergy{background:#fff7ed;color:#f97316;}
+.ev-ill{background:#eff6ff;color:#3b82f6;}
+.ev-other{background:#f5f5f5;color:#888;}
+.event-desc{font-size:13px;color:#444;line-height:1.55;}
+.event-handler{font-size:11px;color:#bbb;margin-top:4px;}
+
+/* Sick leave */
+.sl-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f5f5f5;flex-wrap:wrap;}
+.sl-item:last-child{border-bottom:none;}
+.sl-date{font-size:12px;color:#888;min-width:90px;}
+.sl-reason{font-size:13px;font-weight:500;flex:1;}
+.sl-days{font-size:12px;color:#f97316;font-weight:700;white-space:nowrap;}
+.sl-note{font-size:11px;color:#bbb;width:100%;padding-left:102px;}
+
+/* Access banner */
+.access-banner{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:11px 16px;font-size:12px;color:#92400e;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+/* Restricted */
+.restricted{text-align:center;padding:48px 24px;color:#ccc;}
+.restricted .r-icon{font-size:40px;margin-bottom:12px;}
+.restricted p{font-size:14px;}
+
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;padding:20px;}
+.overlay.active{display:flex;}
+.modal{background:#fff;border-radius:20px;padding:28px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:#999;margin-bottom:22px;}
+.form-group{margin-bottom:13px;}
+.form-label{font-size:11px;font-weight:700;color:#666;margin-bottom:5px;display:block;letter-spacing:.04em;text-transform:uppercase;}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 13px;border:1px solid #e0e0e0;border-radius:10px;font-size:13px;outline:none;transition:border-color .2s;font-family:inherit;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#1a1a1a;}
+.form-textarea{min-height:80px;resize:vertical;}
+.modal-actions{display:flex;gap:8px;margin-top:20px;}
+.btn-cancel{flex:1;background:#f0f0f0;color:#777;}
+.btn-save{flex:2;background:#1a1a1a;color:#fff;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;transform:translateY(60px);opacity:0;transition:all .3s;z-index:200;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+@media(max-width:520px){.header{padding:12px 16px;}.main{padding:14px;}.info-grid{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <span class="logo">T-07</span>
+        <span class="header-title">健康記錄 · Health</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <span class="role-label">身份：</span>
+        <button class="role-badge role-admin" id="roleBtn" onclick="cycleRole()">管理員 Admin</button>
+    </div>
+</div>
+
+<div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-label">學生名單</div>
+        <div id="studentList"></div>
+    </div>
+
+    <!-- Main -->
+    <div class="main" id="mainArea"></div>
+</div>
+
+<!-- Event Modal -->
+<div class="overlay" id="eventOverlay">
+    <div class="modal">
+        <div class="modal-title">新增健康事件</div>
+        <div class="modal-sub" id="eventModalSub"></div>
+        <div class="form-group">
+            <label class="form-label">事件類型</label>
+            <select class="form-select" id="evType">
+                <option value="injury">受傷</option>
+                <option value="allergy">過敏反應</option>
+                <option value="ill">病患</option>
+                <option value="other">其他</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">事件描述</label>
+            <textarea class="form-textarea" id="evDesc" placeholder="描述發生情況、症狀、處理方式..."></textarea>
+        </div>
+        <div class="form-group">
+            <label class="form-label">處理人員</label>
+            <input class="form-input" id="evHandler" placeholder="例：Chan Sir、校護 Wong Miss...">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeModal('eventOverlay')">取消</button>
+            <button class="btn btn-save" onclick="saveEvent()">儲存記錄</button>
+        </div>
+    </div>
+</div>
+
+<!-- Sick Leave Modal -->
+<div class="overlay" id="slOverlay">
+    <div class="modal">
+        <div class="modal-title">新增病假記錄</div>
+        <div class="modal-sub" id="slModalSub"></div>
+        <div class="form-group">
+            <label class="form-label">日期</label>
+            <input class="form-input" id="slDate" type="date">
+        </div>
+        <div class="form-group">
+            <label class="form-label">天數</label>
+            <input class="form-input" id="slDays" type="number" min="1" max="30" placeholder="1">
+        </div>
+        <div class="form-group">
+            <label class="form-label">原因</label>
+            <input class="form-input" id="slReason" placeholder="例：發燒、腸胃炎...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">備註</label>
+            <input class="form-input" id="slNote" placeholder="例：已提交醫生證明">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeModal('slOverlay')">取消</button>
+            <button class="btn btn-save" onclick="saveSickLeave()">儲存記錄</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data ──────────────────────────────────────────────
+const STUDENTS = [
+    {
+        id:'s1', name:'陳大文', en:'Chan Tai Man', cls:'2A', dob:'2012-05-14', gender:'男',
+        blood:'A+', hasAlert:true,
+        avatar:{bg:'#fef2f2',color:'#ef4444',init:'陳'},
+        allergies:['花生','海鮮'],
+        conditions:['哮喘'],
+        notes:'運動後需注意呼吸情況，備有哮喘噴劑存放於校護室。',
+        contacts:[
+            {priority:1,name:'陳志偉',rel:'父親',phone:'9123 4567'},
+            {priority:2,name:'李美玲',rel:'母親',phone:'9234 5678'},
+        ],
+        meds:[
+            {name:'Ventolin 哮喘噴劑',dose:'按需使用',time:'運動前或發作時',supervisor:'校護',done:true},
+        ],
+        events:[
+            {date:'2026-10-15',type:'allergy',desc:'午飯後出現輕微過敏反應，疑食用含花生食品。已服抗敏藥，通知家長。',handler:'Wong Miss（校護）'},
+            {date:'2026-09-03',type:'ill',desc:'上午第三節感到頭暈，面色蒼白，送往校護室休息。家長接返。',handler:'Chan Sir（班主任）'},
+        ],
+        sickLeaves:[
+            {date:'2026-10-16',days:1,reason:'過敏反應跟進',note:'已提交醫生證明'},
+            {date:'2026-09-04',days:2,reason:'發燒',note:''},
+        ],
+    },
+    {
+        id:'s2', name:'林小燕', en:'Lam Siu Yin', cls:'2A', dob:'2012-11-30', gender:'女',
+        blood:'O+', hasAlert:false,
+        avatar:{bg:'#f0fdf4',color:'#22c55e',init:'林'},
+        allergies:['青黴素（盤尼西林）'],
+        conditions:[],
+        notes:'對盤尼西林類抗生素有敏感，如需用藥請先諮詢家長。',
+        contacts:[
+            {priority:1,name:'林建明',rel:'父親',phone:'9345 6789'},
+        ],
+        meds:[],
+        events:[
+            {date:'2026-08-28',type:'injury',desc:'體育課跑步時跌倒，右膝擦傷，已消毒包紮。',handler:'Lam Sir（體育老師）'},
+        ],
+        sickLeaves:[
+            {date:'2026-09-20',days:1,reason:'腸胃炎',note:''},
+        ],
+    },
+    {
+        id:'s3', name:'黃俊傑', en:'Wong Chun Kit', cls:'1B', dob:'2013-03-22', gender:'男',
+        blood:'B+', hasAlert:true,
+        avatar:{bg:'#eff6ff',color:'#3b82f6',init:'黃'},
+        allergies:['乳製品'],
+        conditions:['1型糖尿病'],
+        notes:'需在固定時間監測血糖，午飯前後需特別注意。低血糖急救用品存放於班房。緊急時立即致電家長。',
+        contacts:[
+            {priority:1,name:'黃志強',rel:'父親',phone:'9456 7890'},
+            {priority:2,name:'黃陳麗華',rel:'母親',phone:'9567 8901'},
+            {priority:3,name:'陳醫生診所',rel:'主診醫生',phone:'2345 6789'},
+        ],
+        meds:[
+            {name:'胰島素注射',dose:'按醫生指示',time:'午飯前',supervisor:'校護',done:false},
+            {name:'葡萄糖錠（急救）',dose:'低血糖時使用',time:'按需',supervisor:'班主任',done:false},
+        ],
+        events:[
+            {date:'2026-11-01',type:'ill',desc:'下午第六節出現低血糖症狀，頭暈、手震。已即時補充葡萄糖，情況好轉，通知家長。',handler:'Ho Miss（校護）'},
+        ],
+        sickLeaves:[],
+    },
+    {
+        id:'s4', name:'張雅詩', en:'Cheung Nga Si', cls:'1A', dob:'2013-07-08', gender:'女',
+        blood:'AB-', hasAlert:false,
+        avatar:{bg:'#fdf4ff',color:'#a855f7',init:'張'},
+        allergies:[],
+        conditions:[],
+        notes:'',
+        contacts:[
+            {priority:1,name:'張偉明',rel:'父親',phone:'9678 9012'},
+        ],
+        meds:[],
+        events:[],
+        sickLeaves:[
+            {date:'2026-10-05',days:3,reason:'流感',note:'已提交醫生證明'},
+        ],
+    },
+];
+
+const ROLES = ['admin','nurse','teacher'];
+const ROLE_LABELS = {admin:'管理員 Admin',nurse:'校護 Nurse',teacher:'老師 Teacher'};
+const ROLE_CLASSES = {admin:'role-admin',nurse:'role-nurse',teacher:'role-teacher'};
+
+let currentRole = 'admin';
+let currentStudentId = 's1';
+let currentTab = 'overview';
+
+// ── Role ─────────────────────────────────────────────
+function cycleRole() {
+    const idx = ROLES.indexOf(currentRole);
+    currentRole = ROLES[(idx+1) % ROLES.length];
+    const btn = document.getElementById('roleBtn');
+    btn.textContent = ROLE_LABELS[currentRole];
+    btn.className = 'role-badge ' + ROLE_CLASSES[currentRole];
+    renderMain();
+    showToast('身份切換：' + ROLE_LABELS[currentRole]);
+}
+
+// ── Sidebar ───────────────────────────────────────────
+function renderSidebar() {
+    const list = document.getElementById('studentList');
+    list.innerHTML = STUDENTS.map(s => `
+        <div class="student-item${s.id===currentStudentId?' active':''}" onclick="selectStudent('${s.id}')">
+            <div class="s-avatar" style="background:${s.avatar.bg};color:${s.avatar.color}">${s.avatar.init}</div>
+            <div>
+                <div class="s-name">${s.name}</div>
+                <div class="s-class">${s.cls} · ${s.en.split(' ')[0]}</div>
+            </div>
+            ${s.hasAlert ? '<div class="s-alert"></div>' : ''}
+        </div>`).join('');
+}
+
+function selectStudent(id) {
+    currentStudentId = id;
+    currentTab = 'overview';
+    renderSidebar();
+    renderMain();
+}
+
+// ── Main ──────────────────────────────────────────────
+function renderMain() {
+    const s = STUDENTS.find(x => x.id === currentStudentId);
+    const area = document.getElementById('mainArea');
+
+    const tabs = [
+        {id:'overview',label:'概覽'},
+        {id:'contacts',label:'緊急聯絡'},
+        {id:'meds',    label:'藥物'},
+        {id:'events',  label:'事件記錄'},
+        {id:'sick',    label:'病假'},
+    ];
+
+    const accessBanner = currentRole === 'teacher'
+        ? `<div class="access-banner">⚠️ 你的身份僅可查看基本過敏及緊急注意事項，完整記錄需由校護或管理員查閱。</div>` : '';
+
+    area.innerHTML = `
+        <div class="main-top">
+            <div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="s-avatar" style="background:${s.avatar.bg};color:${s.avatar.color};width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;">${s.avatar.init}</div>
+                    <div>
+                        <div class="main-name">${s.name} <span style="font-size:14px;color:#bbb;font-weight:400">${s.en}</span></div>
+                        <div class="main-sub">${s.cls} · ${s.gender} · ${s.dob} · 血型 ${s.blood}</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;" class="no-print">
+                ${currentRole!=='teacher'?`<button class="btn btn-add" onclick="openEventModal()">＋ 事件</button>`:''}
+                ${currentRole!=='teacher'?`<button class="btn btn-add" style="background:#3b82f6" onclick="openSLModal()">＋ 病假</button>`:''}
+                <button class="btn btn-pdf" onclick="window.print()">↓ PDF</button>
+            </div>
+        </div>
+        ${accessBanner}
+        ${s.hasAlert ? `<div class="alert-box"><div class="alert-icon">🚨</div><div class="alert-text"><strong>醫療注意事項</strong>${s.notes}</div></div>` : ''}
+        <div class="tabs">${tabs.map(t=>`<button class="tab${currentTab===t.id?' active':''}" onclick="switchTab('${t.id}')">${t.label}</button>`).join('')}</div>
+        <div id="tabContent"></div>`;
+
+    renderTab(s);
+}
+
+function switchTab(tab) {
+    currentTab = tab;
+    const s = STUDENTS.find(x => x.id === currentStudentId);
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.textContent === {overview:'概覽',contacts:'緊急聯絡',meds:'藥物',events:'事件記錄',sick:'病假'}[tab]));
+    renderTab(s);
+}
+
+function renderTab(s) {
+    const tc = document.getElementById('tabContent');
+    if (!tc) return;
+
+    if (currentTab === 'overview') {
+        const canSeeAll = currentRole !== 'teacher';
+        tc.innerHTML = `
+            <div class="card">
+                <div class="card-title"><span>🩺</span> 基本健康資訊</div>
+                <div class="info-grid">
+                    <div class="info-item"><label>血型</label><p>${s.blood}</p></div>
+                    <div class="info-item"><label>性別</label><p>${s.gender}</p></div>
+                    <div class="info-item"><label>出生日期</label><p>${s.dob}</p></div>
+                    <div class="info-item"><label>班別</label><p>${s.cls}</p></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span>⚠️</span> 過敏資訊</div>
+                <div class="tag-list">
+                    ${s.allergies.length ? s.allergies.map(a=>`<span class="tag tag-red">${a}</span>`).join('') : '<span style="font-size:13px;color:#bbb">無已知過敏</span>'}
+                </div>
+            </div>
+            ${canSeeAll ? `
+            <div class="card">
+                <div class="card-title"><span>🏥</span> 慢性病 / 長期病患</div>
+                <div class="tag-list">
+                    ${s.conditions.length ? s.conditions.map(c=>`<span class="tag tag-orange">${c}</span>`).join('') : '<span style="font-size:13px;color:#bbb">無</span>'}
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span>📋</span> 備註</div>
+                <p style="font-size:13px;color:#555;line-height:1.7">${s.notes||'—'}</p>
+            </div>` : ''}`;
+    }
+
+    else if (currentTab === 'contacts') {
+        if (currentRole === 'teacher') { tc.innerHTML = restricted(); return; }
+        tc.innerHTML = `<div class="card">
+            <div class="card-title"><span>📞</span> 緊急聯絡人</div>
+            <div class="contact-grid">
+                ${s.contacts.map(c=>`
+                <div class="contact-card">
+                    <div class="priority">優先 #${c.priority}</div>
+                    <div class="c-name">${c.name}</div>
+                    <div class="c-rel">${c.rel}</div>
+                    <div class="c-phone"><a href="tel:${c.phone}">${c.phone}</a></div>
+                </div>`).join('')}
+            </div>
+        </div>`;
+    }
+
+    else if (currentTab === 'meds') {
+        if (currentRole === 'teacher') { tc.innerHTML = restricted(); return; }
+        tc.innerHTML = `<div class="card">
+            <div class="card-title"><span>💊</span> 在校藥物記錄</div>
+            ${s.meds.length ? s.meds.map((m,i)=>`
+            <div class="med-item">
+                <div class="med-dot"></div>
+                <div style="flex:1">
+                    <div class="med-name">${m.name}</div>
+                    <div class="med-detail">劑量：${m.dose}　時間：${m.time}　監督：${m.supervisor}</div>
+                </div>
+                <button class="med-confirm ${m.done?'med-done':'med-pending'}" onclick="toggleMed(${i})">
+                    ${m.done?'✓ 已服藥':'待確認'}
+                </button>
+            </div>`).join('') : '<p style="font-size:13px;color:#bbb">無在校藥物記錄</p>'}
+        </div>`;
+    }
+
+    else if (currentTab === 'events') {
+        if (currentRole === 'teacher') { tc.innerHTML = restricted(); return; }
+        const typeMap = {injury:'ev-injury',allergy:'ev-allergy',ill:'ev-ill',other:'ev-other'};
+        const typeLabel = {injury:'受傷',allergy:'過敏反應',ill:'病患',other:'其他'};
+        tc.innerHTML = `<div class="card">
+            <div class="card-title"><span>📝</span> 健康事件記錄</div>
+            ${s.events.length ? s.events.map(e=>`
+            <div class="event-item">
+                <div class="event-date">${e.date}</div>
+                <div style="flex:1">
+                    <span class="event-type ${typeMap[e.type]}">${typeLabel[e.type]}</span>
+                    <div class="event-desc">${e.desc}</div>
+                    <div class="event-handler">處理：${e.handler}</div>
+                </div>
+            </div>`).join('') : '<p style="font-size:13px;color:#bbb">暫無事件記錄</p>'}
+        </div>`;
+    }
+
+    else if (currentTab === 'sick') {
+        if (currentRole === 'teacher') { tc.innerHTML = restricted(); return; }
+        const total = s.sickLeaves.reduce((a,b)=>a+(+b.days),0);
+        tc.innerHTML = `
+            <div class="card" style="display:flex;gap:24px;flex-wrap:wrap;padding:16px 20px;">
+                <div><div style="font-size:11px;color:#bbb;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">本學年病假</div><div style="font-size:24px;font-weight:700;color:#f97316">${total} 天</div></div>
+                <div><div style="font-size:11px;color:#bbb;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">記錄次數</div><div style="font-size:24px;font-weight:700;color:#3b82f6">${s.sickLeaves.length} 次</div></div>
+            </div>
+            <div class="card">
+                <div class="card-title"><span>🗓</span> 病假記錄</div>
+                ${s.sickLeaves.length ? s.sickLeaves.map(sl=>`
+                <div class="sl-item">
+                    <div class="sl-date">${sl.date}</div>
+                    <div class="sl-reason">${sl.reason}</div>
+                    <div class="sl-days">${sl.days} 天</div>
+                    ${sl.note?`<div class="sl-note">${sl.note}</div>`:''}
+                </div>`).join('') : '<p style="font-size:13px;color:#bbb">暫無病假記錄</p>'}
+            </div>`;
+    }
+}
+
+function restricted() {
+    return `<div class="restricted"><div class="r-icon">🔒</div><p>此部分需要校護或管理員權限才可查閱</p></div>`;
+}
+
+// ── Interactions ──────────────────────────────────────
+function toggleMed(idx) {
+    const s = STUDENTS.find(x => x.id === currentStudentId);
+    s.meds[idx].done = !s.meds[idx].done;
+    renderTab(s);
+    showToast(s.meds[idx].done ? '已確認服藥 ✓' : '已重設為待確認');
+}
+
+function openEventModal() {
+    const s = STUDENTS.find(x => x.id === currentStudentId);
+    document.getElementById('eventModalSub').textContent = s.name + ' · ' + new Date().toISOString().slice(0,10);
+    document.getElementById('evDesc').value = '';
+    document.getElementById('evHandler').value = '';
+    document.getElementById('eventOverlay').classList.add('active');
+}
+
+function saveEvent() {
+    const desc = document.getElementById('evDesc').value.trim();
+    const handler = document.getElementById('evHandler').value.trim();
+    const type = document.getElementById('evType').value;
+    if (!desc) { showToast('請輸入事件描述'); return; }
+    const s = STUDENTS.find(x => x.id === currentStudentId);
+    s.events.unshift({ date: new Date().toISOString().slice(0,10), type, desc, handler: handler||'—' });
+    closeModal('eventOverlay');
+    currentTab = 'events';
+    renderMain();
+    showToast('事件記錄已儲存 ✓');
+}
+
+function openSLModal() {
+    const s = STUDENTS.find(x => x.id === currentStudentId);
+    document.getElementById('slModalSub').textContent = s.name;
+    document.getElementById('slDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('slDays').value = '1';
+    document.getElementById('slReason').value = '';
+    document.getElementById('slNote').value = '';
+    document.getElementById('slOverlay').classList.add('active');
+}
+
+function saveSickLeave() {
+    const date   = document.getElementById('slDate').value;
+    const days   = document.getElementById('slDays').value;
+    const reason = document.getElementById('slReason').value.trim();
+    const note   = document.getElementById('slNote').value.trim();
+    if (!reason) { showToast('請輸入病假原因'); return; }
+    const s = STUDENTS.find(x => x.id === currentStudentId);
+    s.sickLeaves.unshift({ date, days: parseInt(days)||1, reason, note });
+    closeModal('slOverlay');
+    currentTab = 'sick';
+    renderMain();
+    showToast('病假記錄已儲存 ✓');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+document.querySelectorAll('.overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); });
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.overlay.active').forEach(o => o.classList.remove('active'));
+});
+
+// ── Init ──────────────────────────────────────────────
+renderSidebar();
+renderMain();
+</script>
+</body>
+</html>
