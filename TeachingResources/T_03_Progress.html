@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>學生進度追蹤 · T-03</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Segoe UI', 'PingFang HK', sans-serif; background:#f1f5f9; }
+    .tab-active   { border-bottom:3px solid #6366f1; color:#6366f1; font-weight:700; }
+    .tab-inactive { color:#94a3b8; border-bottom:3px solid transparent; }
+    .card { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+    .student-row { cursor:pointer; transition:background 0.15s; }
+    .student-row:hover { background:#f8f7ff !important; }
+    .kanban-col { min-height:180px; }
+    .stage-chip { display:inline-block; padding:2px 10px; border-radius:99px; font-size:11px; font-weight:600; }
+    .stage-ahead   { background:#ede9fe; color:#6d28d9; }
+    .stage-on      { background:#dcfce7; color:#16a34a; }
+    .stage-watch   { background:#fef9c3; color:#b45309; }
+    .stage-behind  { background:#fee2e2; color:#dc2626; }
+    .timeline-line { border-left:2px solid #e2e8f0; margin-left:7px; }
+    .dot-ahead  { background:#6d28d9; }
+    .dot-on     { background:#16a34a; }
+    .dot-watch  { background:#b45309; }
+    .dot-behind { background:#dc2626; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- Top Bar -->
+<div class="bg-white shadow-sm px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">📈</span>
+    <div>
+      <p class="text-xs text-slate-400">TeachingResources / T_03_Progress</p>
+      <h1 class="text-lg font-bold text-slate-800">學生進度追蹤</h1>
+    </div>
+  </div>
+  <div class="flex gap-2">
+    <a href="T_01_Resource.html" class="text-xs text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full hover:bg-indigo-100 transition">📁 T-01 資源</a>
+    <a href="T_02_Homework.html" class="text-xs text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full hover:bg-indigo-100 transition">📋 T-02 功課</a>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="max-w-5xl mx-auto px-4 mt-6">
+  <div class="flex gap-0 border-b border-slate-200 mb-6">
+    <button onclick="switchView('class')"   id="tab-class"   class="tab-active   px-6 py-3 text-sm transition">🏫 一班 View</button>
+    <button onclick="switchView('student')" id="tab-student" class="tab-inactive px-6 py-3 text-sm transition">👤 個人 View</button>
+  </div>
+
+  <!-- ===================== CLASS VIEW ===================== -->
+  <div id="view-class">
+
+    <!-- Summary -->
+    <div class="grid grid-cols-4 gap-3 mb-6">
+      <div class="card p-4 text-center border-t-4 border-purple-400">
+        <p class="text-xl font-bold text-purple-600" id="count-ahead">—</p>
+        <p class="text-xs text-slate-500 mt-1">🚀 超前</p>
+      </div>
+      <div class="card p-4 text-center border-t-4 border-green-400">
+        <p class="text-xl font-bold text-green-600" id="count-on">—</p>
+        <p class="text-xs text-slate-500 mt-1">✅ 達標</p>
+      </div>
+      <div class="card p-4 text-center border-t-4 border-yellow-400">
+        <p class="text-xl font-bold text-yellow-600" id="count-watch">—</p>
+        <p class="text-xs text-slate-500 mt-1">👀 需留意</p>
+      </div>
+      <div class="card p-4 text-center border-t-4 border-red-400">
+        <p class="text-xl font-bold text-red-500" id="count-behind">—</p>
+        <p class="text-xs text-slate-500 mt-1">⚠ 落後</p>
+      </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="card p-5 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-slate-700 text-sm">📊 全班階段分佈</h2>
+        <span class="text-xs text-slate-400">點擊學生卡片查看詳情</span>
+      </div>
+      <div class="grid grid-cols-4 gap-3">
+
+        <div class="kanban-col bg-purple-50 rounded-xl p-3">
+          <p class="text-xs font-bold text-purple-600 mb-2">🚀 超前</p>
+          <div id="kanban-ahead" class="space-y-2"></div>
+        </div>
+
+        <div class="kanban-col bg-green-50 rounded-xl p-3">
+          <p class="text-xs font-bold text-green-600 mb-2">✅ 達標</p>
+          <div id="kanban-on" class="space-y-2"></div>
+        </div>
+
+        <div class="kanban-col bg-yellow-50 rounded-xl p-3">
+          <p class="text-xs font-bold text-yellow-600 mb-2">👀 需留意</p>
+          <div id="kanban-watch" class="space-y-2"></div>
+        </div>
+
+        <div class="kanban-col bg-red-50 rounded-xl p-3">
+          <p class="text-xs font-bold text-red-500 mb-2">⚠ 落後</p>
+          <div id="kanban-behind" class="space-y-2"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Student Table -->
+    <div class="card p-5 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-slate-700 text-sm">👥 學生名單</h2>
+        <div class="flex gap-2">
+          <button onclick="filterTable('all')"    class="tbl-filter text-xs px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 font-semibold">全部</button>
+          <button onclick="filterTable('ahead')"  class="tbl-filter text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500">超前</button>
+          <button onclick="filterTable('on')"     class="tbl-filter text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500">達標</button>
+          <button onclick="filterTable('watch')"  class="tbl-filter text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500">需留意</button>
+          <button onclick="filterTable('behind')" class="tbl-filter text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500">落後</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-xs text-slate-400 border-b border-slate-100">
+              <th class="text-left py-2 pr-4">學生姓名</th>
+              <th class="text-center py-2 px-2">當前階段</th>
+              <th class="text-center py-2 px-2">功課完成率</th>
+              <th class="text-center py-2 px-2">T-02 建議</th>
+              <th class="text-left py-2 pl-4">最新備註</th>
+            </tr>
+          </thead>
+          <tbody id="progress-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== STUDENT INDIVIDUAL VIEW ===================== -->
+  <div id="view-student" class="hidden">
+
+    <div class="flex items-center gap-3 mb-5">
+      <button onclick="backToClass()" class="text-sm text-indigo-500 bg-indigo-50 px-3 py-2 rounded-xl hover:bg-indigo-100">← 返回一班</button>
+      <div>
+        <h2 class="font-bold text-slate-800 text-base" id="stu-detail-name">—</h2>
+        <p class="text-xs text-slate-400">個人進度詳情</p>
+      </div>
+    </div>
+
+    <!-- Info Row -->
+    <div class="grid grid-cols-3 gap-3 mb-6">
+      <div class="card p-4 text-center">
+        <p class="text-sm font-bold text-slate-700" id="stu-stage-now">—</p>
+        <p class="text-xs text-slate-500 mt-1">當前階段</p>
+      </div>
+      <div class="card p-4 text-center">
+        <p class="text-sm font-bold text-indigo-600" id="stu-hw-rate">—</p>
+        <p class="text-xs text-slate-500 mt-1">功課完成率（T-02）</p>
+      </div>
+      <div class="card p-4 text-center">
+        <p class="text-sm font-bold text-slate-700" id="stu-last-update">—</p>
+        <p class="text-xs text-slate-500 mt-1">最後更新</p>
+      </div>
+    </div>
+
+    <!-- Manual Stage Update -->
+    <div class="card p-5 mb-5">
+      <h2 class="font-semibold text-slate-700 text-sm mb-3">✏️ 手動更新階段</h2>
+      <div class="flex flex-wrap gap-2 mb-3">
+        <button onclick="setStage('ahead')"  class="stage-select text-xs px-4 py-2 rounded-xl border-2 border-transparent bg-purple-100 text-purple-700 hover:border-purple-400 transition font-semibold">🚀 超前</button>
+        <button onclick="setStage('on')"     class="stage-select text-xs px-4 py-2 rounded-xl border-2 border-transparent bg-green-100  text-green-700  hover:border-green-400  transition font-semibold">✅ 達標</button>
+        <button onclick="setStage('watch')"  class="stage-select text-xs px-4 py-2 rounded-xl border-2 border-transparent bg-yellow-100 text-yellow-700 hover:border-yellow-400 transition font-semibold">👀 需留意</button>
+        <button onclick="setStage('behind')" class="stage-select text-xs px-4 py-2 rounded-xl border-2 border-transparent bg-red-100    text-red-700    hover:border-red-400    transition font-semibold">⚠ 落後</button>
+      </div>
+      <div class="flex gap-2">
+        <input id="stage-note-input" type="text" placeholder="備註（選填）" class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"/>
+        <button onclick="confirmStageUpdate()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm hover:bg-indigo-700 transition">確認更新</button>
+      </div>
+      <p id="stage-select-hint" class="text-xs text-slate-400 mt-2">尚未選擇階段</p>
+    </div>
+
+    <!-- Timeline -->
+    <div class="card p-5 mb-8">
+      <h2 class="font-semibold text-slate-700 text-sm mb-4">🕒 進度時間線</h2>
+      <div id="timeline-body" class="space-y-0"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== CONFIRM MODAL ===================== -->
+<div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
+    <p class="text-2xl mb-2" id="modal-icon">✅</p>
+    <p class="font-bold text-slate-800 text-base mb-1" id="modal-title">已更新</p>
+    <p class="text-sm text-slate-500" id="modal-desc">—</p>
+    <button onclick="closeConfirmModal()" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-xl text-sm hover:bg-indigo-700">確定</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const stageConfig = {
+  ahead:  { label:'🚀 超前',  cls:'stage-ahead',  dot:'dot-ahead',  bg:'bg-purple-50' },
+  on:     { label:'✅ 達標',  cls:'stage-on',     dot:'dot-on',     bg:'bg-green-50'  },
+  watch:  { label:'👀 需留意',cls:'stage-watch',  dot:'dot-watch',  bg:'bg-yellow-50' },
+  behind: { label:'⚠ 落後',  cls:'stage-behind', dot:'dot-behind', bg:'bg-red-50'    },
+};
+
+const studentsData = [
+  {
+    name:'陳大文', stage:'ahead', hwRate:95,
+    timeline:[
+      { date:'2026-11-10', stage:'ahead',  note:'表現優異，主動完成額外練習' },
+      { date:'2026-10-28', stage:'on',     note:'達標，進步明顯' },
+      { date:'2026-10-15', stage:'on',     note:'初步評估，表現穩定' },
+    ]
+  },
+  {
+    name:'李小明', stage:'watch', hwRate:50,
+    timeline:[
+      { date:'2026-11-08', stage:'watch',  note:'功課完成率偏低，需跟進' },
+      { date:'2026-10-20', stage:'on',     note:'表現正常' },
+    ]
+  },
+  {
+    name:'黃美儀', stage:'on', hwRate:100,
+    timeline:[
+      { date:'2026-11-05', stage:'on',     note:'穩定達標' },
+      { date:'2026-10-18', stage:'on',     note:'初步評估良好' },
+    ]
+  },
+  {
+    name:'張志偉', stage:'behind', hwRate:25,
+    timeline:[
+      { date:'2026-11-09', stage:'behind', note:'多份功課逾期，需面談' },
+      { date:'2026-10-30', stage:'watch',  note:'有落後跡象' },
+      { date:'2026-10-15', stage:'on',     note:'初步評估正常' },
+    ]
+  },
+  {
+    name:'吳嘉欣', stage:'ahead', hwRate:100,
+    timeline:[
+      { date:'2026-11-07', stage:'ahead',  note:'完成所有功課並提早提交' },
+      { date:'2026-10-22', stage:'on',     note:'穩定' },
+    ]
+  },
+  {
+    name:'劉建華', stage:'on', hwRate:75,
+    timeline:[
+      { date:'2026-11-06', stage:'on',     note:'整體達標' },
+    ]
+  },
+  {
+    name:'何俊傑', stage:'behind', hwRate:25,
+    timeline:[
+      { date:'2026-11-10', stage:'behind', note:'多次逾期，已通知家長' },
+      { date:'2026-10-28', stage:'watch',  note:'開始出現落後情況' },
+    ]
+  },
+  {
+    name:'林家豪', stage:'watch', hwRate:50,
+    timeline:[
+      { date:'2026-11-08', stage:'watch',  note:'留意中，下週重新評估' },
+      { date:'2026-10-20', stage:'on',     note:'達標' },
+    ]
+  },
+  {
+    name:'鄭詠琳', stage:'on', hwRate:75,
+    timeline:[
+      { date:'2026-11-05', stage:'on',     note:'穩定' },
+    ]
+  },
+  {
+    name:'周子浩', stage:'behind', hwRate:25,
+    timeline:[
+      { date:'2026-11-09', stage:'behind', note:'需要額外輔導支援' },
+      { date:'2026-10-25', stage:'watch',  note:'進度開始落後' },
+    ]
+  },
+];
+
+let currentStudentIndex = null;
+let selectedStage = null;
+
+function hwSuggestion(rate) {
+  if (rate >= 90) return { label:'建議：超前', stage:'ahead' };
+  if (rate >= 70) return { label:'建議：達標', stage:'on'    };
+  if (rate >= 50) return { label:'建議：需留意',stage:'watch' };
+  return               { label:'建議：落後', stage:'behind'};
+}
+
+// ── BUILD KANBAN ───────────────────────────────────────────
+function buildKanban() {
+  ['ahead','on','watch','behind'].forEach(s => {
+    document.getElementById('kanban-' + s).innerHTML = '';
+  });
+
+  studentsData.forEach((s, idx) => {
+    const cfg = stageConfig[s.stage];
+    const card = document.createElement('div');
+    card.className = `bg-white rounded-lg px-3 py-2 text-xs font-medium text-slate-700 shadow-sm cursor-pointer hover:shadow-md transition flex justify-between items-center`;
+    card.innerHTML = `<span>${s.name}</span><span class="text-slate-300 text-xs">${s.hwRate}%</span>`;
+    card.addEventListener('click', () => openStudentDetail(idx));
+    document.getElementById('kanban-' + s.stage).appendChild(card);
+  });
+
+  document.getElementById('count-ahead').textContent  = studentsData.filter(s=>s.stage==='ahead').length;
+  document.getElementById('count-on').textContent     = studentsData.filter(s=>s.stage==='on').length;
+  document.getElementById('count-watch').textContent  = studentsData.filter(s=>s.stage==='watch').length;
+  document.getElementById('count-behind').textContent = studentsData.filter(s=>s.stage==='behind').length;
+}
+
+// ── BUILD TABLE ───────────────────────────────────────────
+function buildTable(filter='all') {
+  const tbody = document.getElementById('progress-table-body');
+  tbody.innerHTML = '';
+
+  studentsData.forEach((s, idx) => {
+    if (filter !== 'all' && s.stage !== filter) return;
+
+    const cfg  = stageConfig[s.stage];
+    const sug  = hwSuggestion(s.hwRate);
+    const sugCfg = stageConfig[sug.stage];
+    const note = s.timeline[0]?.note || '—';
+
+    const tr = document.createElement('tr');
+    tr.className = 'student-row border-b border-slate-50';
+    tr.innerHTML = `
+      <td class="py-3 pr-4"><span class="text-indigo-600 font-semibold hover:underline">${s.name}</span></td>
+      <td class="py-3 px-2 text-center"><span class="stage-chip ${cfg.cls}">${cfg.label}</span></td>
+      <td class="py-3 px-2 text-center text-sm font-semibold text-slate-700">${s.hwRate}%</td>
+      <td class="py-3 px-2 text-center"><span class="stage-chip ${sugCfg.cls}">${sug.label}</span></td>
+      <td class="py-3 pl-4 text-xs text-slate-500 max-w-xs truncate">${note}</td>
+    `;
+    tr.addEventListener('click', () => openStudentDetail(idx));
+    tbody.appendChild(tr);
+  });
+}
+
+// ── STUDENT DETAIL ────────────────────────────────────────
+function openStudentDetail(idx) {
+  currentStudentIndex = idx;
+  selectedStage = null;
+  const s = studentsData[idx];
+  const cfg = stageConfig[s.stage];
+
+  document.getElementById('stu-detail-name').textContent  = `👤 ${s.name}`;
+  document.getElementById('stu-stage-now').innerHTML      = `<span class="stage-chip ${cfg.cls}">${cfg.label}</span>`;
+  document.getElementById('stu-hw-rate').textContent      = `${s.hwRate}%`;
+  document.getElementById('stu-last-update').textContent  = s.timeline[0]?.date.replace(/-/g,'/').slice(5) || '—';
+  document.getElementById('stage-select-hint').textContent = '尚未選擇階段';
+  document.getElementById('stage-note-input').value = '';
+
+  // Reset stage select buttons
+  document.querySelectorAll('.stage-select').forEach(b => b.style.borderColor = 'transparent');
+
+  buildTimeline(s);
+  switchView('student');
+}
+
+function buildTimeline(s) {
+  const container = document.getElementById('timeline-body');
+  container.innerHTML = '';
+
+  s.timeline.forEach((entry, i) => {
+    const cfg = stageConfig[entry.stage];
+    const isLast = i === s.timeline.length - 1;
+    const div = document.createElement('div');
+    div.className = 'flex gap-3';
+    div.innerHTML = `
+      <div class="flex flex-col items-center">
+        <div class="w-3.5 h-3.5 rounded-full mt-1 flex-shrink-0 ${cfg.dot}"></div>
+        ${!isLast ? `<div class="flex-1 w-0.5 bg-slate-200 my-1"></div>` : ''}
+      </div>
+      <div class="pb-4 flex-1">
+        <div class="flex items-center gap-2 mb-0.5">
+          <span class="stage-chip ${cfg.cls}">${cfg.label}</span>
+          <span class="text-xs text-slate-400">${entry.date.replace(/-/g,'/').slice(5)}</span>
+        </div>
+        <p class="text-xs text-slate-600">${entry.note || '—'}</p>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ── STAGE UPDATE ──────────────────────────────────────────
+function setStage(stage) {
+  selectedStage = stage;
+  const cfg = stageConfig[stage];
+  document.getElementById('stage-select-hint').textContent = `已選擇：${cfg.label}`;
+
+  const colorMap = { ahead:'purple', on:'green', watch:'yellow', behind:'red' };
+  document.querySelectorAll('.stage-select').forEach(b => b.style.borderColor = 'transparent');
+  event.target.style.borderColor = ({ ahead:'#7c3aed', on:'#16a34a', watch:'#b45309', behind:'#dc2626' })[stage];
+}
+
+function confirmStageUpdate() {
+  if (!selectedStage || currentStudentIndex === null) {
+    showModal('⚠️','請先選擇階段','點選上方階段按鈕後再確認更新');
+    return;
+  }
+  const s    = studentsData[currentStudentIndex];
+  const note = document.getElementById('stage-note-input').value.trim() || '老師手動更新';
+  const today = new Date().toISOString().slice(0,10);
+
+  s.stage = selectedStage;
+  s.timeline.unshift({ date: today, stage: selectedStage, note });
+
+  const cfg = stageConfig[selectedStage];
+  document.getElementById('stu-stage-now').innerHTML     = `<span class="stage-chip ${cfg.cls}">${cfg.label}</span>`;
+  document.getElementById('stu-last-update').textContent = today.replace(/-/g,'/').slice(5);
+  document.getElementById('stage-select-hint').textContent = '已更新';
+  document.getElementById('stage-note-input').value = '';
+  document.querySelectorAll('.stage-select').forEach(b => b.style.borderColor = 'transparent');
+
+  buildTimeline(s);
+  buildKanban();
+  buildTable();
+
+  showModal(cfg.label.split(' ')[0], '已成功更新', `${s.name} 的進度已更新為「${cfg.label}」`);
+  selectedStage = null;
+}
+
+// ── FILTER TABLE ──────────────────────────────────────────
+function filterTable(type) {
+  document.querySelectorAll('.tbl-filter').forEach(b => {
+    b.className = 'tbl-filter text-xs px-3 py-1 rounded-full bg-slate-100 text-slate-500';
+  });
+  event.target.className = 'tbl-filter text-xs px-3 py-1 rounded-full bg-indigo-100 text-indigo-600 font-semibold';
+  buildTable(type);
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────
+function switchView(v) {
+  document.getElementById('view-class').classList.toggle('hidden',   v !== 'class');
+  document.getElementById('view-student').classList.toggle('hidden', v !== 'student');
+  document.getElementById('tab-class').className   = v === 'class'   ? 'tab-active   px-6 py-3 text-sm transition' : 'tab-inactive px-6 py-3 text-sm transition';
+  document.getElementById('tab-student').className = v === 'student' ? 'tab-active   px-6 py-3 text-sm transition' : 'tab-inactive px-6 py-3 text-sm transition';
+}
+
+function backToClass() { switchView('class'); }
+
+// ── MODAL ─────────────────────────────────────────────────
+function showModal(icon, title, desc) {
+  document.getElementById('modal-icon').textContent  = icon;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-desc').textContent  = desc;
+  const m = document.getElementById('confirm-modal');
+  m.classList.remove('hidden'); m.classList.add('flex');
+}
+function closeConfirmModal() {
+  const m = document.getElementById('confirm-modal');
+  m.classList.add('hidden'); m.classList.remove('flex');
+}
+
+// ── INIT ──────────────────────────────────────────────────
+buildKanban();
+buildTable();
+</script>
+</body>
+</html>
