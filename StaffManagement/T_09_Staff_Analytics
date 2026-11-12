@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-09 · Staff Analytics</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang HK',sans-serif;background:#f7f7f5;color:#1a1a1a;min-height:100vh;}
+
+/* Header */
+.header{background:#1a1a1a;color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.header-left{display:flex;align-items:center;gap:14px;}
+.logo{font-size:12px;font-weight:700;letter-spacing:.08em;color:#d4ff6e;}
+.header-title{font-size:15px;font-weight:600;}
+.admin-badge{background:#d4ff6e;color:#1a1a1a;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+
+/* Period toggle */
+.period-row{background:#fff;border-bottom:1px solid #ebebeb;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.period-group{display:flex;gap:4px;background:#f0f0f0;border-radius:8px;padding:4px;}
+.period-btn{padding:5px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#888;transition:.15s;}
+.period-btn.active{background:#1a1a1a;color:#fff;}
+.export-row{display:flex;gap:8px;}
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.2s;white-space:nowrap;}
+.btn:hover{opacity:.8;}
+.btn-red{background:#ef4444;color:#fff;}
+.btn-green{background:#22c55e;color:#fff;}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 105px);}
+@media(max-width:720px){.layout{grid-template-columns:1fr;}}
+
+/* Sidebar */
+.sidebar{background:#fff;border-right:1px solid #ebebeb;overflow-y:auto;}
+.sidebar-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:#bbb;padding:14px 16px 8px;text-transform:uppercase;}
+.staff-item{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid #f7f7f7;transition:.15s;border-left:3px solid transparent;}
+.staff-item:hover{background:#f9f9f9;}
+.staff-item.active{background:#f0f6ff;border-left-color:#3b82f6;}
+.s-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.s-info{flex:1;min-width:0;}
+.s-name{font-size:13px;font-weight:600;}
+.s-role{font-size:11px;color:#aaa;}
+.s-score{font-size:13px;font-weight:700;flex-shrink:0;}
+.alert-dot{width:7px;height:7px;border-radius:50%;background:#ef4444;flex-shrink:0;}
+
+/* Main */
+.main{padding:24px;overflow-y:auto;}
+
+/* Overview grid */
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px;}
+.ov-card{background:#fff;border-radius:14px;border:1px solid #e8e8e8;padding:18px;}
+.ov-val{font-size:28px;font-weight:700;margin-bottom:4px;}
+.ov-lbl{font-size:11px;color:#aaa;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+.ov-sub{font-size:11px;margin-top:6px;font-weight:500;}
+
+/* Section */
+.section-title{font-size:12px;font-weight:700;letter-spacing:.06em;color:#aaa;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title span{font-size:15px;}
+.card{background:#fff;border-radius:14px;border:1px solid #e8e8e8;padding:20px;margin-bottom:16px;}
+
+/* Bar chart */
+.bar-chart{display:flex;flex-direction:column;gap:10px;}
+.bar-row{display:flex;align-items:center;gap:12px;}
+.bar-label{font-size:12px;font-weight:600;min-width:90px;color:#555;}
+.bar-wrap{flex:1;height:20px;background:#f0f0f0;border-radius:20px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.bar-val{font-size:12px;font-weight:700;min-width:36px;text-align:right;}
+
+/* Module table */
+.mod-table{width:100%;border-collapse:collapse;}
+.mod-table th{font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;text-align:left;border-bottom:2px solid #f0f0f0;white-space:nowrap;}
+.mod-table td{padding:11px 10px;font-size:13px;border-bottom:1px solid #f7f7f7;vertical-align:middle;}
+.mod-table tr:last-child td{border-bottom:none;}
+.mod-table tr:hover td{background:#fafafa;}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.pill-green{background:#f0fdf4;color:#22c55e;}
+.pill-orange{background:#fff7ed;color:#f97316;}
+.pill-red{background:#fef2f2;color:#ef4444;}
+.pill-gray{background:#f5f5f5;color:#aaa;}
+.pill-blue{background:#eff6ff;color:#3b82f6;}
+
+/* Activity log */
+.log-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f7f7f7;}
+.log-item:last-child{border-bottom:none;}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.log-time{font-size:11px;color:#bbb;min-width:80px;flex-shrink:0;margin-top:1px;}
+.log-text{font-size:13px;color:#444;line-height:1.5;}
+.log-mod{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:6px;letter-spacing:.04em;}
+
+/* Alert banner */
+.alert-banner{background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;}
+.alert-banner-icon{font-size:16px;flex-shrink:0;}
+.alert-banner-text{font-size:13px;color:#b91c1c;line-height:1.55;}
+.alert-banner-text strong{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:3px;}
+
+/* Radar-style module dots */
+.mod-dots{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.mod-dot-item{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.mod-dot-ring{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:3px solid;}
+.mod-dot-lbl{font-size:10px;color:#aaa;font-weight:600;}
+
+/* Detail name row */
+.detail-top{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+.detail-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;}
+.detail-name{font-size:20px;font-weight:700;}
+.detail-meta{font-size:12px;color:#aaa;margin-top:3px;}
+
+/* Score ring */
+.score-ring{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.score-big{font-size:32px;font-weight:700;}
+.score-sub{font-size:11px;color:#aaa;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+
+/* Trend mini */
+.trend-row{display:flex;gap:4px;align-items:flex-end;height:32px;margin-top:8px;}
+.trend-bar{width:14px;border-radius:3px 3px 0 0;background:#3b82f6;opacity:.7;}
+
+@media(max-width:520px){.overview-grid{grid-template-columns:1fr 1fr;}.main{padding:14px;}.period-row{padding:10px 14px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <span class="logo">T-09</span>
+        <span class="header-title">教師工作量分析 · Staff Analytics</span>
+    </div>
+    <span class="admin-badge">👤 管理員專屬</span>
+</div>
+
+<div class="period-row">
+    <div class="period-group">
+        <button class="period-btn" onclick="setPeriod('week')">本週</button>
+        <button class="period-btn active" id="pb-month" onclick="setPeriod('month')">本月</button>
+        <button class="period-btn" onclick="setPeriod('term')">本學期</button>
+    </div>
+    <div class="export-row">
+        <button class="btn btn-green" onclick="exportCSV()">↓ Excel</button>
+        <button class="btn btn-red" onclick="window.print()">↓ PDF</button>
+    </div>
+</div>
+
+<div class="layout">
+    <div class="sidebar">
+        <div class="sidebar-label">教師名單</div>
+        <div id="staffList"></div>
+    </div>
+    <div class="main" id="mainArea"></div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────
+const STAFF = [
+    {
+        id:'t1', name:'Chan Sir', role:'班主任 · 2A', cls:'2A',
+        avatar:{bg:'#eff6ff',color:'#3b82f6',init:'陳'},
+        score:92, alert:false,
+        lastLogin:'2026-11-12 08:15',
+        modules:{
+            attendance:{rate:98,count:42,label:'點名完成率'},
+            homework:  {rate:90,count:38,label:'功課批改'},
+            health:    {rate:85,count:12,label:'健康記錄'},
+            events:    {rate:95,count:8, label:'活動管理'},
+            timetable: {rate:100,count:4, label:'時間表更新'},
+        },
+        trend:{week:[88,90,85,92,94,91,92],month:[82,85,88,92]},
+        logs:[
+            {time:'今天 08:15',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成 2A 班早上點名'},
+            {time:'昨天 15:30',mod:'homework',modLabel:'功課',color:'#10b981',text:'更新數學功課批改記錄（28/30）'},
+            {time:'昨天 10:00',mod:'events',modLabel:'活動',color:'#f59e0b',text:'更新聖誕聯歡晚會回條狀態'},
+            {time:'11-10 09:00',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成 2A 班早上點名'},
+            {time:'11-09 14:20',mod:'health',modLabel:'健康',color:'#ef4444',text:'新增學生健康事件記錄'},
+        ],
+        alerts:[],
+    },
+    {
+        id:'t2', name:'Wong Miss', role:'班主任 · 1A', cls:'1A',
+        avatar:{bg:'#f0fdf4',color:'#22c55e',init:'王'},
+        score:78, alert:true,
+        lastLogin:'2026-11-11 09:40',
+        modules:{
+            attendance:{rate:85,count:36,label:'點名完成率'},
+            homework:  {rate:60,count:18,label:'功課批改'},
+            health:    {rate:70,count:8, label:'健康記錄'},
+            events:    {rate:90,count:6, label:'活動管理'},
+            timetable: {rate:80,count:3, label:'時間表更新'},
+        },
+        trend:{week:[70,72,68,75,78,76,78],month:[65,70,74,78]},
+        logs:[
+            {time:'昨天 09:40',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成 1A 班早上點名'},
+            {time:'11-09 11:00',mod:'events',modLabel:'活動',color:'#f59e0b',text:'更新學生會選舉參與名單'},
+            {time:'11-07 08:20',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成 1A 班早上點名'},
+            {time:'11-05 15:00',mod:'homework',modLabel:'功課',color:'#10b981',text:'更新英文功課批改（15/22）'},
+        ],
+        alerts:['功課批改更新率偏低（60%），連續兩週未達標','健康記錄上次更新距今超過 5 天'],
+    },
+    {
+        id:'t3', name:'Lee Sir', role:'班主任 · 2B', cls:'2B',
+        avatar:{bg:'#fdf4ff',color:'#a855f7',init:'李'},
+        score:88, alert:false,
+        lastLogin:'2026-11-12 07:55',
+        modules:{
+            attendance:{rate:96,count:40,label:'點名完成率'},
+            homework:  {rate:85,count:32,label:'功課批改'},
+            health:    {rate:90,count:15,label:'健康記錄'},
+            events:    {rate:80,count:5, label:'活動管理'},
+            timetable: {rate:95,count:5, label:'時間表更新'},
+        },
+        trend:{week:[82,84,86,85,88,87,88],month:[78,82,85,88]},
+        logs:[
+            {time:'今天 07:55',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成 2B 班早上點名'},
+            {time:'昨天 14:00',mod:'health',modLabel:'健康',color:'#ef4444',text:'更新學生藥物服用確認記錄'},
+            {time:'11-10 16:00',mod:'homework',modLabel:'功課',color:'#10b981',text:'完成數學功課批改（30/30）'},
+            {time:'11-09 08:10',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成 2B 班早上點名'},
+            {time:'11-08 11:30',mod:'timetable',modLabel:'時間表',color:'#8b5cf6',text:'更新 2B 班課節安排'},
+        ],
+        alerts:[],
+    },
+    {
+        id:'t4', name:'Ng Miss', role:'班主任 · 1B', cls:'1B',
+        avatar:{bg:'#fff7ed',color:'#f97316',init:'吳'},
+        score:55, alert:true,
+        lastLogin:'2026-11-08 10:20',
+        modules:{
+            attendance:{rate:72,count:28,label:'點名完成率'},
+            homework:  {rate:45,count:12,label:'功課批改'},
+            health:    {rate:50,count:5, label:'健康記錄'},
+            events:    {rate:65,count:3, label:'活動管理'},
+            timetable: {rate:60,count:2, label:'時間表更新'},
+        },
+        trend:{week:[50,52,48,55,53,56,55],month:[45,48,52,55]},
+        logs:[
+            {time:'11-08 10:20',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成 1B 班早上點名'},
+            {time:'11-06 09:00',mod:'homework',modLabel:'功課',color:'#10b981',text:'更新常識功課批改（8/18）'},
+            {time:'11-04 08:30',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成 1B 班早上點名'},
+        ],
+        alerts:['系統最後登入距今 4 天，活躍度偏低','功課批改完成率僅 45%，建議跟進','點名完成率 72%，低於平均水平'],
+    },
+    {
+        id:'t5', name:'Lam Sir', role:'體育科主任', cls:'—',
+        avatar:{bg:'#fef2f2',color:'#ef4444',init:'林'},
+        score:82, alert:false,
+        lastLogin:'2026-11-12 08:00',
+        modules:{
+            attendance:{rate:94,count:38,label:'點名完成率'},
+            homework:  {rate:80,count:20,label:'功課批改'},
+            health:    {rate:88,count:18,label:'健康記錄'},
+            events:    {rate:92,count:12,label:'活動管理'},
+            timetable: {rate:85,count:6, label:'時間表更新'},
+        },
+        trend:{week:[78,80,79,82,81,83,82],month:[74,77,80,82]},
+        logs:[
+            {time:'今天 08:00',mod:'events',modLabel:'活動',color:'#f59e0b',text:'更新全港學界游泳比賽名單'},
+            {time:'昨天 15:45',mod:'health',modLabel:'健康',color:'#ef4444',text:'記錄體育課受傷事件'},
+            {time:'11-10 08:10',mod:'attendance',modLabel:'點名',color:'#3b82f6',text:'完成體育課出席點名'},
+            {time:'11-09 14:00',mod:'events',modLabel:'活動',color:'#f59e0b',text:'確認比賽回條（12/12）'},
+        ],
+        alerts:[],
+    },
+];
+
+const MODULE_COLORS = {
+    attendance:'#3b82f6', homework:'#10b981', health:'#ef4444', events:'#f59e0b', timetable:'#8b5cf6'
+};
+
+let currentStaffId = 't1';
+let currentPeriod = 'month';
+const periods = ['week','month','term'];
+
+// ── Period ────────────────────────────────────────────
+function setPeriod(p) {
+    currentPeriod = p;
+    periods.forEach(x => {
+        const btn = document.querySelector(`.period-btn[onclick="setPeriod('${x}')"]`);
+        if (btn) btn.classList.toggle('active', x===p);
+    });
+    renderMain();
+}
+
+// ── Sidebar ───────────────────────────────────────────
+function renderSidebar() {
+    const list = document.getElementById('staffList');
+    list.innerHTML = STAFF.map(s => {
+        const scoreColor = s.score>=85?'#22c55e':s.score>=70?'#f97316':'#ef4444';
+        return `
+        <div class="staff-item${s.id===currentStaffId?' active':''}" onclick="selectStaff('${s.id}')">
+            <div class="s-avatar" style="background:${s.avatar.bg};color:${s.avatar.color}">${s.avatar.init}</div>
+            <div class="s-info">
+                <div class="s-name">${s.name}</div>
+                <div class="s-role">${s.role}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+                ${s.alert?'<div class="alert-dot"></div>':''}
+                <div class="s-score" style="color:${scoreColor}">${s.score}</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function selectStaff(id) {
+    currentStaffId = id;
+    renderSidebar();
+    renderMain();
+}
+
+// ── Main ──────────────────────────────────────────────
+function renderMain() {
+    const area = document.getElementById('mainArea');
+    const t = STAFF.find(x=>x.id===currentStaffId);
+    const scoreColor = t.score>=85?'#22c55e':t.score>=70?'#f97316':'#ef4444';
+    const allScores = STAFF.map(s=>s.score);
+    const avg = Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length);
+
+    // period multiplier for display
+    const mult = currentPeriod==='week'?0.25:currentPeriod==='term'?4:1;
+    const pLabel = currentPeriod==='week'?'本週':currentPeriod==='term'?'本學期':'本月';
+
+    const alerts = t.alerts.length ? `
+        <div class="alert-banner">
+            <div class="alert-banner-icon">⚠️</div>
+            <div class="alert-banner-text">
+                <strong>低活躍度警示</strong>
+                ${t.alerts.map(a=>`<div>• ${a}</div>`).join('')}
+            </div>
+        </div>` : '';
+
+    const trendData = currentPeriod==='week' ? t.trend.week : t.trend.month;
+    const maxT = Math.max(...trendData);
+    const trendBars = trendData.map((v,i)=>`
+        <div class="trend-bar" style="height:${Math.round(v/maxT*32)}px;background:${scoreColor};opacity:${0.4+0.6*(i/(trendData.length-1))}"></div>`).join('');
+
+    area.innerHTML = `
+        <div class="detail-top">
+            <div class="detail-avatar" style="background:${t.avatar.bg};color:${t.avatar.color}">${t.avatar.init}</div>
+            <div style="flex:1">
+                <div class="detail-name">${t.name}</div>
+                <div class="detail-meta">${t.role} · 最後登入：${t.lastLogin}</div>
+                <div class="trend-row">${trendBars}</div>
+            </div>
+            <div class="score-ring" style="flex-direction:column;align-items:flex-end;">
+                <div class="score-big" style="color:${scoreColor}">${t.score}</div>
+                <div class="score-sub">活躍度評分</div>
+                <div style="font-size:11px;color:#bbb;margin-top:2px">全體平均 ${avg}</div>
+            </div>
+        </div>
+
+        ${alerts}
+
+        <div class="overview-grid">
+            <div class="ov-card">
+                <div class="ov-val" style="color:#3b82f6">${t.modules.attendance.rate}%</div>
+                <div class="ov-lbl">點名完成率</div>
+                <div class="ov-sub" style="color:#aaa">${pLabel} ${Math.round(t.modules.attendance.count*mult)} 次</div>
+            </div>
+            <div class="ov-card">
+                <div class="ov-val" style="color:#10b981">${t.modules.homework.rate}%</div>
+                <div class="ov-lbl">功課批改率</div>
+                <div class="ov-sub" style="color:#aaa">${pLabel} ${Math.round(t.modules.homework.count*mult)} 次</div>
+            </div>
+            <div class="ov-card">
+                <div class="ov-val" style="color:#ef4444">${t.modules.health.rate}%</div>
+                <div class="ov-lbl">健康記錄</div>
+                <div class="ov-sub" style="color:#aaa">${pLabel} ${Math.round(t.modules.health.count*mult)} 筆</div>
+            </div>
+            <div class="ov-card">
+                <div class="ov-val" style="color:#f59e0b">${t.modules.events.rate}%</div>
+                <div class="ov-lbl">活動管理</div>
+                <div class="ov-sub" style="color:#aaa">${pLabel} ${Math.round(t.modules.events.count*mult)} 次</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title"><span>📊</span> 各模組使用率</div>
+            <div class="bar-chart">
+                ${Object.entries(t.modules).map(([k,v])=>{
+                    const color = MODULE_COLORS[k];
+                    const pill = v.rate>=85?`pill-green`:v.rate>=70?`pill-orange`:`pill-red`;
+                    return `<div class="bar-row">
+                        <div class="bar-label">${v.label}</div>
+                        <div class="bar-wrap"><div class="bar-fill" style="width:${v.rate}%;background:${color}"></div></div>
+                        <div class="bar-val" style="color:${color}">${v.rate}%</div>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title"><span>📋</span> 全體教師對比（${pLabel}）</div>
+            <div style="overflow-x:auto;">
+            <table class="mod-table">
+                <thead><tr>
+                    <th>教師</th><th>點名</th><th>功課</th><th>健康</th><th>活動</th><th>評分</th>
+                </tr></thead>
+                <tbody>
+                    ${STAFF.map(s=>{
+                        const sc = s.score>=85?'pill-green':s.score>=70?'pill-orange':'pill-red';
+                        const getP = r => r>=85?'pill-green':r>=70?'pill-orange':'pill-red';
+                        return `<tr style="${s.id===currentStaffId?'background:#f0f6ff;font-weight:600':''}">
+                            <td>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div style="width:28px;height:28px;border-radius:50%;background:${s.avatar.bg};color:${s.avatar.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">${s.avatar.init}</div>
+                                    ${s.name}
+                                </div>
+                            </td>
+                            <td><span class="pill ${getP(s.modules.attendance.rate)}">${s.modules.attendance.rate}%</span></td>
+                            <td><span class="pill ${getP(s.modules.homework.rate)}">${s.modules.homework.rate}%</span></td>
+                            <td><span class="pill ${getP(s.modules.health.rate)}">${s.modules.health.rate}%</span></td>
+                            <td><span class="pill ${getP(s.modules.events.rate)}">${s.modules.events.rate}%</span></td>
+                            <td><span class="pill ${sc}">${s.score}</span></td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title"><span>🕐</span> 最近操作記錄</div>
+            ${t.logs.map(l=>`
+            <div class="log-item">
+                <div class="log-dot" style="background:${l.color}"></div>
+                <div class="log-time">${l.time}</div>
+                <div class="log-text">
+                    ${l.text}
+                    <span class="log-mod" style="background:${l.color}20;color:${l.color}">${l.modLabel}</span>
+                </div>
+            </div>`).join('')}
+        </div>`;
+}
+
+// ── Export ────────────────────────────────────────────
+function exportCSV() {
+    let csv = '教師,班別,點名完成率,功課批改率,健康記錄率,活動管理率,時間表更新率,活躍度評分,最後登入\n';
+    STAFF.forEach(s=>{
+        csv += `${s.name},${s.cls},${s.modules.attendance.rate}%,${s.modules.homework.rate}%,${s.modules.health.rate}%,${s.modules.events.rate}%,${s.modules.timetable.rate}%,${s.score},${s.lastLogin}\n`;
+    });
+    const blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `StaffAnalytics_${currentPeriod}.csv`;
+    a.click();
+}
+
+// ── Init ──────────────────────────────────────────────
+renderSidebar();
+renderMain();
+</script>
+</body>
+</html>
