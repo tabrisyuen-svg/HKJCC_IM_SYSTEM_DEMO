@@ -1,0 +1,448 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Mic, MicOff, CheckCircle, XCircle, BarChart2, MessageCircle, BookOpen, Clock, ChevronRight } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const LANGS = [
+  { code: 'en', label: 'English', tag: 'en-US' },
+  { code: 'zh', label: '普通話', tag: 'zh-CN' },
+  { code: 'yue', label: '廣東話', tag: 'zh-HK', exp: true },
+];
+
+const READING_PASSAGES = {
+  en: {
+    title: 'Reading Practice',
+    text: 'The sun rises in the east and sets in the west every day.',
+    mockTranscript: 'The sun rises in the east and sets in the west every day.',
+    mockWrong: [],
+  },
+  zh: {
+    title: '朗讀練習',
+    text: '春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知多少。',
+    mockTranscript: '春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知少。',
+    mockWrong: ['多'],
+  },
+  yue: {
+    title: '朗讀練習',
+    text: '香港係一個國際城市，中西文化在此交匯。',
+    mockTranscript: '香港係一個國際城市，中西文化在此交會。',
+    mockWrong: ['匯'],
+  },
+};
+
+const DIALOGUE_PROMPTS = {
+  en: [
+    {
+      q: 'What did you do last weekend?',
+      hint: 'Use: went / watched / played / visited',
+      keywords: ['went', 'watched', 'played', 'visited', 'had', 'met'],
+      mockAnswer: 'I went to the park and played football with my friends.',
+    },
+    {
+      q: 'Describe your favourite season.',
+      hint: 'Use: because / weather / enjoy / like',
+      keywords: ['because', 'weather', 'enjoy', 'like', 'love', 'warm', 'cold'],
+      mockAnswer: 'I like summer because the weather is warm and I enjoy swimming.',
+    },
+  ],
+  zh: [
+    {
+      q: '你昨天做了什麼？',
+      hint: '請使用：我去了、我吃了、我看了',
+      keywords: ['我去了', '我吃了', '我看了', '我做了', '昨天'],
+      mockAnswer: '我昨天去了圖書館，然後和家人一起吃了晚飯。',
+    },
+    {
+      q: '介紹你最喜歡的季節。',
+      hint: '請使用：因為、天氣、喜歡、享受',
+      keywords: ['因為', '天氣', '喜歡', '享受', '覺得'],
+      mockAnswer: '我最喜歡秋天，因為天氣涼爽，我喜歡在公園散步。',
+    },
+  ],
+  yue: [
+    {
+      q: '你尋日做咗咩？',
+      hint: '請使用：我去咗、我食咗、我睇咗',
+      keywords: ['我去咗', '我食咗', '我睇咗', '我做咗', '尋日'],
+      mockAnswer: '我尋日去咗圖書館，食咗晚飯之後就返屋企。',
+    },
+  ],
+};
+
+const HISTORY = [
+  { date: '11/08', mode: '朗讀', lang: '普通話', score: 72 },
+  { date: '11/09', mode: '對話', lang: 'English', score: 65 },
+  { date: '11/10', mode: '朗讀', lang: 'English', score: 80 },
+  { date: '11/11', mode: '對話', lang: '普通話', score: 75 },
+  { date: '11/12', mode: '朗讀', lang: '普通話', score: 88 },
+];
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+
+function computeScore(target, transcript, wrongChars) {
+  if (!wrongChars || wrongChars.length === 0) return 100;
+  const totalChars = target.replace(/[，。？！ ]/g, '').length;
+  const missed = wrongChars.length;
+  return Math.max(0, Math.round(((totalChars - missed) / totalChars) * 100));
+}
+
+function renderDiff(target, wrongChars) {
+  return target.split('').map((ch, i) => {
+    const isWrong = wrongChars.includes(ch);
+    return (
+      <span key={i} className={isWrong
+        ? 'bg-red-100 text-red-600 border-b-2 border-red-400 font-semibold'
+        : 'text-slate-800'}>
+        {ch}
+      </span>
+    );
+  });
+}
+
+function ScoreBadge({ score }) {
+  const color = score >= 85 ? 'text-emerald-600 bg-emerald-50 border-emerald-200'
+    : score >= 60 ? 'text-yellow-600 bg-yellow-50 border-yellow-200'
+    : 'text-red-600 bg-red-50 border-red-200';
+  return (
+    <span className={`text-2xl font-bold px-4 py-2 rounded-2xl border ${color}`}>
+      {score}%
+    </span>
+  );
+}
+
+// ── RECORDING BUTTON ──────────────────────────────────────────────────────────
+
+function RecordButton({ recording, onClick, disabled }) {
+  return (
+    <button onClick={onClick} disabled={disabled}
+      className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-md
+        ${recording
+          ? 'bg-red-500 hover:bg-red-600 scale-105'
+          : 'bg-slate-900 hover:bg-slate-700'
+        } ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}>
+      {recording && (
+        <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-40" />
+      )}
+      {recording
+        ? <MicOff size={22} className="text-white relative z-10" />
+        : <Mic size={22} className="text-white relative z-10" />
+      }
+    </button>
+  );
+}
+
+// ── MAIN ──────────────────────────────────────────────────────────────────────
+
+export default function App() {
+  const [tab, setTab] = useState('read');
+  const [lang, setLang] = useState('en');
+  const [recording, setRecording] = useState(false);
+  const [phase, setPhase] = useState('idle'); // idle | recording | result
+  const [score, setScore] = useState(null);
+  const [transcript, setTranscript] = useState('');
+  const [wrongChars, setWrongChars] = useState([]);
+  const [timer, setTimer] = useState(0);
+  const [dIdx, setDIdx] = useState(0);
+  const [dPhase, setDPhase] = useState('idle');
+  const [dTranscript, setDTranscript] = useState('');
+  const [dMatched, setDMatched] = useState([]);
+  const [dTimer, setDTimer] = useState(0);
+  const [history, setHistory] = useState(HISTORY);
+  const timerRef = useRef(null);
+  const dTimerRef = useRef(null);
+
+  const passage = READING_PASSAGES[lang];
+  const prompts = DIALOGUE_PROMPTS[lang] || DIALOGUE_PROMPTS['en'];
+  const prompt = prompts[dIdx % prompts.length];
+
+  // Reset on lang change
+  useEffect(() => {
+    setPhase('idle'); setScore(null); setTranscript(''); setWrongChars([]); setTimer(0);
+    setDPhase('idle'); setDTranscript(''); setDMatched([]); setDTimer(0); setDIdx(0);
+    clearInterval(timerRef.current); clearInterval(dTimerRef.current);
+  }, [lang]);
+
+  // ── Reading record ──
+  const startRead = () => {
+    setPhase('recording'); setRecording(true); setTimer(0); setScore(null);
+    timerRef.current = setInterval(() => setTimer(t => t + 1), 1000);
+    setTimeout(() => {
+      clearInterval(timerRef.current);
+      const p = READING_PASSAGES[lang];
+      const s = computeScore(p.text, p.mockTranscript, p.mockWrong);
+      setTranscript(p.mockTranscript);
+      setWrongChars(p.mockWrong);
+      setScore(s);
+      setPhase('result');
+      setRecording(false);
+      setHistory(h => [{ date: '今天', mode: '朗讀', lang: LANGS.find(l => l.code === lang)?.label, score: s }, ...h.slice(0, 6)]);
+    }, 3000);
+  };
+
+  const resetRead = () => { setPhase('idle'); setScore(null); setTranscript(''); setWrongChars([]); setTimer(0); };
+
+  // ── Dialogue record ──
+  const startDialogue = () => {
+    setDPhase('recording'); setRecording(true); setDTimer(0); setDMatched([]);
+    dTimerRef.current = setInterval(() => setDTimer(t => t + 1), 1000);
+    setTimeout(() => {
+      clearInterval(dTimerRef.current);
+      const answer = prompt.mockAnswer;
+      const matched = prompt.keywords.filter(kw => answer.toLowerCase().includes(kw.toLowerCase()));
+      setDTranscript(answer);
+      setDMatched(matched);
+      setDPhase('result');
+      setRecording(false);
+      const s = Math.round((matched.length / prompt.keywords.length) * 100);
+      setHistory(h => [{ date: '今天', mode: '對話', lang: LANGS.find(l => l.code === lang)?.label, score: s }, ...h.slice(0, 6)]);
+    }, 3000);
+  };
+
+  const nextDialogue = () => { setDPhase('idle'); setDTranscript(''); setDMatched([]); setDTimer(0); setDIdx(i => i + 1); };
+
+  const tabs = [
+    { key: 'read',      label: '朗讀練習', icon: <BookOpen size={13} /> },
+    { key: 'dialogue',  label: '對話練習', icon: <MessageCircle size={13} /> },
+    { key: 'history',   label: '練習記錄',  icon: <BarChart2 size={13} /> },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-lg mx-auto px-4 py-6">
+
+        {/* Header */}
+        <div className="mb-5">
+          <p className="text-xs text-slate-400 font-mono mb-1">S-01 · Module 02</p>
+          <h1 className="text-2xl font-bold text-slate-900">口語練習</h1>
+          <p className="text-sm text-slate-500 mt-0.5">開口練習，即時反饋</p>
+        </div>
+
+        {/* Language Selector */}
+        <div className="flex gap-2 mb-5">
+          {LANGS.map(l => (
+            <button key={l.code} onClick={() => setLang(l.code)}
+              className={`flex-1 py-2 rounded-xl text-sm font-medium border transition-all flex flex-col items-center gap-0.5
+                ${lang === l.code
+                  ? 'bg-slate-900 text-white border-slate-900'
+                  : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
+              {l.label}
+              {l.exp && <span className={`text-xs px-1.5 rounded-full ${lang === l.code ? 'bg-white text-slate-700' : 'bg-amber-50 text-amber-500 border border-amber-200'}`}>實驗</span>}
+            </button>
+          ))}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-1 bg-slate-100 rounded-2xl p-1 mb-5">
+          {tabs.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-medium transition-all
+                ${tab === t.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+              {t.icon}{t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── READING TAB ── */}
+        {tab === 'read' && (
+          <div className="space-y-3">
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">{passage.title}</p>
+                {phase === 'recording' && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    <span className="text-xs text-red-500 font-mono">{String(Math.floor(timer/60)).padStart(2,'0')}:{String(timer%60).padStart(2,'0')}</span>
+                  </div>
+                )}
+              </div>
+              <div className="bg-slate-50 rounded-xl p-4 mb-4">
+                <p className="text-base leading-loose text-slate-800 tracking-wide">
+                  {phase === 'result'
+                    ? renderDiff(passage.text, wrongChars)
+                    : passage.text}
+                </p>
+              </div>
+
+              {phase === 'result' && (
+                <div className="mb-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-slate-500">流暢度分數</p>
+                    <ScoreBadge score={score} />
+                  </div>
+                  <div className="bg-slate-50 rounded-xl p-3">
+                    <p className="text-xs text-slate-400 mb-1">系統識別結果</p>
+                    <p className="text-sm text-slate-700 leading-relaxed">{transcript}</p>
+                  </div>
+                  {wrongChars.length > 0 && (
+                    <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-xl p-3">
+                      <XCircle size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-red-600">
+                        標紅字詞「{wrongChars.join('、')}」與目標文本不符，建議重新練習該句。
+                      </p>
+                    </div>
+                  )}
+                  {wrongChars.length === 0 && (
+                    <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl p-3">
+                      <CheckCircle size={14} className="text-emerald-500 flex-shrink-0" />
+                      <p className="text-xs text-emerald-700">完美朗讀！所有字詞均與目標文本吻合。</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                {phase !== 'result' && (
+                  <RecordButton recording={recording} onClick={startRead} disabled={phase === 'recording'} />
+                )}
+                {phase === 'idle' && <p className="text-sm text-slate-400">點擊麥克風開始朗讀</p>}
+                {phase === 'recording' && <p className="text-sm text-slate-500 animate-pulse">識別中，請繼續朗讀…</p>}
+                {phase === 'result' && (
+                  <button onClick={resetRead}
+                    className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-sm font-semibold">
+                    重新練習
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-4">
+              <p className="text-xs font-semibold text-indigo-700 mb-1">如何計算流暢度？</p>
+              <p className="text-xs text-indigo-600 leading-relaxed">
+                系統將語音轉錄文字與目標文本逐字比對，計算相符字數佔比。紅色標記的字詞代表識別結果與目標不一致，建議重點練習。
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── DIALOGUE TAB ── */}
+        {tab === 'dialogue' && (
+          <div className="space-y-3">
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">對話練習</p>
+                {dPhase === 'recording' && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    <span className="text-xs text-red-500 font-mono">{String(Math.floor(dTimer/60)).padStart(2,'0')}:{String(dTimer%60).padStart(2,'0')}</span>
+                  </div>
+                )}
+              </div>
+              <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-3">
+                <p className="text-xs text-indigo-400 mb-1">題目</p>
+                <p className="text-base font-semibold text-indigo-900">{prompt.q}</p>
+              </div>
+              <div className="bg-slate-50 rounded-xl px-4 py-2 mb-4">
+                <p className="text-xs text-slate-400">{prompt.hint}</p>
+              </div>
+
+              {dPhase === 'result' && (
+                <div className="space-y-3 mb-4">
+                  <div className="bg-slate-50 rounded-xl p-3">
+                    <p className="text-xs text-slate-400 mb-1">你的回答</p>
+                    <p className="text-sm text-slate-800 leading-relaxed">{dTranscript}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 mb-2">目標句型關鍵詞匹配</p>
+                    <div className="flex flex-wrap gap-2">
+                      {prompt.keywords.map((kw, i) => (
+                        <span key={i} className={`text-xs px-2.5 py-1 rounded-full border font-medium flex items-center gap-1
+                          ${dMatched.includes(kw)
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-slate-100 text-slate-400 border-slate-200'}`}>
+                          {dMatched.includes(kw) && <CheckCircle size={10} />}
+                          {kw}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                    <p className="text-sm text-slate-500">關鍵詞使用率</p>
+                    <ScoreBadge score={Math.round((dMatched.length / prompt.keywords.length) * 100)} />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                {dPhase !== 'result' && (
+                  <RecordButton recording={dPhase === 'recording'} onClick={startDialogue} disabled={dPhase === 'recording'} />
+                )}
+                {dPhase === 'idle' && <p className="text-sm text-slate-400">點擊麥克風開始回答</p>}
+                {dPhase === 'recording' && <p className="text-sm text-slate-500 animate-pulse">識別中，請繼續說話…</p>}
+                {dPhase === 'result' && (
+                  <button onClick={nextDialogue}
+                    className="flex-1 py-3 bg-slate-900 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
+                    下一題 <ChevronRight size={15} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4">
+              <p className="text-xs font-semibold text-amber-700 mb-1">關鍵詞匹配說明</p>
+              <p className="text-xs text-amber-600 leading-relaxed">
+                對話練習不評核語意理解，只確認學生是否使用了目標句型中的關鍵詞。重點在於練習量的累積，而非精準評核。
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── HISTORY TAB ── */}
+        {tab === 'history' && (
+          <div className="space-y-3">
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <p className="text-sm font-semibold text-slate-700 mb-3">分數趨勢</p>
+              <ResponsiveContainer width="100%" height={160}>
+                <LineChart data={[...history].reverse()} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#94A3B8' }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94A3B8' }} />
+                  <Tooltip
+                    contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #E2E8F0' }}
+                    formatter={(v) => [`${v}%`, '分數']}
+                  />
+                  <Line type="monotone" dataKey="score" stroke="#6366F1" strokeWidth={2}
+                    dot={{ r: 4, fill: '#6366F1' }} activeDot={{ r: 5 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <p className="text-sm font-semibold text-slate-700 mb-3">練習記錄</p>
+              <div className="space-y-2">
+                {history.map((h, i) => (
+                  <div key={i} className="flex items-center gap-3 py-2 border-b border-slate-50 last:border-0">
+                    <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                      {h.mode === '朗讀' ? <BookOpen size={14} className="text-slate-500" /> : <MessageCircle size={14} className="text-slate-500" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-700 font-medium">{h.mode}</p>
+                      <p className="text-xs text-slate-400">{h.lang} · {h.date}</p>
+                    </div>
+                    <span className={`text-sm font-bold ${h.score >= 85 ? 'text-emerald-600' : h.score >= 60 ? 'text-yellow-600' : 'text-red-500'}`}>
+                      {h.score}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { val: history.length, label: '總練習次數', color: 'text-slate-800' },
+                { val: `${Math.round(history.reduce((a, h) => a + h.score, 0) / history.length)}%`, label: '平均分數', color: 'text-indigo-600' },
+                { val: history.filter(h => h.score >= 80).length, label: '優秀次數', color: 'text-emerald-600' },
+              ].map((s, i) => (
+                <div key={i} className="bg-white rounded-2xl p-3 text-center border border-slate-100 shadow-sm">
+                  <div className={`text-xl font-bold ${s.color}`}>{s.val}</div>
+                  <div className="text-xs text-slate-400 mt-0.5 leading-tight">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
