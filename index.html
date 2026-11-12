@@ -106,6 +106,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .mi-y{background:rgba(245,197,24,.2);}
 .mi-p{background:rgba(139,92,246,.2);}
 .mi-r{background:rgba(239,68,68,.2);}
+.mi-t{background:rgba(20,184,166,.2);}
 .mi-mu{background:rgba(122,144,168,.12);}
 .mod-info h4{font-size:14px;font-weight:600;}
 .mod-info p{font-size:11px;color:var(--muted);margin-top:1px;}
@@ -174,7 +175,6 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
     <div class="nav-tab active" data-tab="student" onclick="switchTab('student')">
       <span class="ni">👤</span>學生
     </div>
-    <!-- ── T-05 ADD：教學資源 Tab ── -->
     <div class="nav-tab" data-tab="teaching" onclick="switchTab('teaching')">
       <span class="ni">📚</span>教學資源
     </div>
@@ -247,15 +247,34 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       </nav>
     </div>
 
-    <!-- ── T-05 ADD：教學資源 Sidebar ── -->
+    <!-- ── 教學資源 Sidebar（T-01 ~ T-05 全加入）── -->
     <div class="sb-sec" id="sb-teaching">
       <div class="sb-hdr">
         <div class="sb-hdr-tag">TEACHING RESOURCES</div>
         <div class="sb-hdr-name">教學資源</div>
       </div>
       <nav class="sb-nav">
-        <div class="sb-item on" data-tpage="analytics" onclick="switchTeachingPage('analytics')">
-          <span class="si">📊</span>學情報告與數據分析
+        <div class="sb-item on" data-tpage="t-dashboard" onclick="switchTeachingPage('t-dashboard')">
+          <span class="si">🏠</span>總覽
+        </div>
+        <div class="sb-item" data-tpage="resource" onclick="switchTeachingPage('resource')">
+          <span class="si">📁</span>Resource
+          <span class="sb-badge bd-done">T-01</span>
+        </div>
+        <div class="sb-item" data-tpage="homework" onclick="switchTeachingPage('homework')">
+          <span class="si">📝</span>Homework
+          <span class="sb-badge bd-done">T-02</span>
+        </div>
+        <div class="sb-item" data-tpage="progress" onclick="switchTeachingPage('progress')">
+          <span class="si">📈</span>Progress
+          <span class="sb-badge bd-done">T-03</span>
+        </div>
+        <div class="sb-item" data-tpage="tgroup" onclick="switchTeachingPage('tgroup')">
+          <span class="si">👥</span>Group
+          <span class="sb-badge bd-done">T-04</span>
+        </div>
+        <div class="sb-item" data-tpage="analytics" onclick="switchTeachingPage('analytics')">
+          <span class="si">📊</span>Analytics
           <span class="sb-badge bd-done">T-05</span>
         </div>
       </nav>
@@ -364,41 +383,45 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 /* ── CONFIG ── */
 const IFRAME_PAGES = {
   // Student
-  profile:      { src:'Student/D_01_StudentProfile.html',        code:'D-01', label:'學生檔案',        ready:true  },
-  attendance:   { src:'Student/D_02_Attendance.html',            code:'D-02', label:'點名系統',        ready:true  },
-  markbook:     { src:'Student/D_03_MarkBook.html',              code:'D-03', label:'成績冊',          ready:true  },
-  scoreboard:   { src:'Student/D_04_ScoreBoard.html',            code:'D-04', label:'記分板',          ready:true  },
-  behavior:     { src:'Student/D_06_BehaviourItemSettings.html', code:'D-06', label:'行為項目設定',    ready:true  },
-  importexport: { src:'Student/D_M2_ImportExport.html',          code:'M-02', label:'匯入 / 匯出',     ready:false },
-  permission:   { src:'Student/D_M3_Permission.html',            code:'M-03', label:'權限管理',        ready:false },
-  // ── T-05 ADD：Teaching Resources ──
-  analytics:    { src:'TeachingResources/T_05_Analytics.html',   code:'T-05', label:'學情報告與數據分析', ready:true },
+  profile:      { src:'Student/D_01_StudentProfile.html',        code:'D-01', label:'學生檔案',          ready:true  },
+  attendance:   { src:'Student/D_02_Attendance.html',            code:'D-02', label:'點名系統',          ready:true  },
+  markbook:     { src:'Student/D_03_MarkBook.html',              code:'D-03', label:'成績冊',            ready:true  },
+  scoreboard:   { src:'Student/D_04_ScoreBoard.html',            code:'D-04', label:'記分板',            ready:true  },
+  behavior:     { src:'Student/D_06_BehaviourItemSettings.html', code:'D-06', label:'行為項目設定',      ready:true  },
+  importexport: { src:'Student/D_M2_ImportExport.html',          code:'M-02', label:'匯入 / 匯出',       ready:false },
+  permission:   { src:'Student/D_M3_Permission.html',            code:'M-03', label:'權限管理',          ready:false },
+  // Teaching Resources（T-01 ~ T-05）
+  resource:     { src:'TeachingResources/T_01_Resource.html',    code:'T-01', label:'Resource',          ready:true  },
+  homework:     { src:'TeachingResources/T_02_Homework.html',    code:'T-02', label:'Homework',          ready:true  },
+  progress:     { src:'TeachingResources/T_03_Progress.html',    code:'T-03', label:'Progress',          ready:true  },
+  tgroup:       { src:'TeachingResources/T_04_Group.html',       code:'T-04', label:'Group',             ready:true  },
+  analytics:    { src:'TeachingResources/T_05_Analytics.html',   code:'T-05', label:'Analytics',         ready:true  },
   // Admin
-  'admin-f02':  { src:'Admin/F_02_SchoolManagement.html',        code:'F-02', label:'學校管理',        ready:true  },
-  'admin-f03':  { src:'Admin/F_03_AIChat.html',                  code:'F-03', label:'AI 對話',         ready:true  },
-  'admin-f04':  { src:'Admin/F_04_SkillLibrary.html',            code:'F-04', label:'示範 Skills',     ready:true  },
-  'admin-f05':  { src:'Admin/F_05_UsageQuota.html',              code:'F-05', label:'用量及額度',      ready:false },
+  'admin-f02':  { src:'Admin/F_02_SchoolManagement.html',        code:'F-02', label:'學校管理',          ready:true  },
+  'admin-f03':  { src:'Admin/F_03_AIChat.html',                  code:'F-03', label:'AI 對話',           ready:true  },
+  'admin-f04':  { src:'Admin/F_04_SkillLibrary.html',            code:'F-04', label:'示範 Skills',       ready:true  },
+  'admin-f05':  { src:'Admin/F_05_UsageQuota.html',              code:'F-05', label:'用量及額度',        ready:false },
 };
 
 const CS_PAGES = {
-  markbook:     { ico:'📒', title:'成績冊',          sub:'學科成績記錄、測驗分數、科目評分管理，開發中，敬請期待。'     },
-  scoreboard:   { ico:'🏆', title:'記分板',          sub:'行為積分記錄、獎懲排行榜、積分統計報告，開發中，敬請期待。'   },
-  importexport: { ico:'📁', title:'匯入 / 匯出',     sub:'學生資料批量匯入、報告匯出 Excel / PDF，開發中，敬請期待。'  },
-  permission:   { ico:'🔒', title:'權限管理',        sub:'老師帳號管理、班別權限設定，開發中，敬請期待。'               },
-  'admin-f05':  { ico:'⚠️', title:'F-05 · 用量及額度', sub:'GitHub 檔名需先修正，修正後即可載入。'                    },
+  markbook:     { ico:'📒', title:'成績冊',       sub:'學科成績記錄、測驗分數、科目評分管理，開發中，敬請期待。'    },
+  scoreboard:   { ico:'🏆', title:'記分板',       sub:'行為積分記錄、獎懲排行榜、積分統計報告，開發中，敬請期待。' },
+  importexport: { ico:'📁', title:'匯入 / 匯出',  sub:'學生資料批量匯入、報告匯出 Excel / PDF，開發中，敬請期待。'},
+  permission:   { ico:'🔒', title:'權限管理',     sub:'老師帳號管理、班別權限設定，開發中，敬請期待。'            },
+  'admin-f05':  { ico:'⚠️', title:'F-05 · 用量及額度', sub:'GitHub 檔名需先修正，修正後即可載入。'              },
 };
 
 const TAB_CS = {
-  skills:{ ico:'⭐', title:'技能系統即將推出',  sub:'加減分、行為記錄、技能評分功能正在開發中，敬請期待。'  },
-  ai:    { ico:'🤖', title:'AI 教練即將推出',   sub:'班級整體分析、個別學生建議、異常預警功能正在開發中。' },
+  skills:{ ico:'⭐', title:'技能系統即將推出', sub:'加減分、行為記錄、技能評分功能正在開發中，敬請期待。'  },
+  ai:    { ico:'🤖', title:'AI 教練即將推出',  sub:'班級整體分析、個別學生建議、異常預警功能正在開發中。' },
 };
 
-/* ── AUTH STATE ── */
-let adminAuthed    = sessionStorage.getItem('adminAuthed') === '1';
-let curTab         = 'student';
-let curPage        = 'dashboard';
-let curAdminPage   = 'admin-home';
-let curTeachingPage = 'analytics'; // ── T-05 ADD ──
+/* ── STATE ── */
+let adminAuthed     = sessionStorage.getItem('adminAuthed') === '1';
+let curTab          = 'student';
+let curPage         = 'dashboard';
+let curAdminPage    = 'admin-home';
+let curTeachingPage = 't-dashboard';
 
 /* ── VIEWS ── */
 function showView(v){
@@ -416,10 +439,7 @@ function loadIframe(page){
   loader.classList.remove('hide');
   frame.src = '';
   showView('iframe');
-  setTimeout(()=>{
-    frame.onload = ()=>loader.classList.add('hide');
-    frame.src = cfg.src;
-  }, 120);
+  setTimeout(()=>{ frame.onload = ()=>loader.classList.add('hide'); frame.src = cfg.src; }, 120);
 }
 
 function showCS(ico, title, sub){
@@ -429,7 +449,7 @@ function showCS(ico, title, sub){
   showView('cs');
 }
 
-/* ── DASHBOARD ── */
+/* ── STUDENT DASHBOARD ── */
 function buildDashboard(){
   const d    = new Date();
   const days = ['日','一','二','三','四','五','六'];
@@ -478,12 +498,31 @@ function buildDashboard(){
     <span class="mod-pill pill-done">✅ 已完成</span>
   </div>
 </div>
-<!-- ── T-05 ADD：教學資源模組 ── -->
 <div class="sec-ttl">教學資源模組</div>
 <div class="mod-grid" style="margin-bottom:22px">
-  <div class="mod-card" onclick="switchTab('teaching')">
-    <div class="mod-row"><div class="mod-ico mi-p">📊</div><div class="mod-info"><h4>學情報告與數據分析</h4><p>出席、成績、功課整合報告</p></div><div class="mod-code">T-05</div></div>
-    <div class="mod-desc">整合出席率、成績、功課完成率，個人 / 小組 / 全班視覺化報告，支援 PDF / Excel 導出。</div>
+  <div class="mod-card" onclick="goTeaching('resource')">
+    <div class="mod-row"><div class="mod-ico mi-g">📁</div><div class="mod-info"><h4>Resource</h4><p>教材資源庫</p></div><div class="mod-code">T-01</div></div>
+    <div class="mod-desc">教學材料、課件及參考資料集中管理。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card" onclick="goTeaching('homework')">
+    <div class="mod-row"><div class="mod-ico mi-b">📝</div><div class="mod-info"><h4>Homework</h4><p>功課管理</p></div><div class="mod-code">T-02</div></div>
+    <div class="mod-desc">功課派發、完成狀況追蹤、批改記錄。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card" onclick="goTeaching('progress')">
+    <div class="mod-row"><div class="mod-ico mi-y">📈</div><div class="mod-info"><h4>Progress</h4><p>進度追蹤</p></div><div class="mod-code">T-03</div></div>
+    <div class="mod-desc">課程進度記錄、學習里程碑、目標達成率。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card" onclick="goTeaching('tgroup')">
+    <div class="mod-row"><div class="mod-ico mi-p">👥</div><div class="mod-info"><h4>Group</h4><p>小組管理</p></div><div class="mod-code">T-04</div></div>
+    <div class="mod-desc">學習小組分配、組別管理、協作記錄。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card" onclick="goTeaching('analytics')">
+    <div class="mod-row"><div class="mod-ico mi-t">📊</div><div class="mod-info"><h4>Analytics</h4><p>學情報告與數據分析</p></div><div class="mod-code">T-05</div></div>
+    <div class="mod-desc">整合出席率、成績、功課完成率，個人 / 小組 / 全班報告，PDF / Excel 導出。</div>
     <span class="mod-pill pill-done">✅ 已完成</span>
   </div>
 </div>
@@ -495,8 +534,54 @@ function buildDashboard(){
   <div class="act-row"><div class="act-ico" style="background:rgba(245,197,24,.1)">🚧</div><div class="act-bd"><strong>D-04 記分板</strong><span>行為積分記錄、獎懲排行榜、積分統計</span></div><span class="act-time">開發中</span></div>
   <div class="act-row"><div class="act-ico" style="background:rgba(139,92,246,.1)">🔮</div><div class="act-bd"><strong>D-05（功能待定）</strong><span>模組尚未規劃</span></div><span class="act-time" style="color:#C4B5FD">待確定</span></div>
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>D-06 行為項目設定</strong><span>管理員統一設定行為類別與分數</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
-  <!-- ── T-05 ADD ── -->
-  <div class="act-row"><div class="act-ico" style="background:rgba(139,92,246,.15)">✅</div><div class="act-bd"><strong>T-05 學情報告與數據分析</strong><span>整合出席、成績、功課完成率，個人 / 小組 / 全班報告，PDF / Excel 導出，預警自動標記</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-01 Resource</strong><span>教材資源庫，集中管理課件及參考資料</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-02 Homework</strong><span>功課派發、完成狀況追蹤、批改記錄</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-03 Progress</strong><span>課程進度記錄、學習里程碑、目標達成率</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-04 Group</strong><span>學習小組分配、組別管理、協作記錄</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-05 Analytics</strong><span>整合出席、成績、功課完成率，個人 / 小組 / 全班報告，PDF / Excel 導出，預警自動標記</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+</div>`;
+  showView('dashboard');
+}
+
+/* ── TEACHING DASHBOARD ── */
+function buildTeachingDashboard(){
+  document.getElementById('dashboard-view').innerHTML = `
+<div class="breadcrumb"><span>教學資源</span><span>›</span><strong>總覽</strong></div>
+<div class="dash-hello">
+  <h1>教學資源 <em>T-01 ～ T-05</em> 📚</h1>
+  <p>TeachingResources · 五個模組，全部可用</p>
+</div>
+<div class="qs-grid">
+  <div class="qs-card qc-g"><div class="qs-lbl">已完成模組</div><div class="qs-num" style="color:#4ADE80">5</div><div class="qs-sub">T-01 ~ T-05</div><div class="qs-ico">✅</div></div>
+  <div class="qs-card qc-b"><div class="qs-lbl">開發中模組</div><div class="qs-num" style="color:#93C5FD">0</div><div class="qs-sub">全部可用</div><div class="qs-ico">🚧</div></div>
+</div>
+<div class="sec-ttl">所有模組</div>
+<div class="mod-grid" style="margin-bottom:0">
+  <div class="mod-card" onclick="switchTeachingPage('resource')">
+    <div class="mod-row"><div class="mod-ico mi-g">📁</div><div class="mod-info"><h4>Resource</h4><p>教材資源庫</p></div><div class="mod-code">T-01</div></div>
+    <div class="mod-desc">教學材料、課件及參考資料集中管理。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card" onclick="switchTeachingPage('homework')">
+    <div class="mod-row"><div class="mod-ico mi-b">📝</div><div class="mod-info"><h4>Homework</h4><p>功課管理</p></div><div class="mod-code">T-02</div></div>
+    <div class="mod-desc">功課派發、完成狀況追蹤、批改記錄。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card" onclick="switchTeachingPage('progress')">
+    <div class="mod-row"><div class="mod-ico mi-y">📈</div><div class="mod-info"><h4>Progress</h4><p>進度追蹤</p></div><div class="mod-code">T-03</div></div>
+    <div class="mod-desc">課程進度記錄、學習里程碑、目標達成率。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card" onclick="switchTeachingPage('tgroup')">
+    <div class="mod-row"><div class="mod-ico mi-p">👥</div><div class="mod-info"><h4>Group</h4><p>小組管理</p></div><div class="mod-code">T-04</div></div>
+    <div class="mod-desc">學習小組分配、組別管理、協作記錄。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+  <div class="mod-card" onclick="switchTeachingPage('analytics')">
+    <div class="mod-row"><div class="mod-ico mi-t">📊</div><div class="mod-info"><h4>Analytics</h4><p>學情報告與數據分析</p></div><div class="mod-code">T-05</div></div>
+    <div class="mod-desc">整合出席率、成績、功課完成率，個人 / 小組 / 全班報告，PDF / Excel 導出。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
 </div>`;
   showView('dashboard');
 }
@@ -538,45 +623,33 @@ function buildAdminDashboard(){
 /* ── TAB NAVIGATION ── */
 function switchTab(tab){
   if(tab === 'admin' && !adminAuthed){ showAdminLogin(); return; }
-
   curTab = tab;
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
-
-  // ── T-05 ADD：加入 'teaching' ──
   ['student','teaching','skills','ai','admin'].forEach(s=>{
     const el = document.getElementById('sb-'+s);
     if(!el) return;
     el.classList.remove('on');
     if(el.classList.contains('sb-cs')) el.style.display = 'none';
   });
-
   const target = document.getElementById('sb-'+tab);
   if(target){
     if(target.classList.contains('sb-cs')) target.style.display = 'flex';
     else target.classList.add('on');
   }
-
-  if(tab === 'student'){
-    renderStudentPage(curPage);
-  } else if(tab === 'teaching'){
-    // ── T-05 ADD ──
-    renderTeachingPage(curTeachingPage);
-  } else if(tab === 'admin'){
-    renderAdminPage(curAdminPage);
-  } else {
-    const cs = TAB_CS[tab];
-    showCS(cs.ico, cs.title, cs.sub);
-  }
+  if(tab === 'student')       renderStudentPage(curPage);
+  else if(tab === 'teaching') renderTeachingPage(curTeachingPage);
+  else if(tab === 'admin')    renderAdminPage(curAdminPage);
+  else{ const cs=TAB_CS[tab]; showCS(cs.ico, cs.title, cs.sub); }
   closeSidebar();
 }
 
+/* ── STUDENT ROUTING ── */
 function switchPage(page){
   curPage = page;
   document.querySelectorAll('#sb-student .sb-item').forEach(i=>i.classList.toggle('on', i.dataset.page===page));
   renderStudentPage(page);
   closeSidebar();
 }
-
 function renderStudentPage(page){
   if(page === 'dashboard'){ buildDashboard(); return; }
   const cfg = IFRAME_PAGES[page];
@@ -586,7 +659,11 @@ function renderStudentPage(page){
   if(cfg){ showCS('🚧', cfg.label, `${cfg.code} · ${cfg.label}，開發中，敬請期待。`); }
 }
 
-/* ── T-05 ADD：Teaching Resources Routing ── */
+/* ── TEACHING ROUTING ── */
+function goTeaching(page){
+  curTeachingPage = page;
+  switchTab('teaching');
+}
 function switchTeachingPage(page){
   curTeachingPage = page;
   document.querySelectorAll('#sb-teaching .sb-item[data-tpage]').forEach(i=>
@@ -595,8 +672,8 @@ function switchTeachingPage(page){
   renderTeachingPage(page);
   closeSidebar();
 }
-
 function renderTeachingPage(page){
+  if(page === 't-dashboard'){ buildTeachingDashboard(); return; }
   const cfg = IFRAME_PAGES[page];
   if(cfg && cfg.ready){ loadIframe(page); return; }
   const cs = CS_PAGES[page];
@@ -604,7 +681,7 @@ function renderTeachingPage(page){
   if(cfg){ showCS('🚧', cfg.label, `${cfg.code} · ${cfg.label}，開發中，敬請期待。`); }
 }
 
-/* ── ADMIN PAGE ROUTING ── */
+/* ── ADMIN ROUTING ── */
 function switchAdminPage(page){
   curAdminPage = page;
   document.querySelectorAll('#sb-admin .sb-item[data-adminpage]').forEach(i=>
@@ -613,7 +690,6 @@ function switchAdminPage(page){
   renderAdminPage(page);
   closeSidebar();
 }
-
 function renderAdminPage(page){
   if(page === 'admin-home'){ buildAdminDashboard(); return; }
   const cfg = IFRAME_PAGES[page];
@@ -631,9 +707,7 @@ function showAdminLogin(){
   document.getElementById('m-adminLogin').classList.remove('hide');
   setTimeout(()=>document.getElementById('loginEmail').focus(), 100);
 }
-function closeAdminLogin(){
-  document.getElementById('m-adminLogin').classList.add('hide');
-}
+function closeAdminLogin(){ document.getElementById('m-adminLogin').classList.add('hide'); }
 function doAdminLogin(){
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const pwd   = document.getElementById('loginPwd').value;
