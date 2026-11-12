@@ -5,104 +5,483 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>T-06 · Timetable</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang HK', 'Noto Sans HK', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang HK', sans-serif;
             background: #f7f7f5;
             color: #1a1a1a;
             min-height: 100vh;
         }
 
-        .hero {
+        /* Header */
+        .header {
             background: #1a1a1a;
-            color: #fff;
-            padding: 64px 24px 56px;
-            text-align: center;
-        }
-
-        .badge {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #a0a0a0;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 {
-            font-size: clamp(28px, 6vw, 48px);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            line-height: 1.15;
-            margin-bottom: 16px;
-        }
-
-        .hero h1 span {
-            color: #d4ff6e;
-        }
-
-        .hero p {
-            font-size: clamp(14px, 2.5vw, 17px);
-            color: #a0a0a0;
-            max-width: 480px;
-            margin: 0 auto;
-            line-height: 1.7;
-        }
-
-        .section {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 48px 24px;
-        }
-
-        .section-label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #888;
-            margin-bottom: 28px;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 48px;
-        }
-
-        .feature-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 28px 24px;
-            border: 1px solid #e8e8e8;
-            transition: box-shadow 0.2s;
-        }
-
-        .feature-card:hover {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        .feature-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            color: white;
+            padding: 18px 24px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-bottom: 16px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .logo { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #d4ff6e; }
+        .header-title { font-size: 15px; font-weight: 600; }
+        .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .class-select {
+            background: #2a2a2a;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
         }
 
-        .icon-view { background: #eef4ff; }
-        .icon-edit { background: #fff4ee; }
-        .icon-export { background: #f0fff4; }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+        .btn:hover { opacity: 0.8; }
+        .btn-excel { background: #22c55e; color: white; }
+        .btn-pdf   { background: #ef4444; color: white; }
 
-        .feature-card h3 {
-            font
+        /* Main */
+        .main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+
+        .table-wrap {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        table { width: 100%; border-collapse: collapse; min-width: 580px; }
+
+        thead th {
+            background: #1a1a1a;
+            color: white;
+            padding: 13px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.03em;
+        }
+        thead th.col-time { width: 88px; background: #111; }
+        thead th .sub { font-weight: 400; font-size: 10px; color: #888; display: block; margin-top: 2px; }
+
+        td { border: 1px solid #f0f0f0; vertical-align: middle; }
+
+        td.time-cell {
+            background: #fafafa;
+            padding: 10px 10px;
+            text-align: center;
+            border-color: #f0f0f0;
+        }
+        .time-label { font-size: 11px; font-weight: 700; color: #1a1a1a; display: block; }
+        .time-range { font-size: 10px; color: #bbb; display: block; margin-top: 2px; line-height: 1.5; }
+
+        tr.break-row td {
+            background: #f7f7f5;
+            border-color: #ebebeb;
+            text-align: center;
+            color: #c0c0c0;
+            font-size: 11px;
+            padding: 7px 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .cell-btn {
+            width: 100%;
+            min-height: 68px;
+            padding: 10px 10px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+        .cell-btn:hover { background: #f0f6ff; }
+        .cell-btn.empty:hover { background: #f9f9f9; }
+
+        .cell-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .cell-subject { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+        .cell-teacher { font-size: 11px; color: #888; }
+        .cell-room    { font-size: 10px; color: #bbb; }
+        .cell-empty   { font-size: 20px; color: #e0e0e0; }
+
+        /* Modal */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .overlay.active { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+        }
+        .modal-title    { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .modal-sub      { font-size: 12px; color: #999; margin-bottom: 24px; }
+        .form-label     { font-size: 11px; font-weight: 600; color: #666; margin-bottom: 6px; display: block; letter-spacing: 0.04em; }
+        .form-group     { margin-bottom: 14px; }
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-input:focus { border-color: #1a1a1a; }
+
+        .modal-actions { display: flex; gap: 8px; margin-top: 22px; }
+        .btn-cancel { flex: 1; background: #f0f0f0; color: #777; }
+        .btn-clear  { flex: 1; background: #fff0f0; color: #ef4444; }
+        .btn-save   { flex: 2; background: #1a1a1a; color: white; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px; right: 24px;
+            background: #1a1a1a;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            transform: translateY(60px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 200;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* Print */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .main { padding: 0; max-width: 100%; }
+            .table-wrap { border: none; border-radius: 0; }
+            .cell-btn:hover { background: transparent; }
+        }
+
+        @media (max-width: 520px) {
+            .header { padding: 14px 16px; }
+            .main   { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <span class="logo">T-06</span>
+        <span class="header-title">時間表管理 · Timetable</span>
+    </div>
+    <div class="header-right no-print">
+        <select class="class-select" id="classSelect" onchange="changeClass()">
+            <option value="1A">Class 1A</option>
+            <option value="1B">Class 1B</option>
+            <option value="2A">Class 2A</option>
+            <option value="2B">Class 2B</option>
+        </select>
+        <button class="btn btn-excel" onclick="exportCSV()">↓ Excel</button>
+        <button class="btn btn-pdf"   onclick="exportPDF()">↓ PDF</button>
+    </div>
+</div>
+
+<div class="main">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-time">時間</th>
+                    <th>星期一<span class="sub">Monday</span></th>
+                    <th>星期二<span class="sub">Tuesday</span></th>
+                    <th>星期三<span class="sub">Wednesday</span></th>
+                    <th>星期四<span class="sub">Thursday</span></th>
+                    <th>星期五<span class="sub">Friday</span></th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay">
+    <div class="modal">
+        <div class="modal-title">編輯課節</div>
+        <div class="modal-sub" id="modalSub"></div>
+        <div class="form-group">
+            <label class="form-label">科目 SUBJECT</label>
+            <input class="form-input" id="iSubject" placeholder="例：數學、英文、中文...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">老師 TEACHER</label>
+            <input class="form-input" id="iTeacher" placeholder="例：Chan Sir、Wong Miss...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">課室 ROOM</label>
+            <input class="form-input" id="iRoom" placeholder="例：101、Hall、Lab...">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn btn-clear"  onclick="clearCell()">清除</button>
+            <button class="btn btn-save"   onclick="saveCell()">儲存</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PERIODS = [
+    { id:'p1',     label:'P1',   start:'08:00', end:'08:40', isBreak:false },
+    { id:'p2',     label:'P2',   start:'08:40', end:'09:20', isBreak:false },
+    { id:'p3',     label:'P3',   start:'09:20', end:'10:00', isBreak:false },
+    { id:'break1', label:'小息', start:'10:00', end:'10:20', isBreak:true  },
+    { id:'p4',     label:'P4',   start:'10:20', end:'11:00', isBreak:false },
+    { id:'p5',     label:'P5',   start:'11:00', end:'11:40', isBreak:false },
+    { id:'p6',     label:'P6',   start:'11:40', end:'12:20', isBreak:false },
+    { id:'lunch',  label:'午膳', start:'12:20', end:'13:20', isBreak:true  },
+    { id:'p7',     label:'P7',   start:'13:20', end:'14:00', isBreak:false },
+    { id:'p8',     label:'P8',   start:'14:00', end:'14:40', isBreak:false },
+];
+
+const DAYS     = ['mon','tue','wed','thu','fri'];
+const DAY_NAMES = { mon:'星期一', tue:'星期二', wed:'星期三', thu:'星期四', fri:'星期五' };
+
+const COLORS = {
+    '中文':'#ef4444','英文':'#3b82f6','數學':'#f59e0b','常識':'#10b981',
+    '體育':'#8b5cf6','音樂':'#ec4899','美術':'#f97316','電腦':'#06b6d4',
+    '普通話':'#a3a300','科學':'#14b8a6','歷史':'#a78bfa','地理':'#84cc16',
+    '班主任':'#1a1a1a',
+};
+const getColor = s => COLORS[s] || '#94a3b8';
+
+// Pre-filled sample data
+const DATA = {
+    '1A': {
+        p1:{ mon:{subject:'中文',  teacher:'Chan Sir',   room:'101'},    tue:{subject:'英文',  teacher:'Wong Miss',  room:'101'},    wed:{subject:'數學',  teacher:'Lee Sir',    room:'101'},    thu:{subject:'常識',  teacher:'Ng Miss',    room:'101'},    fri:{subject:'中文',  teacher:'Chan Sir',   room:'101'} },
+        p2:{ mon:{subject:'英文',  teacher:'Wong Miss',  room:'101'},    tue:{subject:'數學',  teacher:'Lee Sir',    room:'101'},    wed:{subject:'中文',  teacher:'Chan Sir',   room:'101'},    thu:{subject:'英文',  teacher:'Wong Miss',  room:'101'},    fri:{subject:'數學',  teacher:'Lee Sir',    room:'101'} },
+        p3:{ mon:{subject:'數學',  teacher:'Lee Sir',    room:'101'},    tue:{subject:'常識',  teacher:'Ng Miss',    room:'101'},    wed:{subject:'英文',  teacher:'Wong Miss',  room:'101'},    thu:{subject:'數學',  teacher:'Lee Sir',    room:'101'},    fri:{subject:'常識',  teacher:'Ng Miss',    room:'101'} },
+        p4:{ mon:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   tue:{subject:'音樂',  teacher:'Ho Miss',    room:'Music'},  wed:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   thu:{subject:'美術',  teacher:'Yip Miss',   room:'Art'},    fri:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'} },
+        p5:{ mon:{subject:'常識',  teacher:'Ng Miss',    room:'101'},    tue:{subject:'中文',  teacher:'Chan Sir',   room:'101'},    wed:{subject:'數學',  teacher:'Lee Sir',    room:'101'},    thu:{subject:'英文',  teacher:'Wong Miss',  room:'101'},    fri:{subject:'中文',  teacher:'Chan Sir',   room:'101'} },
+        p6:{ mon:{subject:'普通話',teacher:'Zhang Miss', room:'101'},    tue:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   wed:{subject:'常識',  teacher:'Ng Miss',    room:'101'},    thu:{subject:'中文',  teacher:'Chan Sir',   room:'101'},    fri:{subject:'英文',  teacher:'Wong Miss',  room:'101'} },
+        p7:{ mon:{subject:'美術',  teacher:'Yip Miss',   room:'Art'},    tue:{subject:'普通話',teacher:'Zhang Miss', room:'101'},    wed:{subject:'音樂',  teacher:'Ho Miss',    room:'Music'},  thu:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   fri:{subject:'班主任',teacher:'Chan Sir',   room:'101'} },
+        p8:{ mon:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    tue:{subject:'數學',  teacher:'Lee Sir',    room:'101'},    wed:{subject:'英文',  teacher:'Wong Miss',  room:'101'},    thu:{subject:'普通話',teacher:'Zhang Miss', room:'101'},    fri:{subject:'常識',  teacher:'Ng Miss',    room:'101'} },
+    },
+    '1B': {
+        p1:{ mon:{subject:'數學',  teacher:'Lee Sir',    room:'102'},    tue:{subject:'中文',  teacher:'Lau Miss',   room:'102'},    wed:{subject:'英文',  teacher:'Smith Miss', room:'102'},    thu:{subject:'數學',  teacher:'Lee Sir',    room:'102'},    fri:{subject:'常識',  teacher:'Cheung Sir', room:'102'} },
+        p2:{ mon:{subject:'英文',  teacher:'Smith Miss', room:'102'},    tue:{subject:'數學',  teacher:'Lee Sir',    room:'102'},    wed:{subject:'中文',  teacher:'Lau Miss',   room:'102'},    thu:{subject:'英文',  teacher:'Smith Miss', room:'102'},    fri:{subject:'數學',  teacher:'Lee Sir',    room:'102'} },
+        p3:{ mon:{subject:'中文',  teacher:'Lau Miss',   room:'102'},    tue:{subject:'英文',  teacher:'Smith Miss', room:'102'},    wed:{subject:'數學',  teacher:'Lee Sir',    room:'102'},    thu:{subject:'常識',  teacher:'Cheung Sir', room:'102'},    fri:{subject:'英文',  teacher:'Smith Miss', room:'102'} },
+        p4:{ mon:{subject:'音樂',  teacher:'Ho Miss',    room:'Music'},  tue:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   wed:{subject:'美術',  teacher:'Yip Miss',   room:'Art'},    thu:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    fri:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'} },
+        p5:{ mon:{subject:'常識',  teacher:'Cheung Sir', room:'102'},    tue:{subject:'普通話',teacher:'Zhang Miss', room:'102'},    wed:{subject:'常識',  teacher:'Cheung Sir', room:'102'},    thu:{subject:'中文',  teacher:'Lau Miss',   room:'102'},    fri:{subject:'中文',  teacher:'Lau Miss',   room:'102'} },
+        p6:{ mon:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   tue:{subject:'常識',  teacher:'Cheung Sir', room:'102'},    wed:{subject:'普通話',teacher:'Zhang Miss', room:'102'},    thu:{subject:'數學',  teacher:'Lee Sir',    room:'102'},    fri:{subject:'普通話',teacher:'Zhang Miss', room:'102'} },
+        p7:{ mon:{subject:'普通話',teacher:'Zhang Miss', room:'102'},    tue:{subject:'美術',  teacher:'Yip Miss',   room:'Art'},    wed:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   thu:{subject:'音樂',  teacher:'Ho Miss',    room:'Music'},  fri:{subject:'班主任',teacher:'Lau Miss',   room:'102'} },
+        p8:{ mon:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    tue:{subject:'英文',  teacher:'Smith Miss', room:'102'},    wed:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    thu:{subject:'英文',  teacher:'Smith Miss', room:'102'},    fri:{subject:'常識',  teacher:'Cheung Sir', room:'102'} },
+    },
+    '2A': {
+        p1:{ mon:{subject:'數學',  teacher:'Chan Sir',   room:'201'},    tue:{subject:'英文',  teacher:'Brown Miss', room:'201'},    wed:{subject:'中文',  teacher:'Wong Sir',   room:'201'},    thu:{subject:'數學',  teacher:'Chan Sir',   room:'201'},    fri:{subject:'英文',  teacher:'Brown Miss', room:'201'} },
+        p2:{ mon:{subject:'中文',  teacher:'Wong Sir',   room:'201'},    tue:{subject:'數學',  teacher:'Chan Sir',   room:'201'},    wed:{subject:'英文',  teacher:'Brown Miss', room:'201'},    thu:{subject:'中文',  teacher:'Wong Sir',   room:'201'},    fri:{subject:'數學',  teacher:'Chan Sir',   room:'201'} },
+        p3:{ mon:{subject:'英文',  teacher:'Brown Miss', room:'201'},    tue:{subject:'中文',  teacher:'Wong Sir',   room:'201'},    wed:{subject:'數學',  teacher:'Chan Sir',   room:'201'},    thu:{subject:'英文',  teacher:'Brown Miss', room:'201'},    fri:{subject:'中文',  teacher:'Wong Sir',   room:'201'} },
+        p4:{ mon:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'},    tue:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   wed:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'},    thu:{subject:'音樂',  teacher:'Ho Miss',    room:'Music'},  fri:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'} },
+        p5:{ mon:{subject:'歷史',  teacher:'Ng Sir',     room:'201'},    tue:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'},    wed:{subject:'歷史',  teacher:'Ng Sir',     room:'201'},    thu:{subject:'數學',  teacher:'Chan Sir',   room:'201'},    fri:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'} },
+        p6:{ mon:{subject:'地理',  teacher:'Yip Miss',   room:'201'},    tue:{subject:'歷史',  teacher:'Ng Sir',     room:'201'},    wed:{subject:'地理',  teacher:'Yip Miss',   room:'201'},    thu:{subject:'英文',  teacher:'Brown Miss', room:'201'},    fri:{subject:'歷史',  teacher:'Ng Sir',     room:'201'} },
+        p7:{ mon:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    tue:{subject:'地理',  teacher:'Yip Miss',   room:'201'},    wed:{subject:'音樂',  teacher:'Ho Miss',    room:'Music'},  thu:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   fri:{subject:'班主任',teacher:'Wong Sir',   room:'201'} },
+        p8:{ mon:{subject:'普通話',teacher:'Zhang Miss', room:'201'},    tue:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    wed:{subject:'中文',  teacher:'Wong Sir',   room:'201'},    thu:{subject:'地理',  teacher:'Yip Miss',   room:'201'},    fri:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'} },
+    },
+    '2B': {
+        p1:{ mon:{subject:'英文',  teacher:'Jones Sir',  room:'202'},    tue:{subject:'數學',  teacher:'Leung Miss', room:'202'},    wed:{subject:'中文',  teacher:'Chow Sir',   room:'202'},    thu:{subject:'英文',  teacher:'Jones Sir',  room:'202'},    fri:{subject:'數學',  teacher:'Leung Miss', room:'202'} },
+        p2:{ mon:{subject:'數學',  teacher:'Leung Miss', room:'202'},    tue:{subject:'中文',  teacher:'Chow Sir',   room:'202'},    wed:{subject:'數學',  teacher:'Leung Miss', room:'202'},    thu:{subject:'中文',  teacher:'Chow Sir',   room:'202'},    fri:{subject:'英文',  teacher:'Jones Sir',  room:'202'} },
+        p3:{ mon:{subject:'中文',  teacher:'Chow Sir',   room:'202'},    tue:{subject:'英文',  teacher:'Jones Sir',  room:'202'},    wed:{subject:'英文',  teacher:'Jones Sir',  room:'202'},    thu:{subject:'數學',  teacher:'Leung Miss', room:'202'},    fri:{subject:'中文',  teacher:'Chow Sir',   room:'202'} },
+        p4:{ mon:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   tue:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'},    wed:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   thu:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'},    fri:{subject:'音樂',  teacher:'Ho Miss',    room:'Music'} },
+        p5:{ mon:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'},    tue:{subject:'歷史',  teacher:'Ng Sir',     room:'202'},    wed:{subject:'歷史',  teacher:'Ng Sir',     room:'202'},    thu:{subject:'體育',  teacher:'Lam Sir',    room:'Hall'},   fri:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'} },
+        p6:{ mon:{subject:'歷史',  teacher:'Ng Sir',     room:'202'},    tue:{subject:'地理',  teacher:'Yip Miss',   room:'202'},    wed:{subject:'科學',  teacher:'Ho Sir',     room:'Lab'},    thu:{subject:'歷史',  teacher:'Ng Sir',     room:'202'},    fri:{subject:'地理',  teacher:'Yip Miss',   room:'202'} },
+        p7:{ mon:{subject:'地理',  teacher:'Yip Miss',   room:'202'},    tue:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    wed:{subject:'地理',  teacher:'Yip Miss',   room:'202'},    thu:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    fri:{subject:'班主任',teacher:'Chow Sir',   room:'202'} },
+        p8:{ mon:{subject:'電腦',  teacher:'Tam Sir',    room:'Lab'},    tue:{subject:'普通話',teacher:'Zhang Miss', room:'202'},    wed:{subject:'普通話',teacher:'Zhang Miss', room:'202'},    thu:{subject:'普通話',teacher:'Zhang Miss', room:'202'},    fri:{subject:'英文',  teacher:'Jones Sir',  room:'202'} },
+    },
+};
+
+let currentClass = '1A';
+let editing = null;
+
+function render() {
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+    const classData = DATA[currentClass];
+
+    PERIODS.forEach(p => {
+        const tr = document.createElement('tr');
+
+        if (p.isBreak) {
+            tr.classList.add('break-row');
+            const td = document.createElement('td');
+            td.colSpan = 6;
+            td.textContent = `${p.label}　${p.start} – ${p.end}`;
+            tr.appendChild(td);
+        } else {
+            // Time cell
+            const tdTime = document.createElement('td');
+            tdTime.className = 'time-cell';
+            tdTime.innerHTML = `<span class="time-label">${p.label}</span><span class="time-range">${p.start}<br>${p.end}</span>`;
+            tr.appendChild(tdTime);
+
+            // Day cells
+            DAYS.forEach(day => {
+                const td = document.createElement('td');
+                const cell = classData[p.id] && classData[p.id][day];
+                const btn = document.createElement('button');
+                btn.className = 'cell-btn' + (cell ? '' : ' empty');
+                btn.onclick = () => openModal(p.id, day, p.label);
+
+                if (cell) {
+                    const color = getColor(cell.subject);
+                    btn.innerHTML = `
+                        <span class="cell-subject"><span class="cell-dot" style="background:${color}"></span>${cell.subject}</span>
+                        <span class="cell-teacher">${cell.teacher}</span>
+                        <span class="cell-room">${cell.room}</span>`;
+                } else {
+                    btn.innerHTML = `<span class="cell-empty">＋</span>`;
+                }
+                td.appendChild(btn);
+                tr.appendChild(td);
+            });
+        }
+
+        tbody.appendChild(tr);
+    });
+}
+
+function changeClass() {
+    currentClass = document.getElementById('classSelect').value;
+    render();
+}
+
+function openModal(periodId, day, label) {
+    editing = { periodId, day };
+    const classData = DATA[currentClass];
+    const cell = classData[periodId] && classData[periodId][day];
+    document.getElementById('modalSub').textContent = `${currentClass}  ·  ${label}  ·  ${DAY_NAMES[day]}`;
+    document.getElementById('iSubject').value = cell ? cell.subject : '';
+    document.getElementById('iTeacher').value = cell ? cell.teacher : '';
+    document.getElementById('iRoom').value    = cell ? cell.room    : '';
+    document.getElementById('overlay').classList.add('active');
+    setTimeout(() => document.getElementById('iSubject').focus(), 50);
+}
+
+function closeModal() {
+    document.getElementById('overlay').classList.remove('active');
+    editing = null;
+}
+
+function saveCell() {
+    if (!editing) return;
+    const subject = document.getElementById('iSubject').value.trim();
+    const teacher = document.getElementById('iTeacher').value.trim();
+    const room    = document.getElementById('iRoom').value.trim();
+    if (!subject) { showToast('請輸入科目名稱'); return; }
+    const { periodId, day } = editing;
+    if (!DATA[currentClass][periodId]) DATA[currentClass][periodId] = {};
+    DATA[currentClass][periodId][day] = { subject, teacher, room };
+    closeModal();
+    render();
+    showToast('已儲存 ✓');
+}
+
+function clearCell() {
+    if (!editing) return;
+    const { periodId, day } = editing;
+    if (DATA[currentClass][periodId]) delete DATA[currentClass][periodId][day];
+    closeModal();
+    render();
+    showToast('已清除');
+}
+
+function exportCSV() {
+    const classData = DATA[currentClass];
+    const dayNames  = ['星期一','星期二','星期三','星期四','星期五'];
+    let csv = `Class ${currentClass} 時間表\n節次,時間,${dayNames.join(',')}\n`;
+
+    PERIODS.forEach(p => {
+        if (p.isBreak) {
+            csv += `,"${p.label} ${p.start}–${p.end}",,,,\n`;
+            return;
+        }
+        let row = `${p.label},${p.start}-${p.end}`;
+        DAYS.forEach(day => {
+            const cell = classData[p.id] && classData[p.id][day];
+            row += cell ? `,"${cell.subject} / ${cell.teacher} / ${cell.room}"` : ',';
+        });
+        csv += row + '\n';
+    });
+
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Timetable_${currentClass}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Excel 匯出完成 ✓');
+}
+
+function exportPDF() {
+    window.print();
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+document.getElementById('overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('overlay')) closeModal();
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter'  && document.getElementById('overlay').classList.contains('active')) saveCell();
+    if (e.key === 'Escape') closeModal();
+});
+
+render();
+</script>
+</body>
+</html>
