@@ -19,8 +19,9 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .logo-badge{width:36px;height:36px;border-radius:9px;background:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--yellow);font-size:14px;}
 .logo-txt h2{font-size:10.5px;color:var(--yellow);font-weight:700;white-space:nowrap;}
 .logo-txt p{font-size:9px;color:var(--muted);margin-top:2px;white-space:nowrap;}
-.main-nav{display:flex;gap:3px;flex:1;}
-.nav-tab{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .2s;user-select:none;white-space:nowrap;}
+.main-nav{display:flex;gap:3px;flex:1;overflow-x:auto;scrollbar-width:none;}
+.main-nav::-webkit-scrollbar{display:none;}
+.nav-tab{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .2s;user-select:none;white-space:nowrap;flex-shrink:0;}
 .nav-tab:hover{background:var(--card2);color:var(--text);}
 .nav-tab.active{background:var(--green);color:#fff;}
 .nav-tab.active .ni{color:var(--yellow);}
@@ -108,6 +109,8 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .mi-r{background:rgba(239,68,68,.2);}
 .mi-t{background:rgba(20,184,166,.2);}
 .mi-mu{background:rgba(122,144,168,.12);}
+.mi-em{background:rgba(34,197,94,.15);}
+.mi-am{background:rgba(245,158,11,.2);}
 .mod-info h4{font-size:14px;font-weight:600;}
 .mod-info p{font-size:11px;color:var(--muted);margin-top:1px;}
 .mod-code{margin-left:auto;font-size:10px;color:var(--yellow);font-weight:700;}
@@ -178,6 +181,12 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
     <div class="nav-tab" data-tab="teaching" onclick="switchTab('teaching')">
       <span class="ni">📚</span>教學資源
     </div>
+    <div class="nav-tab" data-tab="meridian" onclick="switchTab('meridian')">
+      <span class="ni">🎓</span>Meridian
+    </div>
+    <div class="nav-tab" data-tab="parent" onclick="switchTab('parent')">
+      <span class="ni">👨‍👩‍👧</span>家長端
+    </div>
     <div class="nav-tab" data-tab="skills" onclick="switchTab('skills')">
       <span class="ni">⭐</span>技能系統<span class="coming-chip">即將推出</span>
     </div>
@@ -212,116 +221,85 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
         <div class="sb-hdr-name">學生管理</div>
       </div>
       <nav class="sb-nav">
-        <div class="sb-item on" data-page="dashboard" onclick="switchPage('dashboard')">
-          <span class="si">🏠</span>總覽
-        </div>
-        <div class="sb-item" data-page="profile" onclick="switchPage('profile')">
-          <span class="si">👤</span>學生檔案
-          <span class="sb-badge bd-done">D-01</span>
-        </div>
-        <div class="sb-item" data-page="attendance" onclick="switchPage('attendance')">
-          <span class="si">📋</span>點名系統
-          <span class="sb-badge bd-done">D-02</span>
-        </div>
-        <div class="sb-item" data-page="markbook" onclick="switchPage('markbook')">
-          <span class="si">📒</span>成績冊
-          <span class="sb-badge bd-wip">D-03</span>
-        </div>
-        <div class="sb-item" data-page="scoreboard" onclick="switchPage('scoreboard')">
-          <span class="si">🏆</span>記分板
-          <span class="sb-badge bd-wip">D-04</span>
-        </div>
+        <div class="sb-item on" data-page="dashboard" onclick="switchPage('dashboard')"><span class="si">🏠</span>總覽</div>
+        <div class="sb-item" data-page="profile" onclick="switchPage('profile')"><span class="si">👤</span>學生檔案<span class="sb-badge bd-done">D-01</span></div>
+        <div class="sb-item" data-page="attendance" onclick="switchPage('attendance')"><span class="si">📋</span>點名系統<span class="sb-badge bd-done">D-02</span></div>
+        <div class="sb-item" data-page="markbook" onclick="switchPage('markbook')"><span class="si">📒</span>成績冊<span class="sb-badge bd-wip">D-03</span></div>
+        <div class="sb-item" data-page="scoreboard" onclick="switchPage('scoreboard')"><span class="si">🏆</span>記分板<span class="sb-badge bd-wip">D-04</span></div>
         <div class="sb-divider">管理</div>
-        <div class="sb-item" data-page="behavior" onclick="switchPage('behavior')">
-          <span class="si">⚙️</span>行為項目設定
-          <span class="sb-badge bd-done">D-06</span>
-        </div>
-        <div class="sb-item" data-page="importexport" onclick="switchPage('importexport')">
-          <span class="si">📁</span>匯入 / 匯出
-          <span class="sb-badge bd-wip">即將</span>
-        </div>
-        <div class="sb-item" data-page="permission" onclick="switchPage('permission')">
-          <span class="si">🔒</span>權限管理
-          <span class="sb-badge bd-wip">即將</span>
-        </div>
+        <div class="sb-item" data-page="behavior" onclick="switchPage('behavior')"><span class="si">⚙️</span>行為項目設定<span class="sb-badge bd-done">D-06</span></div>
+        <div class="sb-item" data-page="importexport" onclick="switchPage('importexport')"><span class="si">📁</span>匯入 / 匯出<span class="sb-badge bd-wip">即將</span></div>
+        <div class="sb-item" data-page="permission" onclick="switchPage('permission')"><span class="si">🔒</span>權限管理<span class="sb-badge bd-wip">即將</span></div>
       </nav>
     </div>
 
-    <!-- ── 教學資源 Sidebar（T-01 ~ T-05 全加入）── -->
+    <!-- 教學資源 T-01~T-09 -->
     <div class="sb-sec" id="sb-teaching">
       <div class="sb-hdr">
         <div class="sb-hdr-tag">TEACHING RESOURCES</div>
         <div class="sb-hdr-name">教學資源</div>
       </div>
       <nav class="sb-nav">
-        <div class="sb-item on" data-tpage="t-dashboard" onclick="switchTeachingPage('t-dashboard')">
-          <span class="si">🏠</span>總覽
-        </div>
-        <div class="sb-item" data-tpage="resource" onclick="switchTeachingPage('resource')">
-          <span class="si">📁</span>Resource
-          <span class="sb-badge bd-done">T-01</span>
-        </div>
-        <div class="sb-item" data-tpage="homework" onclick="switchTeachingPage('homework')">
-          <span class="si">📝</span>Homework
-          <span class="sb-badge bd-done">T-02</span>
-        </div>
-        <div class="sb-item" data-tpage="progress" onclick="switchTeachingPage('progress')">
-          <span class="si">📈</span>Progress
-          <span class="sb-badge bd-done">T-03</span>
-        </div>
-        <div class="sb-item" data-tpage="tgroup" onclick="switchTeachingPage('tgroup')">
-          <span class="si">👥</span>Group
-          <span class="sb-badge bd-done">T-04</span>
-        </div>
-        <div class="sb-item" data-tpage="analytics" onclick="switchTeachingPage('analytics')">
-          <span class="si">📊</span>Analytics
-          <span class="sb-badge bd-done">T-05</span>
-        </div>
+        <div class="sb-item on" data-tpage="t-dashboard" onclick="switchTeachingPage('t-dashboard')"><span class="si">🏠</span>總覽</div>
+        <div class="sb-item" data-tpage="resource" onclick="switchTeachingPage('resource')"><span class="si">📁</span>Resource<span class="sb-badge bd-done">T-01</span></div>
+        <div class="sb-item" data-tpage="homework" onclick="switchTeachingPage('homework')"><span class="si">📝</span>Homework<span class="sb-badge bd-done">T-02</span></div>
+        <div class="sb-item" data-tpage="progress" onclick="switchTeachingPage('progress')"><span class="si">📈</span>Progress<span class="sb-badge bd-done">T-03</span></div>
+        <div class="sb-item" data-tpage="tgroup" onclick="switchTeachingPage('tgroup')"><span class="si">👥</span>Group<span class="sb-badge bd-done">T-04</span></div>
+        <div class="sb-item" data-tpage="analytics" onclick="switchTeachingPage('analytics')"><span class="si">📊</span>Analytics<span class="sb-badge bd-done">T-05</span></div>
+        <div class="sb-item" data-tpage="timetable" onclick="switchTeachingPage('timetable')"><span class="si">🗓️</span>Timetable<span class="sb-badge bd-done">T-06</span></div>
+        <div class="sb-item" data-tpage="health" onclick="switchTeachingPage('health')"><span class="si">❤️</span>Health<span class="sb-badge bd-done">T-07</span></div>
+        <div class="sb-item" data-tpage="event" onclick="switchTeachingPage('event')"><span class="si">📅</span>Event<span class="sb-badge bd-done">T-08</span></div>
+        <div class="sb-divider">Staff Management</div>
+        <div class="sb-item" data-tpage="staff-analytics" onclick="switchTeachingPage('staff-analytics')"><span class="si">💼</span>Staff Analytics<span class="sb-badge bd-done">T-09</span></div>
       </nav>
     </div>
 
-    <!-- 技能 / AI：Coming Soon -->
-    <div class="sb-cs" id="sb-skills">
-      <div class="sb-cs-ico">⭐</div>
-      <p><strong style="color:var(--text)">技能系統</strong><br>即將推出</p>
-    </div>
-    <div class="sb-cs" id="sb-ai">
-      <div class="sb-cs-ico">🤖</div>
-      <p><strong style="color:var(--text)">AI 教練</strong><br>即將推出</p>
+    <!-- Meridian S-01~S-03 -->
+    <div class="sb-sec" id="sb-meridian">
+      <div class="sb-hdr">
+        <div class="sb-hdr-tag">MERIDIAN · STUDENT PORTAL</div>
+        <div class="sb-hdr-name">學生端</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-item on" data-mpage="m-dashboard" onclick="switchMeridianPage('m-dashboard')"><span class="si">🏠</span>總覽</div>
+        <div class="sb-item" data-mpage="retrace" onclick="switchMeridianPage('retrace')"><span class="si">⭐</span>Retrace<span class="sb-badge bd-done">S-01</span></div>
+        <div class="sb-item" data-mpage="echo" onclick="switchMeridianPage('echo')"><span class="si">🎤</span>Echo<span class="sb-badge bd-done">S-02</span></div>
+        <div class="sb-item" data-mpage="ease" onclick="switchMeridianPage('ease')"><span class="si">♿</span>Ease<span class="sb-badge bd-done">S-03</span></div>
+      </nav>
     </div>
 
-    <!-- 管理 Sidebar -->
+    <!-- Parent Portal P-01 -->
+    <div class="sb-sec" id="sb-parent">
+      <div class="sb-hdr">
+        <div class="sb-hdr-tag">PARENT PORTAL</div>
+        <div class="sb-hdr-name">家長端</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-item on" data-ppage="p-dashboard" onclick="switchParentPage('p-dashboard')"><span class="si">🏠</span>總覽</div>
+        <div class="sb-item" data-ppage="parents" onclick="switchParentPage('parents')"><span class="si">👨‍👩‍👧</span>家長總覽<span class="sb-badge bd-done">P-01</span></div>
+      </nav>
+    </div>
+
+    <!-- Coming Soon -->
+    <div class="sb-cs" id="sb-skills"><div class="sb-cs-ico">⭐</div><p><strong style="color:var(--text)">技能系統</strong><br>即將推出</p></div>
+    <div class="sb-cs" id="sb-ai"><div class="sb-cs-ico">🤖</div><p><strong style="color:var(--text)">AI 教練</strong><br>即將推出</p></div>
+
+    <!-- 管理 -->
     <div class="sb-sec" id="sb-admin">
       <div class="sb-hdr">
         <div class="sb-hdr-tag">SYSTEM ADMIN</div>
         <div class="sb-hdr-name">系統管理</div>
       </div>
       <nav class="sb-nav">
-        <div class="sb-item on" data-adminpage="admin-home" onclick="switchAdminPage('admin-home')">
-          <span class="si">🏠</span>管理總覽
-        </div>
+        <div class="sb-item on" data-adminpage="admin-home" onclick="switchAdminPage('admin-home')"><span class="si">🏠</span>管理總覽</div>
         <div class="sb-divider">功能模組</div>
-        <div class="sb-item" data-adminpage="admin-f02" onclick="switchAdminPage('admin-f02')">
-          <span class="si">🏫</span>學校管理
-          <span class="sb-badge bd-done">F-02</span>
-        </div>
-        <div class="sb-item" data-adminpage="admin-f03" onclick="switchAdminPage('admin-f03')">
-          <span class="si">🤖</span>AI 對話
-          <span class="sb-badge bd-wip">F-03</span>
-        </div>
-        <div class="sb-item" data-adminpage="admin-f04" onclick="switchAdminPage('admin-f04')">
-          <span class="si">🧩</span>示範 Skills
-          <span class="sb-badge bd-wip">F-04</span>
-        </div>
-        <div class="sb-item" data-adminpage="admin-f05" onclick="switchAdminPage('admin-f05')">
-          <span class="si">📊</span>用量及額度
-          <span class="sb-badge bd-wip">F-05</span>
-        </div>
+        <div class="sb-item" data-adminpage="admin-f02" onclick="switchAdminPage('admin-f02')"><span class="si">🏫</span>學校管理<span class="sb-badge bd-done">F-02</span></div>
+        <div class="sb-item" data-adminpage="admin-f03" onclick="switchAdminPage('admin-f03')"><span class="si">🤖</span>AI 對話<span class="sb-badge bd-wip">F-03</span></div>
+        <div class="sb-item" data-adminpage="admin-f04" onclick="switchAdminPage('admin-f04')"><span class="si">🧩</span>示範 Skills<span class="sb-badge bd-wip">F-04</span></div>
+        <div class="sb-item" data-adminpage="admin-f05" onclick="switchAdminPage('admin-f05')"><span class="si">📊</span>用量及額度<span class="sb-badge bd-wip">F-05</span></div>
       </nav>
       <div class="sb-logout">
-        <div class="sb-item sb-item-danger" onclick="adminLogout()">
-          <span class="si">🚪</span>登出管理
-        </div>
+        <div class="sb-item sb-item-danger" onclick="adminLogout()"><span class="si">🚪</span>登出管理</div>
       </div>
     </div>
 
@@ -348,7 +326,6 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 
 <div class="mob-overlay" id="mobOverlay" onclick="closeSidebar()"></div>
 
-<!-- 管理員登入 Modal -->
 <div class="mbg hide" id="m-adminLogin">
   <div class="mbox">
     <div class="mhdr">
@@ -357,21 +334,9 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
     </div>
     <p style="font-size:12px;color:var(--muted);margin-bottom:16px">管理功能（F-01 至 F-05）需要管理員身份驗證，一般教師帳號無法訪問。</p>
     <div class="login-err" id="loginErr">❌ 帳號或密碼錯誤，請重試</div>
-    <div class="ff">
-      <label>管理員電郵 *</label>
-      <input class="fi" type="email" id="loginEmail" placeholder="admin@cncs.edu.hk"
-             onkeydown="if(event.key==='Enter')doAdminLogin()">
-    </div>
-    <div class="ff">
-      <label>密碼 *</label>
-      <input class="fi" type="password" id="loginPwd" placeholder="••••••••"
-             onkeydown="if(event.key==='Enter')doAdminLogin()">
-    </div>
-    <div class="demo-cred">
-      <span style="color:var(--yellow);font-weight:700">🔑 示範帳號</span><br>
-      📧 admin@cncs.edu.hk<br>
-      🔒 Admin@2526
-    </div>
+    <div class="ff"><label>管理員電郵 *</label><input class="fi" type="email" id="loginEmail" placeholder="admin@cncs.edu.hk" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+    <div class="ff"><label>密碼 *</label><input class="fi" type="password" id="loginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+    <div class="demo-cred"><span style="color:var(--yellow);font-weight:700">🔑 示範帳號</span><br>📧 admin@cncs.edu.hk<br>🔒 Admin@2526</div>
     <div class="mbtns">
       <button class="btn btn-o" onclick="closeAdminLogin()">取消</button>
       <button class="btn btn-g" onclick="doAdminLogin()">🔐 登入管理</button>
@@ -383,24 +348,34 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 /* ── CONFIG ── */
 const IFRAME_PAGES = {
   // Student
-  profile:      { src:'Student/D_01_StudentProfile.html',        code:'D-01', label:'學生檔案',          ready:true  },
-  attendance:   { src:'Student/D_02_Attendance.html',            code:'D-02', label:'點名系統',          ready:true  },
-  markbook:     { src:'Student/D_03_MarkBook.html',              code:'D-03', label:'成績冊',            ready:true  },
-  scoreboard:   { src:'Student/D_04_ScoreBoard.html',            code:'D-04', label:'記分板',            ready:true  },
-  behavior:     { src:'Student/D_06_BehaviourItemSettings.html', code:'D-06', label:'行為項目設定',      ready:true  },
-  importexport: { src:'Student/D_M2_ImportExport.html',          code:'M-02', label:'匯入 / 匯出',       ready:false },
-  permission:   { src:'Student/D_M3_Permission.html',            code:'M-03', label:'權限管理',          ready:false },
-  // Teaching Resources（T-01 ~ T-05）
-  resource:     { src:'TeachingResources/T_01_Resource.html',    code:'T-01', label:'Resource',          ready:true  },
-  homework:     { src:'TeachingResources/T_02_Homework.html',    code:'T-02', label:'Homework',          ready:true  },
-  progress:     { src:'TeachingResources/T_03_Progress.html',    code:'T-03', label:'Progress',          ready:true  },
-  tgroup:       { src:'TeachingResources/T_04_Group.html',       code:'T-04', label:'Group',             ready:true  },
-  analytics:    { src:'TeachingResources/T_05_Analytics.html',   code:'T-05', label:'Analytics',         ready:true  },
+  profile:           { src:'Student/D_01_StudentProfile.html',        code:'D-01', label:'學生檔案',        ready:true  },
+  attendance:        { src:'Student/D_02_Attendance.html',            code:'D-02', label:'點名系統',        ready:true  },
+  markbook:          { src:'Student/D_03_MarkBook.html',              code:'D-03', label:'成績冊',          ready:true  },
+  scoreboard:        { src:'Student/D_04_ScoreBoard.html',            code:'D-04', label:'記分板',          ready:true  },
+  behavior:          { src:'Student/D_06_BehaviourItemSettings.html', code:'D-06', label:'行為項目設定',    ready:true  },
+  importexport:      { src:'Student/D_M2_ImportExport.html',          code:'M-02', label:'匯入 / 匯出',     ready:false },
+  permission:        { src:'Student/D_M3_Permission.html',            code:'M-03', label:'權限管理',        ready:false },
+  // Teaching
+  resource:          { src:'TeachingResources/T_01_Resource.html',    code:'T-01', label:'Resource',        ready:true  },
+  homework:          { src:'TeachingResources/T_02_Homework.html',    code:'T-02', label:'Homework',        ready:true  },
+  progress:          { src:'TeachingResources/T_03_Progress.html',    code:'T-03', label:'Progress',        ready:true  },
+  tgroup:            { src:'TeachingResources/T_04_Group.html',       code:'T-04', label:'Group',           ready:true  },
+  analytics:         { src:'TeachingResources/T_05_Analytics.html',   code:'T-05', label:'Analytics',       ready:true  },
+  timetable:         { src:'TeachingResources/T_06_Timetable',        code:'T-06', label:'Timetable',       ready:true  },
+  health:            { src:'TeachingResources/T_07_Health',           code:'T-07', label:'Health',          ready:true  },
+  event:             { src:'TeachingResources/T_08_Event',            code:'T-08', label:'Event',           ready:true  },
+  'staff-analytics': { src:'StaffManagement/T_09_Staff_Analytics',    code:'T-09', label:'Staff Analytics', ready:true  },
+  // Meridian
+  retrace:           { src:'Meridian/S_01_Retrace',                   code:'S-01', label:'Retrace · 錯題本', ready:true  },
+  echo:              { src:'Meridian/S_02_Echo',                      code:'S-02', label:'Echo · 口語練習',  ready:true  },
+  ease:              { src:'Meridian/S_03_Ease',                      code:'S-03', label:'Ease · SEN 支援',  ready:true  },
+  // Parent
+  parents:           { src:'ParentPortal/P_01_Parents',               code:'P-01', label:'家長總覽',         ready:true  },
   // Admin
-  'admin-f02':  { src:'Admin/F_02_SchoolManagement.html',        code:'F-02', label:'學校管理',          ready:true  },
-  'admin-f03':  { src:'Admin/F_03_AIChat.html',                  code:'F-03', label:'AI 對話',           ready:true  },
-  'admin-f04':  { src:'Admin/F_04_SkillLibrary.html',            code:'F-04', label:'示範 Skills',       ready:true  },
-  'admin-f05':  { src:'Admin/F_05_UsageQuota.html',              code:'F-05', label:'用量及額度',        ready:false },
+  'admin-f02':       { src:'Admin/F_02_SchoolManagement.html',        code:'F-02', label:'學校管理',         ready:true  },
+  'admin-f03':       { src:'Admin/F_03_AIChat.html',                  code:'F-03', label:'AI 對話',          ready:true  },
+  'admin-f04':       { src:'Admin/F_04_SkillLibrary.html',            code:'F-04', label:'示範 Skills',      ready:true  },
+  'admin-f05':       { src:'Admin/F_05_UsageQuota.html',              code:'F-05', label:'用量及額度',       ready:false },
 };
 
 const CS_PAGES = {
@@ -420,46 +395,40 @@ const TAB_CS = {
 let adminAuthed     = sessionStorage.getItem('adminAuthed') === '1';
 let curTab          = 'student';
 let curPage         = 'dashboard';
-let curAdminPage    = 'admin-home';
 let curTeachingPage = 't-dashboard';
+let curMeridianPage = 'm-dashboard';
+let curParentPage   = 'p-dashboard';
+let curAdminPage    = 'admin-home';
 
 /* ── VIEWS ── */
 function showView(v){
-  document.getElementById('dashboard-view').style.display = v==='dashboard' ? 'block' : 'none';
-  document.getElementById('iframe-view').style.display    = v==='iframe'    ? 'block' : 'none';
-  document.getElementById('cs-view').style.display        = v==='cs'        ? 'flex'  : 'none';
+  document.getElementById('dashboard-view').style.display = v==='dashboard'?'block':'none';
+  document.getElementById('iframe-view').style.display    = v==='iframe'   ?'block':'none';
+  document.getElementById('cs-view').style.display        = v==='cs'       ?'flex' :'none';
 }
 
 function loadIframe(page){
-  const cfg    = IFRAME_PAGES[page];
-  const frame  = document.getElementById('mainFrame');
-  const loader = document.getElementById('iframeLoader');
-  document.getElementById('loaderCode').textContent = cfg.code;
-  document.getElementById('loaderTxt').textContent  = `載入 ${cfg.label}…`;
-  loader.classList.remove('hide');
-  frame.src = '';
-  showView('iframe');
-  setTimeout(()=>{ frame.onload = ()=>loader.classList.add('hide'); frame.src = cfg.src; }, 120);
+  const cfg=IFRAME_PAGES[page],frame=document.getElementById('mainFrame'),loader=document.getElementById('iframeLoader');
+  document.getElementById('loaderCode').textContent=cfg.code;
+  document.getElementById('loaderTxt').textContent=`載入 ${cfg.label}…`;
+  loader.classList.remove('hide');frame.src='';showView('iframe');
+  setTimeout(()=>{frame.onload=()=>loader.classList.add('hide');frame.src=cfg.src;},120);
 }
 
-function showCS(ico, title, sub){
-  document.getElementById('csIco').textContent   = ico;
-  document.getElementById('csTitle').textContent = title;
-  document.getElementById('csSub').textContent   = sub;
+function showCS(ico,title,sub){
+  document.getElementById('csIco').textContent=ico;
+  document.getElementById('csTitle').textContent=title;
+  document.getElementById('csSub').textContent=sub;
   showView('cs');
 }
 
 /* ── STUDENT DASHBOARD ── */
 function buildDashboard(){
-  const d    = new Date();
-  const days = ['日','一','二','三','四','五','六'];
-  const ds   = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（星期${days[d.getDay()]}）`;
-  document.getElementById('dashboard-view').innerHTML = `
+  const d=new Date(),days=['日','一','二','三','四','五','六'];
+  const ds=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（星期${days[d.getDay()]}）`;
+  document.getElementById('dashboard-view').innerHTML=`
 <div class="breadcrumb"><span>學生</span><span>›</span><strong>總覽</strong></div>
-<div class="dash-hello">
-  <h1>你好，<em>李老師</em> 👋</h1>
-  <p>${ds} · 中二 2A 班主任</p>
-</div>
+<div class="dash-hello"><h1>你好，<em>李老師</em> 👋</h1><p>${ds} · 中二 2A 班主任</p></div>
 <div class="qs-grid">
   <div class="qs-card qc-g"><div class="qs-lbl">總學生人數</div><div class="qs-num" style="color:#4ADE80">15</div><div class="qs-sub">中二 2A</div><div class="qs-ico">👤</div></div>
   <div class="qs-card qc-y"><div class="qs-lbl">今日出席率</div><div class="qs-num" style="color:var(--yellow)">—</div><div class="qs-sub">點名未完成</div><div class="qs-ico">📋</div></div>
@@ -467,64 +436,35 @@ function buildDashboard(){
   <div class="qs-card qc-r"><div class="qs-lbl">需跟進個案</div><div class="qs-num" style="color:#FCA5A5">0</div><div class="qs-sub">今日</div><div class="qs-ico">⚑</div></div>
   <div class="qs-card qc-p"><div class="qs-lbl">家長通知待發</div><div class="qs-num" style="color:#C4B5FD">0</div><div class="qs-sub">待發送</div><div class="qs-ico">📞</div></div>
 </div>
-<div class="sec-ttl">功能模組</div>
+<div class="sec-ttl">學生管理模組</div>
 <div class="mod-grid">
-  <div class="mod-card" onclick="switchPage('profile')">
-    <div class="mod-row"><div class="mod-ico mi-g">👤</div><div class="mod-info"><h4>學生檔案</h4><p>個人資料管理</p></div><div class="mod-code">D-01</div></div>
-    <div class="mod-desc">學生個人資料、聯絡資訊、學業與行為記錄。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="switchPage('attendance')">
-    <div class="mod-row"><div class="mod-ico mi-g">📋</div><div class="mod-info"><h4>點名系統</h4><p>出席記錄</p></div><div class="mod-code">D-02</div></div>
-    <div class="mod-desc">上午 / 下午點名，六種出席狀態，備注、家長通知、鎖定。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card dim">
-    <div class="mod-row"><div class="mod-ico mi-b">📒</div><div class="mod-info"><h4>成績冊</h4><p>學科成績管理</p></div><div class="mod-code">D-03</div></div>
-    <div class="mod-desc">學科成績記錄、測驗分數、科目評分管理。</div>
-    <span class="mod-pill pill-wip">⋯ 開發中</span>
-  </div>
-  <div class="mod-card dim">
-    <div class="mod-row"><div class="mod-ico mi-y">🏆</div><div class="mod-info"><h4>記分板</h4><p>行為積分管理</p></div><div class="mod-code">D-04</div></div>
-    <div class="mod-desc">行為積分記錄、獎懲排行榜、積分統計報告。</div>
-    <span class="mod-pill pill-wip">⋯ 開發中</span>
-  </div>
-</div>
-<div class="sec-ttl">管理模組</div>
-<div class="mod-grid">
-  <div class="mod-card" onclick="switchPage('behavior')">
-    <div class="mod-row"><div class="mod-ico mi-g">⚙️</div><div class="mod-info"><h4>行為項目設定</h4><p>管理員設定</p></div><div class="mod-code">D-06</div></div>
-    <div class="mod-desc">管理員統一設定行為類別與分數，老師揀選即自動帶出，全校統一標準。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
+  <div class="mod-card" onclick="switchPage('profile')"><div class="mod-row"><div class="mod-ico mi-g">👤</div><div class="mod-info"><h4>學生檔案</h4><p>個人資料管理</p></div><div class="mod-code">D-01</div></div><div class="mod-desc">學生個人資料、聯絡資訊、學業與行為記錄。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchPage('attendance')"><div class="mod-row"><div class="mod-ico mi-g">📋</div><div class="mod-info"><h4>點名系統</h4><p>出席記錄</p></div><div class="mod-code">D-02</div></div><div class="mod-desc">上午 / 下午點名，六種出席狀態，備注、家長通知、鎖定。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card dim"><div class="mod-row"><div class="mod-ico mi-b">📒</div><div class="mod-info"><h4>成績冊</h4><p>學科成績管理</p></div><div class="mod-code">D-03</div></div><div class="mod-desc">學科成績記錄、測驗分數、科目評分管理。</div><span class="mod-pill pill-wip">⋯ 開發中</span></div>
+  <div class="mod-card dim"><div class="mod-row"><div class="mod-ico mi-y">🏆</div><div class="mod-info"><h4>記分板</h4><p>行為積分管理</p></div><div class="mod-code">D-04</div></div><div class="mod-desc">行為積分記錄、獎懲排行榜、積分統計報告。</div><span class="mod-pill pill-wip">⋯ 開發中</span></div>
+  <div class="mod-card" onclick="switchPage('behavior')"><div class="mod-row"><div class="mod-ico mi-g">⚙️</div><div class="mod-info"><h4>行為項目設定</h4><p>管理員設定</p></div><div class="mod-code">D-06</div></div><div class="mod-desc">管理員統一設定行為類別與分數，老師揀選即自動帶出，全校統一標準。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
 </div>
 <div class="sec-ttl">教學資源模組</div>
-<div class="mod-grid" style="margin-bottom:22px">
-  <div class="mod-card" onclick="goTeaching('resource')">
-    <div class="mod-row"><div class="mod-ico mi-g">📁</div><div class="mod-info"><h4>Resource</h4><p>教材資源庫</p></div><div class="mod-code">T-01</div></div>
-    <div class="mod-desc">教學材料、課件及參考資料集中管理。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="goTeaching('homework')">
-    <div class="mod-row"><div class="mod-ico mi-b">📝</div><div class="mod-info"><h4>Homework</h4><p>功課管理</p></div><div class="mod-code">T-02</div></div>
-    <div class="mod-desc">功課派發、完成狀況追蹤、批改記錄。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="goTeaching('progress')">
-    <div class="mod-row"><div class="mod-ico mi-y">📈</div><div class="mod-info"><h4>Progress</h4><p>進度追蹤</p></div><div class="mod-code">T-03</div></div>
-    <div class="mod-desc">課程進度記錄、學習里程碑、目標達成率。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="goTeaching('tgroup')">
-    <div class="mod-row"><div class="mod-ico mi-p">👥</div><div class="mod-info"><h4>Group</h4><p>小組管理</p></div><div class="mod-code">T-04</div></div>
-    <div class="mod-desc">學習小組分配、組別管理、協作記錄。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="goTeaching('analytics')">
-    <div class="mod-row"><div class="mod-ico mi-t">📊</div><div class="mod-info"><h4>Analytics</h4><p>學情報告與數據分析</p></div><div class="mod-code">T-05</div></div>
-    <div class="mod-desc">整合出席率、成績、功課完成率，個人 / 小組 / 全班報告，PDF / Excel 導出。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
+<div class="mod-grid">
+  <div class="mod-card" onclick="goTeaching('resource')"><div class="mod-row"><div class="mod-ico mi-g">📁</div><div class="mod-info"><h4>Resource</h4><p>教材資源庫</p></div><div class="mod-code">T-01</div></div><div class="mod-desc">教學材料、課件及參考資料集中管理。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goTeaching('homework')"><div class="mod-row"><div class="mod-ico mi-b">📝</div><div class="mod-info"><h4>Homework</h4><p>功課管理</p></div><div class="mod-code">T-02</div></div><div class="mod-desc">功課派發、完成狀況追蹤、批改記錄。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goTeaching('progress')"><div class="mod-row"><div class="mod-ico mi-y">📈</div><div class="mod-info"><h4>Progress</h4><p>進度追蹤</p></div><div class="mod-code">T-03</div></div><div class="mod-desc">課程進度記錄、學習里程碑、目標達成率。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goTeaching('tgroup')"><div class="mod-row"><div class="mod-ico mi-p">👥</div><div class="mod-info"><h4>Group</h4><p>小組管理</p></div><div class="mod-code">T-04</div></div><div class="mod-desc">學習小組分配、組別管理、協作記錄。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goTeaching('analytics')"><div class="mod-row"><div class="mod-ico mi-t">📊</div><div class="mod-info"><h4>Analytics</h4><p>學情報告</p></div><div class="mod-code">T-05</div></div><div class="mod-desc">整合出席率、成績、功課完成率，個人 / 全班報告，PDF / Excel 導出。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goTeaching('timetable')"><div class="mod-row"><div class="mod-ico mi-b">🗓️</div><div class="mod-info"><h4>Timetable</h4><p>時間表</p></div><div class="mod-code">T-06</div></div><div class="mod-desc">課節安排與日程管理。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goTeaching('health')"><div class="mod-row"><div class="mod-ico mi-r">❤️</div><div class="mod-info"><h4>Health</h4><p>健康記錄</p></div><div class="mod-code">T-07</div></div><div class="mod-desc">SEN 輔助使用記錄及 IEP 跟進。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goTeaching('event')"><div class="mod-row"><div class="mod-ico mi-y">📅</div><div class="mod-info"><h4>Event</h4><p>活動管理</p></div><div class="mod-code">T-08</div></div><div class="mod-desc">校內活動籌備與通知發佈。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goTeaching('staff-analytics')"><div class="mod-row"><div class="mod-ico mi-mu">💼</div><div class="mod-info"><h4>Staff Analytics</h4><p>員工數據分析</p></div><div class="mod-code">T-09</div></div><div class="mod-desc">教職員表現與出勤數據總覽。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>
+<div class="sec-ttl">Meridian 學生端</div>
+<div class="mod-grid">
+  <div class="mod-card" onclick="goMeridian('retrace')"><div class="mod-row"><div class="mod-ico mi-em">⭐</div><div class="mod-info"><h4>Retrace</h4><p>錯題本 · 學習路徑</p></div><div class="mod-code">S-01</div></div><div class="mod-desc">Spaced Repetition 三級掌握追蹤，答錯後解說解鎖，個人進度雷達圖。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goMeridian('echo')"><div class="mod-row"><div class="mod-ico mi-b">🎤</div><div class="mod-info"><h4>Echo</h4><p>口語練習</p></div><div class="mod-code">S-02</div></div><div class="mod-desc">朗讀流暢度比對、對話關鍵詞匹配，支援英語、普通話及廣東話。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="goMeridian('ease')"><div class="mod-row"><div class="mod-ico mi-p">♿</div><div class="mod-info"><h4>Ease</h4><p>SEN 讀寫障礙支援</p></div><div class="mod-code">S-03</div></div><div class="mod-desc">TTS 朗讀、聚焦閱讀條、OpenDyslexic 字型、語音輸入、IEP 整合。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>
+<div class="sec-ttl">家長端</div>
+<div class="mod-grid">
+  <div class="mod-card" onclick="goParent('parents')"><div class="mod-row"><div class="mod-ico mi-am">👨‍👩‍👧</div><div class="mod-info"><h4>家長總覽</h4><p>Parents</p></div><div class="mod-code">P-01</div></div><div class="mod-desc">子女學習進度、出勤記錄、通知及家校聯繫。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
 </div>
 <div class="sec-ttl">開發進度</div>
 <div class="act-card">
@@ -534,219 +474,226 @@ function buildDashboard(){
   <div class="act-row"><div class="act-ico" style="background:rgba(245,197,24,.1)">🚧</div><div class="act-bd"><strong>D-04 記分板</strong><span>行為積分記錄、獎懲排行榜、積分統計</span></div><span class="act-time">開發中</span></div>
   <div class="act-row"><div class="act-ico" style="background:rgba(139,92,246,.1)">🔮</div><div class="act-bd"><strong>D-05（功能待定）</strong><span>模組尚未規劃</span></div><span class="act-time" style="color:#C4B5FD">待確定</span></div>
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>D-06 行為項目設定</strong><span>管理員統一設定行為類別與分數</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
-  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-01 Resource</strong><span>教材資源庫，集中管理課件及參考資料</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
-  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-02 Homework</strong><span>功課派發、完成狀況追蹤、批改記錄</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
-  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-03 Progress</strong><span>課程進度記錄、學習里程碑、目標達成率</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
-  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-04 Group</strong><span>學習小組分配、組別管理、協作記錄</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
-  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-05 Analytics</strong><span>整合出席、成績、功課完成率，個人 / 小組 / 全班報告，PDF / Excel 導出，預警自動標記</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-01 ~ T-05 教學資源</strong><span>Resource / Homework / Progress / Group / Analytics</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-06 Timetable · T-07 Health · T-08 Event</strong><span>時間表、健康記錄、活動管理</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-09 Staff Analytics</strong><span>員工數據分析，StaffManagement 資料夾</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>S-01 Retrace · S-02 Echo · S-03 Ease</strong><span>Meridian 學生端：錯題本、口語練習、SEN 支援</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>P-01 家長總覽</strong><span>ParentPortal 家長端</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
 </div>`;
   showView('dashboard');
 }
 
 /* ── TEACHING DASHBOARD ── */
 function buildTeachingDashboard(){
-  document.getElementById('dashboard-view').innerHTML = `
+  document.getElementById('dashboard-view').innerHTML=`
 <div class="breadcrumb"><span>教學資源</span><span>›</span><strong>總覽</strong></div>
-<div class="dash-hello">
-  <h1>教學資源 <em>T-01 ～ T-05</em> 📚</h1>
-  <p>TeachingResources · 五個模組，全部可用</p>
-</div>
+<div class="dash-hello"><h1>教學資源 <em>T-01 ～ T-09</em> 📚</h1><p>TeachingResources + StaffManagement · 九個模組，全部可用</p></div>
 <div class="qs-grid">
-  <div class="qs-card qc-g"><div class="qs-lbl">已完成模組</div><div class="qs-num" style="color:#4ADE80">5</div><div class="qs-sub">T-01 ~ T-05</div><div class="qs-ico">✅</div></div>
+  <div class="qs-card qc-g"><div class="qs-lbl">已完成模組</div><div class="qs-num" style="color:#4ADE80">9</div><div class="qs-sub">T-01 ~ T-09</div><div class="qs-ico">✅</div></div>
   <div class="qs-card qc-b"><div class="qs-lbl">開發中模組</div><div class="qs-num" style="color:#93C5FD">0</div><div class="qs-sub">全部可用</div><div class="qs-ico">🚧</div></div>
 </div>
-<div class="sec-ttl">所有模組</div>
+<div class="sec-ttl">教學資源 (T-01 ~ T-08)</div>
+<div class="mod-grid">
+  <div class="mod-card" onclick="switchTeachingPage('resource')"><div class="mod-row"><div class="mod-ico mi-g">📁</div><div class="mod-info"><h4>Resource</h4><p>教材資源庫</p></div><div class="mod-code">T-01</div></div><div class="mod-desc">教學材料、課件及參考資料集中管理。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchTeachingPage('homework')"><div class="mod-row"><div class="mod-ico mi-b">📝</div><div class="mod-info"><h4>Homework</h4><p>功課管理</p></div><div class="mod-code">T-02</div></div><div class="mod-desc">功課派發、完成狀況追蹤、批改記錄。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchTeachingPage('progress')"><div class="mod-row"><div class="mod-ico mi-y">📈</div><div class="mod-info"><h4>Progress</h4><p>進度追蹤</p></div><div class="mod-code">T-03</div></div><div class="mod-desc">課程進度記錄、學習里程碑、目標達成率。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchTeachingPage('tgroup')"><div class="mod-row"><div class="mod-ico mi-p">👥</div><div class="mod-info"><h4>Group</h4><p>小組管理</p></div><div class="mod-code">T-04</div></div><div class="mod-desc">學習小組分配、組別管理、協作記錄。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchTeachingPage('analytics')"><div class="mod-row"><div class="mod-ico mi-t">📊</div><div class="mod-info"><h4>Analytics</h4><p>學情報告與數據分析</p></div><div class="mod-code">T-05</div></div><div class="mod-desc">整合出席率、成績、功課完成率，個人 / 小組 / 全班報告，PDF / Excel 導出。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchTeachingPage('timetable')"><div class="mod-row"><div class="mod-ico mi-b">🗓️</div><div class="mod-info"><h4>Timetable</h4><p>時間表</p></div><div class="mod-code">T-06</div></div><div class="mod-desc">課節安排與日程管理。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchTeachingPage('health')"><div class="mod-row"><div class="mod-ico mi-r">❤️</div><div class="mod-info"><h4>Health</h4><p>健康記錄</p></div><div class="mod-code">T-07</div></div><div class="mod-desc">SEN 輔助使用記錄及 IEP 跟進。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchTeachingPage('event')"><div class="mod-row"><div class="mod-ico mi-y">📅</div><div class="mod-info"><h4>Event</h4><p>活動管理</p></div><div class="mod-code">T-08</div></div><div class="mod-desc">校內活動籌備與通知發佈。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>
+<div class="sec-ttl">員工管理 (T-09)</div>
 <div class="mod-grid" style="margin-bottom:0">
-  <div class="mod-card" onclick="switchTeachingPage('resource')">
-    <div class="mod-row"><div class="mod-ico mi-g">📁</div><div class="mod-info"><h4>Resource</h4><p>教材資源庫</p></div><div class="mod-code">T-01</div></div>
-    <div class="mod-desc">教學材料、課件及參考資料集中管理。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="switchTeachingPage('homework')">
-    <div class="mod-row"><div class="mod-ico mi-b">📝</div><div class="mod-info"><h4>Homework</h4><p>功課管理</p></div><div class="mod-code">T-02</div></div>
-    <div class="mod-desc">功課派發、完成狀況追蹤、批改記錄。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="switchTeachingPage('progress')">
-    <div class="mod-row"><div class="mod-ico mi-y">📈</div><div class="mod-info"><h4>Progress</h4><p>進度追蹤</p></div><div class="mod-code">T-03</div></div>
-    <div class="mod-desc">課程進度記錄、學習里程碑、目標達成率。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="switchTeachingPage('tgroup')">
-    <div class="mod-row"><div class="mod-ico mi-p">👥</div><div class="mod-info"><h4>Group</h4><p>小組管理</p></div><div class="mod-code">T-04</div></div>
-    <div class="mod-desc">學習小組分配、組別管理、協作記錄。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card" onclick="switchTeachingPage('analytics')">
-    <div class="mod-row"><div class="mod-ico mi-t">📊</div><div class="mod-info"><h4>Analytics</h4><p>學情報告與數據分析</p></div><div class="mod-code">T-05</div></div>
-    <div class="mod-desc">整合出席率、成績、功課完成率，個人 / 小組 / 全班報告，PDF / Excel 導出。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
+  <div class="mod-card" onclick="switchTeachingPage('staff-analytics')"><div class="mod-row"><div class="mod-ico mi-mu">💼</div><div class="mod-info"><h4>Staff Analytics</h4><p>員工數據分析</p></div><div class="mod-code">T-09</div></div><div class="mod-desc">教職員表現與出勤數據總覽，StaffManagement 資料夾。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>`;
+  showView('dashboard');
+}
+
+/* ── MERIDIAN DASHBOARD ── */
+function buildMeridianDashboard(){
+  document.getElementById('dashboard-view').innerHTML=`
+<div class="breadcrumb"><span>Meridian</span><span>›</span><strong>學生端總覽</strong></div>
+<div class="dash-hello"><h1>Meridian <em>學生端</em> 🎓</h1><p>S_01_Retrace · S_02_Echo · S_03_Ease · 三個模組全數完成</p></div>
+<div class="qs-grid">
+  <div class="qs-card qc-g"><div class="qs-lbl">已完成模組</div><div class="qs-num" style="color:#4ADE80">3</div><div class="qs-sub">S-01 ~ S-03</div><div class="qs-ico">✅</div></div>
+  <div class="qs-card qc-y"><div class="qs-lbl">AI 升級路徑</div><div class="qs-num" style="color:var(--yellow)">3</div><div class="qs-sub">可選配，獨立啟用</div><div class="qs-ico">🤖</div></div>
+  <div class="qs-card qc-b"><div class="qs-lbl">支援語言</div><div class="qs-num" style="color:#93C5FD">3</div><div class="qs-sub">英 · 普 · 粵</div><div class="qs-ico">🌐</div></div>
+</div>
+<div class="sec-ttl">Meridian 模組</div>
+<div class="mod-grid" style="margin-bottom:0">
+  <div class="mod-card" onclick="switchMeridianPage('retrace')"><div class="mod-row"><div class="mod-ico mi-em">⭐</div><div class="mod-info"><h4>Retrace</h4><p>錯題本 · 學習路徑</p></div><div class="mod-code">S-01</div></div><div class="mod-desc">Spaced Repetition 三級掌握追蹤，答錯後解說解鎖，個人進度雷達圖。老師預設題庫與解說，不依賴 AI。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchMeridianPage('echo')"><div class="mod-row"><div class="mod-ico mi-b">🎤</div><div class="mod-info"><h4>Echo</h4><p>口語練習</p></div><div class="mod-code">S-02</div></div><div class="mod-desc">朗讀流暢度比對、對話關鍵詞匹配，支援英語、普通話及廣東話（實驗性），全瀏覽器原生運行。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchMeridianPage('ease')"><div class="mod-row"><div class="mod-ico mi-p">♿</div><div class="mod-info"><h4>Ease</h4><p>SEN 讀寫障礙支援</p></div><div class="mod-code">S-03</div></div><div class="mod-desc">TTS 朗讀、聚焦閱讀條、OpenDyslexic 字型、語音輸入答題，IEP 整合自動預設輔助模式。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>`;
+  showView('dashboard');
+}
+
+/* ── PARENT DASHBOARD ── */
+function buildParentDashboard(){
+  document.getElementById('dashboard-view').innerHTML=`
+<div class="breadcrumb"><span>家長端</span><span>›</span><strong>總覽</strong></div>
+<div class="dash-hello"><h1>家長端 <em>ParentPortal</em> 👨‍👩‍👧</h1><p>P_01_Parents · 子女學習進度、出勤及通知</p></div>
+<div class="qs-grid">
+  <div class="qs-card qc-g"><div class="qs-lbl">已完成模組</div><div class="qs-num" style="color:#4ADE80">1</div><div class="qs-sub">P-01</div><div class="qs-ico">✅</div></div>
+  <div class="qs-card qc-y"><div class="qs-lbl">待規劃模組</div><div class="qs-num" style="color:var(--yellow)">—</div><div class="qs-sub">P-02 以後</div><div class="qs-ico">🔮</div></div>
+</div>
+<div class="sec-ttl">家長端模組</div>
+<div class="mod-grid" style="margin-bottom:0">
+  <div class="mod-card" onclick="switchParentPage('parents')"><div class="mod-row"><div class="mod-ico mi-am">👨‍👩‍👧</div><div class="mod-info"><h4>家長總覽</h4><p>Parents</p></div><div class="mod-code">P-01</div></div><div class="mod-desc">子女學習進度、出勤記錄、通知及家校聯繫。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
 </div>`;
   showView('dashboard');
 }
 
 /* ── ADMIN DASHBOARD ── */
 function buildAdminDashboard(){
-  document.getElementById('dashboard-view').innerHTML = `
+  document.getElementById('dashboard-view').innerHTML=`
 <div class="breadcrumb"><span>管理</span><span>›</span><strong>管理總覽</strong></div>
-<div class="dash-hello">
-  <h1>管理系統 <em>F-01 ～ F-05</em> ⚙️</h1>
-  <p>已登入為系統管理員 · 陳南昌紀念學校</p>
-</div>
+<div class="dash-hello"><h1>管理系統 <em>F-01 ～ F-05</em> ⚙️</h1><p>已登入為系統管理員 · 陳南昌紀念學校</p></div>
 <div class="sec-ttl">系統功能模組</div>
 <div class="mod-grid">
-  <div class="mod-card" onclick="switchAdminPage('admin-f02')">
-    <div class="mod-row"><div class="mod-ico mi-g">🏫</div><div class="mod-info"><h4>學校管理</h4><p>教師、學生、班別、學年</p></div><div class="mod-code">F-02</div></div>
-    <div class="mod-desc">管理全校教職員及學生帳戶，設定班別及學年，停用帳戶即時生效。</div>
-    <span class="mod-pill pill-done">✅ 已完成</span>
-  </div>
-  <div class="mod-card dim">
-    <div class="mod-row"><div class="mod-ico mi-b">🤖</div><div class="mod-info"><h4>AI 對話</h4><p>AI 對話介面</p></div><div class="mod-code">F-03</div></div>
-    <div class="mod-desc">AI 對話介面，學生 / 教師互動問答。</div>
-    <span class="mod-pill pill-wip">⋯ 開發中</span>
-  </div>
-  <div class="mod-card dim">
-    <div class="mod-row"><div class="mod-ico mi-y">🧩</div><div class="mod-info"><h4>示範 Skills</h4><p>全平台 Skill 庫</p></div><div class="mod-code">F-04</div></div>
-    <div class="mod-desc">約 10 個示範 Skills，無需重新部署即時更新。</div>
-    <span class="mod-pill pill-wip">⋯ 開發中</span>
-  </div>
-  <div class="mod-card dim">
-    <div class="mod-row"><div class="mod-ico mi-r">📊</div><div class="mod-info"><h4>用量及額度</h4><p>Token 上限及帳單</p></div><div class="mod-code">F-05</div></div>
-    <div class="mod-desc">每校 / 每人 Token 上限，用量報表，超額即時停用，帳單誤差 &lt;5%。</div>
-    <span class="mod-pill pill-wip">⋯ 開發中</span>
-  </div>
+  <div class="mod-card" onclick="switchAdminPage('admin-f02')"><div class="mod-row"><div class="mod-ico mi-g">🏫</div><div class="mod-info"><h4>學校管理</h4><p>教師、學生、班別、學年</p></div><div class="mod-code">F-02</div></div><div class="mod-desc">管理全校教職員及學生帳戶，設定班別及學年，停用帳戶即時生效。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card dim"><div class="mod-row"><div class="mod-ico mi-b">🤖</div><div class="mod-info"><h4>AI 對話</h4><p>AI 對話介面</p></div><div class="mod-code">F-03</div></div><div class="mod-desc">AI 對話介面，學生 / 教師互動問答。</div><span class="mod-pill pill-wip">⋯ 開發中</span></div>
+  <div class="mod-card dim"><div class="mod-row"><div class="mod-ico mi-y">🧩</div><div class="mod-info"><h4>示範 Skills</h4><p>全平台 Skill 庫</p></div><div class="mod-code">F-04</div></div><div class="mod-desc">約 10 個示範 Skills，無需重新部署即時更新。</div><span class="mod-pill pill-wip">⋯ 開發中</span></div>
+  <div class="mod-card dim"><div class="mod-row"><div class="mod-ico mi-r">📊</div><div class="mod-info"><h4>用量及額度</h4><p>Token 上限及帳單</p></div><div class="mod-code">F-05</div></div><div class="mod-desc">每校 / 每人 Token 上限，用量報表，超額即時停用。</div><span class="mod-pill pill-wip">⋯ 開發中</span></div>
 </div>`;
   showView('dashboard');
 }
 
 /* ── TAB NAVIGATION ── */
 function switchTab(tab){
-  if(tab === 'admin' && !adminAuthed){ showAdminLogin(); return; }
-  curTab = tab;
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
-  ['student','teaching','skills','ai','admin'].forEach(s=>{
-    const el = document.getElementById('sb-'+s);
-    if(!el) return;
+  if(tab==='admin'&&!adminAuthed){showAdminLogin();return;}
+  curTab=tab;
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  ['student','teaching','meridian','parent','skills','ai','admin'].forEach(s=>{
+    const el=document.getElementById('sb-'+s);if(!el)return;
     el.classList.remove('on');
-    if(el.classList.contains('sb-cs')) el.style.display = 'none';
+    if(el.classList.contains('sb-cs'))el.style.display='none';
   });
-  const target = document.getElementById('sb-'+tab);
-  if(target){
-    if(target.classList.contains('sb-cs')) target.style.display = 'flex';
-    else target.classList.add('on');
-  }
-  if(tab === 'student')       renderStudentPage(curPage);
-  else if(tab === 'teaching') renderTeachingPage(curTeachingPage);
-  else if(tab === 'admin')    renderAdminPage(curAdminPage);
-  else{ const cs=TAB_CS[tab]; showCS(cs.ico, cs.title, cs.sub); }
+  const target=document.getElementById('sb-'+tab);
+  if(target){if(target.classList.contains('sb-cs'))target.style.display='flex';else target.classList.add('on');}
+  if(tab==='student')      renderStudentPage(curPage);
+  else if(tab==='teaching')renderTeachingPage(curTeachingPage);
+  else if(tab==='meridian')renderMeridianPage(curMeridianPage);
+  else if(tab==='parent')  renderParentPage(curParentPage);
+  else if(tab==='admin')   renderAdminPage(curAdminPage);
+  else{const cs=TAB_CS[tab];showCS(cs.ico,cs.title,cs.sub);}
   closeSidebar();
 }
 
 /* ── STUDENT ROUTING ── */
 function switchPage(page){
-  curPage = page;
-  document.querySelectorAll('#sb-student .sb-item').forEach(i=>i.classList.toggle('on', i.dataset.page===page));
-  renderStudentPage(page);
-  closeSidebar();
+  curPage=page;
+  document.querySelectorAll('#sb-student .sb-item').forEach(i=>i.classList.toggle('on',i.dataset.page===page));
+  renderStudentPage(page);closeSidebar();
 }
 function renderStudentPage(page){
-  if(page === 'dashboard'){ buildDashboard(); return; }
-  const cfg = IFRAME_PAGES[page];
-  if(cfg && cfg.ready){ loadIframe(page); return; }
-  const cs = CS_PAGES[page];
-  if(cs){ showCS(cs.ico, cs.title, cs.sub); return; }
-  if(cfg){ showCS('🚧', cfg.label, `${cfg.code} · ${cfg.label}，開發中，敬請期待。`); }
+  if(page==='dashboard'){buildDashboard();return;}
+  const cfg=IFRAME_PAGES[page];
+  if(cfg&&cfg.ready){loadIframe(page);return;}
+  const cs=CS_PAGES[page];if(cs){showCS(cs.ico,cs.title,cs.sub);return;}
+  if(cfg)showCS('🚧',cfg.label,`${cfg.code} · ${cfg.label}，開發中，敬請期待。`);
 }
 
 /* ── TEACHING ROUTING ── */
-function goTeaching(page){
-  curTeachingPage = page;
-  switchTab('teaching');
-}
+function goTeaching(page){curTeachingPage=page;switchTab('teaching');}
 function switchTeachingPage(page){
-  curTeachingPage = page;
-  document.querySelectorAll('#sb-teaching .sb-item[data-tpage]').forEach(i=>
-    i.classList.toggle('on', i.dataset.tpage===page)
-  );
-  renderTeachingPage(page);
-  closeSidebar();
+  curTeachingPage=page;
+  document.querySelectorAll('#sb-teaching .sb-item[data-tpage]').forEach(i=>i.classList.toggle('on',i.dataset.tpage===page));
+  renderTeachingPage(page);closeSidebar();
 }
 function renderTeachingPage(page){
-  if(page === 't-dashboard'){ buildTeachingDashboard(); return; }
-  const cfg = IFRAME_PAGES[page];
-  if(cfg && cfg.ready){ loadIframe(page); return; }
-  const cs = CS_PAGES[page];
-  if(cs){ showCS(cs.ico, cs.title, cs.sub); return; }
-  if(cfg){ showCS('🚧', cfg.label, `${cfg.code} · ${cfg.label}，開發中，敬請期待。`); }
+  if(page==='t-dashboard'){buildTeachingDashboard();return;}
+  const cfg=IFRAME_PAGES[page];
+  if(cfg&&cfg.ready){loadIframe(page);return;}
+  const cs=CS_PAGES[page];if(cs){showCS(cs.ico,cs.title,cs.sub);return;}
+  if(cfg)showCS('🚧',cfg.label,`${cfg.code} · ${cfg.label}，開發中，敬請期待。`);
+}
+
+/* ── MERIDIAN ROUTING ── */
+function goMeridian(page){curMeridianPage=page;switchTab('meridian');}
+function switchMeridianPage(page){
+  curMeridianPage=page;
+  document.querySelectorAll('#sb-meridian .sb-item[data-mpage]').forEach(i=>i.classList.toggle('on',i.dataset.mpage===page));
+  renderMeridianPage(page);closeSidebar();
+}
+function renderMeridianPage(page){
+  document.querySelectorAll('#sb-meridian .sb-item[data-mpage]').forEach(i=>i.classList.toggle('on',i.dataset.mpage===page));
+  if(page==='m-dashboard'){buildMeridianDashboard();return;}
+  const cfg=IFRAME_PAGES[page];
+  if(cfg&&cfg.ready){loadIframe(page);return;}
+  showCS('🚧',cfg?cfg.label:page,'開發中，敬請期待。');
+}
+
+/* ── PARENT ROUTING ── */
+function goParent(page){curParentPage=page;switchTab('parent');}
+function switchParentPage(page){
+  curParentPage=page;
+  document.querySelectorAll('#sb-parent .sb-item[data-ppage]').forEach(i=>i.classList.toggle('on',i.dataset.ppage===page));
+  renderParentPage(page);closeSidebar();
+}
+function renderParentPage(page){
+  document.querySelectorAll('#sb-parent .sb-item[data-ppage]').forEach(i=>i.classList.toggle('on',i.dataset.ppage===page));
+  if(page==='p-dashboard'){buildParentDashboard();return;}
+  const cfg=IFRAME_PAGES[page];
+  if(cfg&&cfg.ready){loadIframe(page);return;}
+  showCS('🚧',cfg?cfg.label:page,'開發中，敬請期待。');
 }
 
 /* ── ADMIN ROUTING ── */
 function switchAdminPage(page){
-  curAdminPage = page;
-  document.querySelectorAll('#sb-admin .sb-item[data-adminpage]').forEach(i=>
-    i.classList.toggle('on', i.dataset.adminpage===page)
-  );
-  renderAdminPage(page);
-  closeSidebar();
+  curAdminPage=page;
+  document.querySelectorAll('#sb-admin .sb-item[data-adminpage]').forEach(i=>i.classList.toggle('on',i.dataset.adminpage===page));
+  renderAdminPage(page);closeSidebar();
 }
 function renderAdminPage(page){
-  if(page === 'admin-home'){ buildAdminDashboard(); return; }
-  const cfg = IFRAME_PAGES[page];
-  if(cfg && cfg.ready){ loadIframe(page); return; }
-  const cs = CS_PAGES[page];
-  if(cs){ showCS(cs.ico, cs.title, cs.sub); return; }
-  if(cfg){ showCS('🚧', cfg.label, `${cfg.code} · ${cfg.label}，準備中。`); }
+  if(page==='admin-home'){buildAdminDashboard();return;}
+  const cfg=IFRAME_PAGES[page];
+  if(cfg&&cfg.ready){loadIframe(page);return;}
+  const cs=CS_PAGES[page];if(cs){showCS(cs.ico,cs.title,cs.sub);return;}
+  if(cfg)showCS('🚧',cfg.label,`${cfg.code} · ${cfg.label}，準備中。`);
 }
 
 /* ── ADMIN AUTH ── */
 function showAdminLogin(){
-  document.getElementById('loginErr').style.display = 'none';
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPwd').value   = '';
+  document.getElementById('loginErr').style.display='none';
+  document.getElementById('loginEmail').value='';document.getElementById('loginPwd').value='';
   document.getElementById('m-adminLogin').classList.remove('hide');
-  setTimeout(()=>document.getElementById('loginEmail').focus(), 100);
+  setTimeout(()=>document.getElementById('loginEmail').focus(),100);
 }
-function closeAdminLogin(){ document.getElementById('m-adminLogin').classList.add('hide'); }
+function closeAdminLogin(){document.getElementById('m-adminLogin').classList.add('hide');}
 function doAdminLogin(){
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pwd   = document.getElementById('loginPwd').value;
-  if(email === 'admin@cncs.edu.hk' && pwd === 'Admin@2526'){
-    sessionStorage.setItem('adminAuthed','1');
-    adminAuthed = true;
-    closeAdminLogin();
-    setAdminChipState(true);
-    switchTab('admin');
-  } else {
-    document.getElementById('loginErr').style.display = 'block';
-    document.getElementById('loginPwd').value = '';
-    document.getElementById('loginPwd').focus();
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pwd=document.getElementById('loginPwd').value;
+  if(email==='admin@cncs.edu.hk'&&pwd==='Admin@2526'){
+    sessionStorage.setItem('adminAuthed','1');adminAuthed=true;
+    closeAdminLogin();setAdminChipState(true);switchTab('admin');
+  }else{
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('loginPwd').value='';document.getElementById('loginPwd').focus();
   }
 }
 function adminLogout(){
-  sessionStorage.removeItem('adminAuthed');
-  adminAuthed  = false;
-  curAdminPage = 'admin-home';
-  setAdminChipState(false);
-  switchTab('student');
+  sessionStorage.removeItem('adminAuthed');adminAuthed=false;curAdminPage='admin-home';
+  setAdminChipState(false);switchTab('student');
 }
 function setAdminChipState(authed){
-  document.getElementById('adminLockChip').style.display = authed ? 'none'   : '';
-  document.getElementById('adminOkChip').style.display   = authed ? 'inline' : 'none';
+  document.getElementById('adminLockChip').style.display=authed?'none':'';
+  document.getElementById('adminOkChip').style.display=authed?'inline':'none';
 }
 
 /* ── MOBILE ── */
 document.getElementById('mobToggle').addEventListener('click',()=>{
   document.getElementById('sidebar').classList.add('open');
-  document.getElementById('mobOverlay').style.display = 'block';
+  document.getElementById('mobOverlay').style.display='block';
 });
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('mobOverlay').style.display = 'none';
+  document.getElementById('mobOverlay').style.display='none';
 }
 
 /* ── INIT ── */
-if(adminAuthed) setAdminChipState(true);
+if(adminAuthed)setAdminChipState(true);
 buildDashboard();
 </script>
 </body>
