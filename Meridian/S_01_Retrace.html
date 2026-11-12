@@ -1,336 +1,427 @@
-import React, { useState } from 'react';
-import {
-  RadarChart, Radar, PolarGrid, PolarAngleAxis,
-  PolarRadiusAxis, ResponsiveContainer
-} from 'recharts';
-import { BookOpen, CheckCircle, XCircle, BarChart2, ChevronRight } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S-01 · 錯題本 · 學習路徑</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang HK', 'Noto Sans HK', sans-serif; }
+        button { font-family: inherit; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50">
 
+<div class="max-w-lg mx-auto px-4 py-6">
+    <div class="mb-5">
+        <p class="text-xs text-slate-400 font-mono mb-1">S-01 · Module 01</p>
+        <h1 class="text-2xl font-bold text-slate-900">錯題本 · 學習路徑</h1>
+        <p class="text-sm text-slate-500 mt-1">Spaced Repetition · 三級掌握追蹤</p>
+    </div>
+    <div id="stats" class="grid grid-cols-3 gap-2 mb-5"></div>
+    <div id="tabs" class="flex gap-1 bg-slate-100 rounded-2xl p-1 mb-5"></div>
+    <div id="content"></div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
 const questions = [
-  {
-    id: 1, topic: '分數計算', subject: '數學',
-    question: '½ + ⅓ 等於多少？',
-    options: ['2/5', '2/6', '5/6', '3/5'],
-    correct: 2,
-    explanation: '分數相加先通分：½ = 3/6，⅓ = 2/6，所以 3/6 + 2/6 = 5/6。',
-  },
-  {
-    id: 2, topic: '閱讀理解', subject: '中文',
-    question: '「春眠不覺曉」的下一句是？',
-    options: ['夜來風雨聲', '處處聞啼鳥', '花落知多少', '窗前明月光'],
-    correct: 1,
-    explanation: '《春曉》：春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知多少。',
-  },
-  {
-    id: 3, topic: '幾何', subject: '數學',
-    question: '正方形邊長 5cm，面積是？',
-    options: ['10 cm²', '20 cm²', '25 cm²', '15 cm²'],
-    correct: 2,
-    explanation: '正方形面積 = 邊長 × 邊長 = 5 × 5 = 25 cm²。',
-  },
-  {
-    id: 4, topic: '詞彙', subject: '英文',
-    question: 'Which word means "happy"?',
-    options: ['Sad', 'Angry', 'Joyful', 'Tired'],
-    correct: 2,
-    explanation: '"Joyful" means feeling great happiness — a direct synonym of "happy".',
-  },
-  {
-    id: 5, topic: '句子結構', subject: '英文',
-    question: 'Choose the correct sentence:',
-    options: ['She go to school.', 'She goes to school.', 'She going to school.', 'She gone to school.'],
-    correct: 1,
-    explanation: 'Third-person singular (she/he/it) needs -s or -es added to the verb. "Go" → "Goes".',
-  },
+    {
+        id: 1, topic: '分數計算', subject: '數學',
+        question: '½ + ⅓ 等於多少？',
+        options: ['2/5', '2/6', '5/6', '3/5'],
+        correct: 2,
+        explanation: '分數相加先通分：½ = 3/6，⅓ = 2/6，所以 3/6 + 2/6 = 5/6。'
+    },
+    {
+        id: 2, topic: '閱讀理解', subject: '中文',
+        question: '「春眠不覺曉」的下一句是？',
+        options: ['夜來風雨聲', '處處聞啼鳥', '花落知多少', '窗前明月光'],
+        correct: 1,
+        explanation: '《春曉》：春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知多少。'
+    },
+    {
+        id: 3, topic: '幾何', subject: '數學',
+        question: '正方形邊長 5cm，面積是？',
+        options: ['10 cm²', '20 cm²', '25 cm²', '15 cm²'],
+        correct: 2,
+        explanation: '正方形面積 = 邊長 × 邊長 = 5 × 5 = 25 cm²。'
+    },
+    {
+        id: 4, topic: '詞彙', subject: '英文',
+        question: 'Which word means "happy"?',
+        options: ['Sad', 'Angry', 'Joyful', 'Tired'],
+        correct: 2,
+        explanation: '"Joyful" means feeling great happiness — a direct synonym of "happy".'
+    },
+    {
+        id: 5, topic: '句子結構', subject: '英文',
+        question: 'Choose the correct sentence:',
+        options: ['She go to school.', 'She goes to school.', 'She going to school.', 'She gone to school.'],
+        correct: 1,
+        explanation: 'Third-person singular (she/he/it) needs -s or -es added to the verb. "Go" → "Goes".'
+    }
 ];
 
 const LEVELS = [
-  { label: '需加強', color: '#EF4444', textClass: 'text-red-600', bgClass: 'bg-red-50', borderClass: 'border-red-200', dotClass: 'bg-red-400' },
-  { label: '鞏固中', color: '#F59E0B', textClass: 'text-yellow-600', bgClass: 'bg-yellow-50', borderClass: 'border-yellow-200', dotClass: 'bg-yellow-400' },
-  { label: '已掌握', color: '#10B981', textClass: 'text-emerald-600', bgClass: 'bg-emerald-50', borderClass: 'border-emerald-200', dotClass: 'bg-emerald-400' },
+    { label: '需加強', color: '#EF4444', textColor: '#DC2626', bg: '#FEF2F2', border: '#FECACA', dot: '#F87171' },
+    { label: '鞏固中', color: '#F59E0B', textColor: '#D97706', bg: '#FFFBEB', border: '#FDE68A', dot: '#FCD34D' },
+    { label: '已掌握', color: '#10B981', textColor: '#059669', bg: '#ECFDF5', border: '#A7F3D0', dot: '#34D399' }
 ];
 
-const initMastery = {
-  '分數計算': { streak: 0, level: 0 },
-  '閱讀理解': { streak: 2, level: 1 },
-  '幾何':     { streak: 3, level: 2 },
-  '詞彙':     { streak: 1, level: 0 },
-  '句子結構': { streak: 2, level: 1 },
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+    tab: 'practice',
+    qIdx: 0,
+    picked: null,
+    submitted: false,
+    mastery: {
+        '分數計算': { streak: 0, level: 0 },
+        '閱讀理解': { streak: 2, level: 1 },
+        '幾何':     { streak: 3, level: 2 },
+        '詞彙':     { streak: 1, level: 0 },
+        '句子結構': { streak: 2, level: 1 }
+    },
+    wrong: [{ ...questions[0], picked: 0, time: '10 分鐘前' }],
+    stats: { total: 0, correct: 0 }
 };
 
-const initWrong = [
-  { ...questions[0], picked: 0, time: '10 分鐘前' },
-];
+let radarChart = null;
 
-export default function App() {
-  const [tab, setTab] = useState('practice');
-  const [qIdx, setQIdx] = useState(0);
-  const [picked, setPicked] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [mastery, setMastery] = useState(initMastery);
-  const [wrong, setWrong] = useState(initWrong);
-  const [stats, setStats] = useState({ total: 0, correct: 0 });
-
-  const q = questions[qIdx];
-  const isRight = picked === q.correct;
-  const curMastery = mastery[q.topic] || { streak: 0, level: 0 };
-
-  const handleSubmit = () => {
-    if (picked === null) return;
-    const prev = mastery[q.topic] || { streak: 0, level: 0 };
-    let newStreak = prev.streak;
-    let newLevel = prev.level;
-
-    if (picked === q.correct) {
-      newStreak = prev.streak + 1;
-      if (newStreak >= 3 && newLevel < 2) { newLevel = newLevel + 1; newStreak = 0; }
-      setStats(s => ({ total: s.total + 1, correct: s.correct + 1 }));
-    } else {
-      newStreak = 0;
-      newLevel = Math.max(prev.level - 1, 0);
-      setWrong(w => [{ ...q, picked, time: '剛剛' }, ...w.filter(x => x.id !== q.id)]);
-      setStats(s => ({ total: s.total + 1, correct: s.correct }));
-    }
-    setMastery(m => ({ ...m, [q.topic]: { streak: newStreak, level: newLevel } }));
-    setSubmitted(true);
-  };
-
-  const handleNext = () => { setPicked(null); setSubmitted(false); setQIdx(i => (i + 1) % questions.length); };
-
-  const radarData = Object.entries(mastery).map(([topic, val]) => ({
-    topic,
-    value: val.level === 0 ? 18 : val.level === 1 ? 55 : 90,
-  }));
-
-  const tabs = [
-    { key: 'practice', label: '練習', icon: <ChevronRight size={13} /> },
-    { key: 'wrong',    label: '錯題本', icon: <BookOpen size={13} /> },
-    { key: 'progress', label: '進度',  icon: <BarChart2 size={13} /> },
-  ];
-
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-lg mx-auto px-4 py-6">
-
-        {/* Header */}
-        <div className="mb-5">
-          <p className="text-xs text-slate-400 font-mono mb-1">S-01 · Module 01</p>
-          <h1 className="text-2xl font-bold text-slate-900">錯題本 · 學習路徑</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Spaced Repetition · 三級掌握追蹤</p>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
-          {[
-            { val: stats.total,   label: '已作答', color: 'text-slate-800' },
-            { val: stats.correct, label: '答對',   color: 'text-emerald-600' },
-            { val: wrong.length,  label: '錯題',   color: 'text-red-500' },
-          ].map((s, i) => (
-            <div key={i} className="bg-white rounded-2xl p-3 text-center border border-slate-100 shadow-sm">
-              <div className={`text-xl font-bold ${s.color}`}>{s.val}</div>
-              <div className="text-xs text-slate-400 mt-0.5">{s.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-1 bg-slate-100 rounded-2xl p-1 mb-5">
-          {tabs.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-medium transition-all
-                ${tab === t.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
-              {t.icon}{t.label}
-            </button>
-          ))}
-        </div>
-
-        {/* ── PRACTICE TAB ── */}
-        {tab === 'practice' && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full border border-indigo-100 font-medium">{q.subject}</span>
-                <span className="text-xs text-slate-500">{q.topic}</span>
-              </div>
-              <span className="text-xs text-slate-400">{qIdx + 1} / {questions.length}</span>
-            </div>
-
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-              <p className="text-slate-900 font-semibold text-base leading-relaxed mb-4">{q.question}</p>
-              <div className="space-y-2">
-                {q.options.map((opt, i) => {
-                  let cls = 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:bg-indigo-50 cursor-pointer';
-                  if (submitted) {
-                    if (i === q.correct) cls = 'border-emerald-400 bg-emerald-50 text-emerald-800 cursor-default';
-                    else if (i === picked) cls = 'border-red-400 bg-red-50 text-red-700 cursor-default';
-                    else cls = 'border-slate-100 bg-slate-50 text-slate-400 cursor-default';
-                  } else if (picked === i) {
-                    cls = 'border-indigo-400 bg-indigo-50 text-indigo-800 cursor-pointer';
-                  }
-                  return (
-                    <button key={i} disabled={submitted} onClick={() => setPicked(i)}
-                      className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all flex items-center gap-3 ${cls}`}>
-                      <span className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold flex-shrink-0">
-                        {String.fromCharCode(65 + i)}
-                      </span>
-                      <span className="flex-1">{opt}</span>
-                      {submitted && i === q.correct && <CheckCircle size={15} className="text-emerald-500 flex-shrink-0" />}
-                      {submitted && i === picked && i !== q.correct && <XCircle size={15} className="text-red-500 flex-shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="mt-4">
-                {!submitted ? (
-                  <button onClick={handleSubmit} disabled={picked === null}
-                    className="w-full py-3 bg-slate-900 text-white rounded-xl text-sm font-semibold disabled:opacity-30 transition-opacity">
-                    確認答案
-                  </button>
-                ) : (
-                  <button onClick={handleNext}
-                    className="w-full py-3 bg-slate-900 text-white rounded-xl text-sm font-semibold">
-                    下一題 →
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Explanation unlock */}
-            {submitted && (
-              <div className={`rounded-2xl p-4 border ${isRight ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
-                <div className="flex items-center gap-2 mb-2">
-                  {isRight
-                    ? <CheckCircle size={15} className="text-emerald-600" />
-                    : <BookOpen size={15} className="text-amber-600" />
-                  }
-                  <span className={`text-xs font-semibold ${isRight ? 'text-emerald-700' : 'text-amber-700'}`}>
-                    {isRight ? '答對了！繼續保持' : '解說已解鎖'}
-                  </span>
-                </div>
-                <p className="text-sm text-slate-700 leading-relaxed">{q.explanation}</p>
-                <div className={`mt-3 pt-3 border-t ${isRight ? 'border-emerald-200' : 'border-amber-200'} flex items-center gap-2 flex-wrap`}>
-                  <span className="text-xs text-slate-500">「{q.topic}」掌握程度：</span>
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full border
-                    ${LEVELS[mastery[q.topic]?.level || 0].bgClass}
-                    ${LEVELS[mastery[q.topic]?.level || 0].textClass}
-                    ${LEVELS[mastery[q.topic]?.level || 0].borderClass}`}>
-                    {LEVELS[mastery[q.topic]?.level || 0].label}
-                  </span>
-                  {isRight && (mastery[q.topic]?.streak || 0) > 0 && (mastery[q.topic]?.level || 0) < 2 && (
-                    <span className="text-xs text-slate-400">
-                      連續答對 {mastery[q.topic]?.streak} 次，再 {3 - (mastery[q.topic]?.streak || 0)} 次升級
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── WRONG ANSWER TAB ── */}
-        {tab === 'wrong' && (
-          <div className="space-y-3">
-            {wrong.length === 0 ? (
-              <div className="bg-white rounded-2xl p-10 text-center border border-slate-100">
-                <CheckCircle size={32} className="text-emerald-400 mx-auto mb-2" />
-                <p className="text-slate-500 text-sm">暫時沒有錯題 🎉</p>
-              </div>
-            ) : wrong.map((w, i) => (
-              <div key={i} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-100 font-medium">{w.subject}</span>
-                    <span className="text-xs text-slate-400">{w.topic}</span>
-                  </div>
-                  <span className="text-xs text-slate-300">{w.time}</span>
-                </div>
-                <p className="text-sm font-semibold text-slate-800 mb-3">{w.question}</p>
-                <div className="space-y-1.5">
-                  {w.options.map((opt, j) => (
-                    <div key={j} className={`px-3 py-2 rounded-xl text-xs flex items-center gap-2 border ${
-                      j === w.correct ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                      j === w.picked  ? 'bg-red-50 text-red-600 border-red-200' :
-                      'bg-slate-50 text-slate-400 border-slate-100'
-                    }`}>
-                      <span className="font-bold">{String.fromCharCode(65 + j)}.</span>
-                      <span className="flex-1">{opt}</span>
-                      {j === w.correct && <CheckCircle size={11} />}
-                      {j === w.picked && j !== w.correct && <XCircle size={11} />}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 pt-3 border-t border-slate-100">
-                  <p className="text-xs text-slate-500 leading-relaxed">{w.explanation}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── PROGRESS TAB ── */}
-        {tab === 'progress' && (
-          <div className="space-y-3">
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <p className="text-sm font-semibold text-slate-700 mb-1">知識點掌握雷達圖</p>
-              <ResponsiveContainer width="100%" height={220}>
-                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                  <PolarGrid stroke="#E2E8F0" />
-                  <PolarAngleAxis dataKey="topic" tick={{ fontSize: 11, fill: '#64748B' }} />
-                  <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
-                  <Radar dataKey="value" stroke="#6366F1" fill="#6366F1" fillOpacity={0.2} strokeWidth={2}
-                    dot={{ r: 3, fill: '#6366F1' }} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <p className="text-sm font-semibold text-slate-700 mb-3">各知識點狀態</p>
-              <div className="space-y-3">
-                {Object.entries(mastery).map(([topic, val]) => {
-                  const lv = LEVELS[val.level];
-                  const pct = val.level === 0 ? 18 : val.level === 1 ? 55 : 90;
-                  return (
-                    <div key={topic}>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full ${lv.dotClass}`} />
-                          <span className="text-sm text-slate-700">{topic}</span>
-                        </div>
-                        <span className={`text-xs font-medium ${lv.textClass}`}>{lv.label}</span>
-                      </div>
-                      <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${pct}%`, backgroundColor: lv.color }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
-              <p className="text-sm font-semibold text-slate-700 mb-3">🔁 Spaced Repetition 複習順序</p>
-              <div className="space-y-2">
-                {Object.entries(mastery)
-                  .sort((a, b) => a[1].level - b[1].level || a[1].streak - b[1].streak)
-                  .map(([topic, val], i) => {
-                    const lv = LEVELS[val.level];
-                    return (
-                      <div key={topic} className="flex items-center gap-3 py-1">
-                        <span className="text-xs text-slate-300 w-5 text-center font-mono">{i + 1}</span>
-                        <span className="text-sm text-slate-700 flex-1">{topic}</span>
-                        {val.level === 0 && <span className="text-xs text-red-400">⚡ 優先</span>}
-                        <span className={`text-xs px-2 py-0.5 rounded-full border ${lv.bgClass} ${lv.textClass} ${lv.borderClass}`}>
-                          {lv.label}
-                        </span>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          </div>
-        )}
-
-      </div>
-    </div>
-  );
+// ============================================================
+// HELPERS
+// ============================================================
+function levelBadge(level) {
+    const lv = LEVELS[level];
+    return `<span style="display:inline-block;background:${lv.bg};color:${lv.textColor};border:1px solid ${lv.border};border-radius:9999px;padding:2px 8px;font-size:11px;font-weight:600;">${lv.label}</span>`;
 }
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+    renderStats();
+    renderTabs();
+    renderContent();
+}
+
+function renderStats() {
+    document.getElementById('stats').innerHTML = [
+        { val: state.stats.total,   label: '已作答', color: '#1e293b' },
+        { val: state.stats.correct, label: '答對',   color: '#059669' },
+        { val: state.wrong.length,  label: '錯題',   color: '#EF4444' }
+    ].map(s => `
+        <div style="background:#fff;border:1px solid #f1f5f9;border-radius:16px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <div style="font-size:20px;font-weight:700;color:${s.color}">${s.val}</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">${s.label}</div>
+        </div>
+    `).join('');
+}
+
+function renderTabs() {
+    const TABS = [
+        { key: 'practice', label: '練習',   icon: '›' },
+        { key: 'wrong',    label: '錯題本', icon: '📖' },
+        { key: 'progress', label: '進度',   icon: '📊' }
+    ];
+    document.getElementById('tabs').innerHTML = TABS.map(t => `
+        <button onclick="setTab('${t.key}')" style="
+            flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+            padding:8px 4px;border-radius:12px;border:none;
+            font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;
+            background:${state.tab === t.key ? '#fff' : 'transparent'};
+            color:${state.tab === t.key ? '#0f172a' : '#64748b'};
+            box-shadow:${state.tab === t.key ? '0 1px 3px rgba(0,0,0,0.08)' : 'none'};
+        ">${t.icon} ${t.label}</button>
+    `).join('');
+}
+
+function renderContent() {
+    if (state.tab === 'practice')     renderPractice();
+    else if (state.tab === 'wrong')   renderWrong();
+    else                              renderProgress();
+}
+
+// ── PRACTICE ──────────────────────────────────────────────
+function renderPractice() {
+    const q      = questions[state.qIdx];
+    const isRight = state.submitted && state.picked === q.correct;
+    const m      = state.mastery[q.topic] || { streak: 0, level: 0 };
+
+    const optionsHTML = q.options.map((opt, i) => {
+        let bg = '#fff', border = '#e2e8f0', color = '#374151', cursor = 'pointer';
+        if (state.submitted) {
+            cursor = 'default';
+            if (i === q.correct)        { bg = '#ECFDF5'; border = '#34D399'; color = '#065f46'; }
+            else if (i === state.picked) { bg = '#FEF2F2'; border = '#F87171'; color = '#B91C1C'; }
+            else                        { bg = '#f8fafc'; border = '#e2e8f0'; color = '#94a3b8'; }
+        } else if (state.picked === i) {
+            bg = '#eef2ff'; border = '#818cf8'; color = '#3730a3';
+        }
+        const icon = state.submitted
+            ? (i === q.correct ? '✓' : (i === state.picked ? '✗' : ''))
+            : '';
+        return `
+            <button onclick="${state.submitted ? '' : `setPicked(${i})`}" style="
+                width:100%;text-align:left;padding:10px 14px;border-radius:12px;
+                border:2px solid ${border};background:${bg};color:${color};
+                font-size:13px;font-weight:500;cursor:${cursor};transition:all 0.15s;
+                display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span style="width:22px;height:22px;border-radius:50%;border:2px solid currentColor;
+                    display:inline-flex;align-items:center;justify-content:center;
+                    font-size:11px;font-weight:700;flex-shrink:0;">
+                    ${String.fromCharCode(65 + i)}
+                </span>
+                <span style="flex:1">${opt}</span>
+                <span style="font-weight:700;font-size:14px">${icon}</span>
+            </button>
+        `;
+    }).join('');
+
+    const actionBtn = !state.submitted
+        ? `<button onclick="handleSubmit()" ${state.picked === null ? 'disabled' : ''} style="
+            width:100%;padding:12px;border:none;border-radius:12px;
+            background:${state.picked === null ? '#94a3b8' : '#0f172a'};color:#fff;
+            font-size:13px;font-weight:600;
+            cursor:${state.picked === null ? 'not-allowed' : 'pointer'};transition:all 0.15s;">
+            確認答案
+           </button>`
+        : `<button onclick="handleNext()" style="
+            width:100%;padding:12px;border:none;border-radius:12px;
+            background:#0f172a;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">
+            下一題 →
+           </button>`;
+
+    let explanationHTML = '';
+    if (state.submitted) {
+        const expBg     = isRight ? '#ECFDF5' : '#FFFBEB';
+        const expBorder = isRight ? '#A7F3D0' : '#FDE68A';
+        const expColor  = isRight ? '#065f46' : '#92400e';
+        const streakText = (isRight && m.streak > 0 && m.level < 2)
+            ? `<span style="font-size:11px;color:#94a3b8">連續答對 ${m.streak} 次，再 ${3 - m.streak} 次升級</span>`
+            : '';
+        explanationHTML = `
+            <div style="background:${expBg};border:1px solid ${expBorder};border-radius:16px;padding:16px;margin-top:12px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <span>${isRight ? '✅' : '📖'}</span>
+                    <span style="font-size:12px;font-weight:600;color:${expColor}">
+                        ${isRight ? '答對了！繼續保持' : '解說已解鎖'}
+                    </span>
+                </div>
+                <p style="font-size:13px;color:#374151;line-height:1.7">${q.explanation}</p>
+                <div style="margin-top:12px;padding-top:12px;border-top:1px solid ${expBorder};display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <span style="font-size:11px;color:#94a3b8">「${q.topic}」掌握程度：</span>
+                    ${levelBadge(m.level)}
+                    ${streakText}
+                </div>
+            </div>
+        `;
+    }
+
+    document.getElementById('content').innerHTML = `
+        <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:11px;background:#eef2ff;color:#4f46e5;padding:4px 10px;border-radius:9999px;border:1px solid #e0e7ff;font-weight:500;">${q.subject}</span>
+                    <span style="font-size:11px;color:#64748b">${q.topic}</span>
+                </div>
+                <span style="font-size:11px;color:#94a3b8">${state.qIdx + 1} / ${questions.length}</span>
+            </div>
+            <div style="background:#fff;border:1px solid #f1f5f9;border-radius:16px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                <p style="font-size:15px;font-weight:600;color:#0f172a;line-height:1.6;margin-bottom:16px">${q.question}</p>
+                ${optionsHTML}
+                <div style="margin-top:4px">${actionBtn}</div>
+            </div>
+            ${explanationHTML}
+        </div>
+    `;
+}
+
+// ── WRONG ANSWER ──────────────────────────────────────────
+function renderWrong() {
+    const el = document.getElementById('content');
+    if (state.wrong.length === 0) {
+        el.innerHTML = `
+            <div style="background:#fff;border:1px solid #f1f5f9;border-radius:16px;padding:40px 20px;text-align:center;">
+                <div style="font-size:32px;margin-bottom:8px">✅</div>
+                <p style="font-size:13px;color:#64748b">暫時沒有錯題 🎉</p>
+            </div>`;
+        return;
+    }
+    el.innerHTML = state.wrong.map(w => {
+        const optRows = w.options.map((opt, j) => {
+            let bg = '#f8fafc', border = '#f1f5f9', color = '#94a3b8';
+            if (j === w.correct)                      { bg = '#ECFDF5'; border = '#A7F3D0'; color = '#065f46'; }
+            else if (j === w.picked)                  { bg = '#FEF2F2'; border = '#FECACA'; color = '#B91C1C'; }
+            const icon = j === w.correct ? '✓' : (j === w.picked && j !== w.correct ? '✗' : '');
+            return `
+                <div style="background:${bg};border:1px solid ${border};color:${color};
+                    padding:8px 12px;border-radius:10px;font-size:12px;margin-bottom:6px;
+                    display:flex;align-items:center;gap:8px;">
+                    <span style="font-weight:700">${String.fromCharCode(65 + j)}.</span>
+                    <span style="flex:1">${opt}</span>
+                    <span style="font-weight:700">${icon}</span>
+                </div>
+            `;
+        }).join('');
+        return `
+            <div style="background:#fff;border:1px solid #f1f5f9;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:11px;background:#FEF2F2;color:#DC2626;padding:2px 8px;border-radius:9999px;border:1px solid #FECACA;font-weight:500;">${w.subject}</span>
+                        <span style="font-size:11px;color:#94a3b8">${w.topic}</span>
+                    </div>
+                    <span style="font-size:11px;color:#cbd5e1">${w.time}</span>
+                </div>
+                <p style="font-size:13px;font-weight:600;color:#1e293b;margin-bottom:10px">${w.question}</p>
+                ${optRows}
+                <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;">
+                    <p style="font-size:12px;color:#64748b;line-height:1.6">${w.explanation}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ── PROGRESS ──────────────────────────────────────────────
+function renderProgress() {
+    if (radarChart) { radarChart.destroy(); radarChart = null; }
+
+    const masteryHTML = Object.entries(state.mastery).map(([topic, val]) => {
+        const lv  = LEVELS[val.level];
+        const pct = val.level === 0 ? 18 : val.level === 1 ? 55 : 90;
+        return `
+            <div style="margin-bottom:14px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="width:8px;height:8px;border-radius:50%;background:${lv.dot};display:inline-block;flex-shrink:0;"></span>
+                        <span style="font-size:13px;color:#334155">${topic}</span>
+                    </div>
+                    <span style="font-size:11px;font-weight:500;color:${lv.textColor}">${lv.label}</span>
+                </div>
+                <div style="height:6px;background:#f1f5f9;border-radius:9999px;overflow:hidden;">
+                    <div style="height:100%;width:${pct}%;background:${lv.color};border-radius:9999px;"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    const reviewHTML = Object.entries(state.mastery)
+        .sort((a, b) => a[1].level - b[1].level || a[1].streak - b[1].streak)
+        .map(([topic, val], i) => {
+            const lv = LEVELS[val.level];
+            return `
+                <div style="display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid #f8fafc;">
+                    <span style="font-size:11px;color:#cbd5e1;width:20px;text-align:center;font-family:monospace;">${i + 1}</span>
+                    <span style="font-size:13px;color:#334155;flex:1">${topic}</span>
+                    ${val.level === 0 ? '<span style="font-size:11px;color:#EF4444">⚡ 優先</span>' : ''}
+                    <span style="background:${lv.bg};color:${lv.textColor};border:1px solid ${lv.border};border-radius:9999px;padding:2px 8px;font-size:11px;font-weight:500;">${lv.label}</span>
+                </div>
+            `;
+        }).join('');
+
+    document.getElementById('content').innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="background:#fff;border:1px solid #f1f5f9;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                <p style="font-size:13px;font-weight:600;color:#334155;margin-bottom:8px;">知識點掌握雷達圖</p>
+                <canvas id="radarCanvas"></canvas>
+            </div>
+            <div style="background:#fff;border:1px solid #f1f5f9;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                <p style="font-size:13px;font-weight:600;color:#334155;margin-bottom:12px;">各知識點狀態</p>
+                ${masteryHTML}
+            </div>
+            <div style="background:#fff;border:1px solid #f1f5f9;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                <p style="font-size:13px;font-weight:600;color:#334155;margin-bottom:8px;">🔁 Spaced Repetition 複習順序</p>
+                ${reviewHTML}
+            </div>
+        </div>
+    `;
+
+    const ctx = document.getElementById('radarCanvas').getContext('2d');
+    radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: Object.keys(state.mastery),
+            datasets: [{
+                data: Object.values(state.mastery).map(v => v.level === 0 ? 18 : v.level === 1 ? 55 : 90),
+                backgroundColor: 'rgba(99,102,241,0.15)',
+                borderColor: '#6366F1',
+                borderWidth: 2,
+                pointBackgroundColor: '#6366F1',
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                r: {
+                    min: 0, max: 100,
+                    ticks: { display: false },
+                    grid: { color: '#E2E8F0' },
+                    pointLabels: { font: { size: 11 }, color: '#64748B' }
+                }
+            }
+        }
+    });
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function setTab(tab) {
+    state.tab = tab;
+    render();
+}
+
+function setPicked(i) {
+    if (state.submitted) return;
+    state.picked = i;
+    renderPractice();
+}
+
+function handleSubmit() {
+    if (state.picked === null) return;
+    const q    = questions[state.qIdx];
+    const prev = state.mastery[q.topic] || { streak: 0, level: 0 };
+    let newStreak = prev.streak;
+    let newLevel  = prev.level;
+
+    if (state.picked === q.correct) {
+        newStreak++;
+        if (newStreak >= 3 && newLevel < 2) { newLevel++; newStreak = 0; }
+        state.stats.correct++;
+    } else {
+        newStreak = 0;
+        newLevel  = Math.max(prev.level - 1, 0);
+        state.wrong = [
+            { ...q, picked: state.picked, time: '剛剛' },
+            ...state.wrong.filter(x => x.id !== q.id)
+        ];
+    }
+    state.stats.total++;
+    state.mastery[q.topic] = { streak: newStreak, level: newLevel };
+    state.submitted = true;
+    render();
+}
+
+function handleNext() {
+    state.picked    = null;
+    state.submitted = false;
+    state.qIdx      = (state.qIdx + 1) % questions.length;
+    render();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+render();
+</script>
+</body>
+</html>
