@@ -1,0 +1,462 @@
+import React, { useState } from 'react';
+import { Volume2, Mic, MicOff, Settings, CheckCircle, User, BookOpen, MessageSquare, FileText } from 'lucide-react';
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const PASSAGE = [
+  "The rainforest is one of the most important ecosystems on Earth.",
+  "It is home to more than half of the world's plant and animal species.",
+  "The trees produce oxygen and absorb carbon dioxide every single day.",
+  "This process helps to regulate the Earth's climate over time.",
+  "Many life-saving medicines have been developed from rainforest plants.",
+];
+
+const QUESTION = "Why are rainforests important to the Earth's climate?";
+const KEYWORDS = ['oxygen', 'carbon dioxide', 'climate', 'trees', 'absorb', 'regulate'];
+const SAMPLE_ANSWER = "Rainforests help regulate the Earth's climate because the trees absorb carbon dioxide and produce oxygen.";
+
+const THEMES = [
+  { key: 'white',  label: '白',  hex: '#FFFFFF' },
+  { key: 'warm',   label: '米白', hex: '#FAF7F2' },
+  { key: 'yellow', label: '淡黃', hex: '#FEFCE8' },
+  { key: 'blue',   label: '淡藍', hex: '#EFF6FF' },
+];
+
+const IEP_LOG = [
+  { date: '11/10', action: 'TTS 朗讀',    count: 12 },
+  { date: '11/11', action: '語音輸入作答', count: 3  },
+  { date: '11/12', action: '聚焦閱讀條',  count: 5  },
+  { date: '11/12', action: 'TTS 朗讀',    count: 8  },
+];
+
+// ── TOGGLE ────────────────────────────────────────────────────────────────────
+function Toggle({ on, onClick }) {
+  return (
+    <button onClick={onClick}
+      className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${on ? 'bg-slate-900' : 'bg-slate-200'}`}>
+      <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${on ? 'left-7' : 'left-1'}`} />
+    </button>
+  );
+}
+
+// ── SPEAKING BARS ─────────────────────────────────────────────────────────────
+function SpeakingBars() {
+  return (
+    <span className="inline-flex items-end gap-0.5 ml-2 align-middle">
+      {[6, 10, 8].map((h, i) => (
+        <span key={i} className="w-1 bg-indigo-500 rounded-full animate-bounce block"
+          style={{ height: h, animationDelay: `${i * 0.15}s` }} />
+      ))}
+    </span>
+  );
+}
+
+// ── MAIN ──────────────────────────────────────────────────────────────────────
+export default function App() {
+  const [tab, setTab] = useState('read');
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Settings
+  const [fontSize, setFontSize]     = useState(1);   // 0=normal 1=large 2=xl
+  const [lineHeight, setLineHeight] = useState(1);   // 0=normal 1=relaxed 2=loose
+  const [theme, setTheme]           = useState('warm');
+  const [focusLine, setFocusLine]   = useState(false);
+  const [dyslexic, setDyslexic]     = useState(false);
+  const [ttsSpeed, setTtsSpeed]     = useState(1);   // 0=slow 1=normal 2=fast
+
+  // Reading
+  const [focusIdx, setFocusIdx]   = useState(0);
+  const [speaking, setSpeaking]   = useState(null);
+
+  // Answer
+  const [recording, setRecording] = useState(false);
+  const [answered, setAnswered]   = useState(false);
+  const [matched, setMatched]     = useState([]);
+
+  const themeHex    = THEMES.find(t => t.key === theme)?.hex || '#FFFFFF';
+  const fontClass   = ['text-base', 'text-lg', 'text-xl'][fontSize];
+  const lineClass   = ['leading-normal', 'leading-relaxed', 'leading-loose'][lineHeight];
+  const dyslexicClass = dyslexic ? 'font-mono tracking-wider' : '';
+
+  const speakSentence = (idx) => {
+    setSpeaking(idx);
+    const duration = ttsSpeed === 0 ? 2800 : ttsSpeed === 1 ? 1800 : 1200;
+    setTimeout(() => setSpeaking(null), duration);
+  };
+
+  const speakAll = () => {
+    setSpeaking('all');
+    const duration = ttsSpeed === 0 ? 5000 : ttsSpeed === 1 ? 3500 : 2200;
+    setTimeout(() => setSpeaking(null), duration);
+  };
+
+  const startRecord = () => {
+    setRecording(true);
+    setTimeout(() => {
+      const m = KEYWORDS.filter(kw => SAMPLE_ANSWER.toLowerCase().includes(kw));
+      setMatched(m);
+      setAnswered(true);
+      setRecording(false);
+    }, 2500);
+  };
+
+  const resetAnswer = () => { setAnswered(false); setMatched([]); };
+
+  const tabs = [
+    { key: 'read',   label: '閱讀模式', icon: <BookOpen size={13} /> },
+    { key: 'answer', label: '語音作答', icon: <MessageSquare size={13} /> },
+    { key: 'iep',    label: 'IEP 記錄', icon: <FileText size={13} /> },
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50 transition-colors duration-300">
+      <div className="max-w-lg mx-auto px-4 py-6">
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <p className="text-xs text-slate-400 font-mono mb-0.5">S-01 · Module 03</p>
+            <h1 className="text-2xl font-bold text-slate-900">SEN 支援</h1>
+            <p className="text-sm text-slate-500">讀寫障礙輔助模式</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-full font-medium">
+              IEP 已啟用
+            </span>
+            <button onClick={() => setShowSettings(s => !s)}
+              className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all
+                ${showSettings ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
+              <Settings size={15} />
+            </button>
+          </div>
+        </div>
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm mb-4 space-y-4">
+            <p className="text-sm font-semibold text-slate-700">輔助設定</p>
+
+            {/* Font size */}
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-slate-600 flex-shrink-0">字體大小</p>
+              <div className="flex gap-1">
+                {['標準', '大', '特大'].map((l, i) => (
+                  <button key={i} onClick={() => setFontSize(i)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all
+                      ${fontSize === i ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Line height */}
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-slate-600 flex-shrink-0">行距</p>
+              <div className="flex gap-1">
+                {['標準', '寬', '更寬'].map((l, i) => (
+                  <button key={i} onClick={() => setLineHeight(i)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all
+                      ${lineHeight === i ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Background */}
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-slate-600 flex-shrink-0">背景色</p>
+              <div className="flex gap-2">
+                {THEMES.map(t => (
+                  <button key={t.key} onClick={() => setTheme(t.key)}
+                    className={`w-8 h-8 rounded-xl border-2 transition-all flex items-center justify-center
+                      ${theme === t.key ? 'border-slate-900 scale-110' : 'border-slate-200'}`}
+                    style={{ backgroundColor: t.hex }}>
+                    {theme === t.key && <span className="w-2 h-2 bg-slate-900 rounded-full" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* TTS speed */}
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-slate-600 flex-shrink-0">朗讀語速</p>
+              <div className="flex gap-1">
+                {['0.5×', '1×', '1.5×'].map((l, i) => (
+                  <button key={i} onClick={() => setTtsSpeed(i)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all
+                      ${ttsSpeed === i ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'}`}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Toggles */}
+            {[
+              { key: 'focusLine', label: '聚焦閱讀條', desc: '每次只高亮一行，遮蓋其餘', val: focusLine, set: setFocusLine },
+              { key: 'dyslexic',  label: 'OpenDyslexic 字型', desc: '英文讀寫障礙輔助字型（模擬）', val: dyslexic, set: setDyslexic },
+            ].map(item => (
+              <div key={item.key} className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm text-slate-600">{item.label}</p>
+                  <p className="text-xs text-slate-400">{item.desc}</p>
+                </div>
+                <Toggle on={item.val} onClick={() => item.set(v => !v)} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Tabs */}
+        <div className="flex gap-1 bg-slate-100 rounded-2xl p-1 mb-5">
+          {tabs.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-medium transition-all
+                ${tab === t.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+              {t.icon}{t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── READ TAB ── */}
+        {tab === 'read' && (
+          <div className="space-y-3">
+            <div className="rounded-2xl p-5 border border-slate-200 shadow-sm transition-colors duration-300"
+              style={{ backgroundColor: themeHex }}>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">閱讀文章</p>
+                <button onClick={speakAll}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all
+                    ${speaking === 'all'
+                      ? 'bg-indigo-600 text-white border-indigo-600'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'}`}>
+                  <Volume2 size={12} />
+                  {speaking === 'all' ? '朗讀中' : '全文朗讀'}
+                  {speaking === 'all' && <SpeakingBars />}
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                {PASSAGE.map((sent, i) => (
+                  <div key={i}
+                    onClick={() => { if (focusLine) setFocusIdx(i); speakSentence(i); }}
+                    className={`relative rounded-xl px-3 py-2.5 transition-all cursor-pointer group
+                      ${focusLine
+                        ? (focusIdx === i
+                          ? 'bg-yellow-100 border-2 border-yellow-300'
+                          : 'opacity-20 select-none')
+                        : 'hover:bg-black/5'
+                      }`}>
+                    <p className={`${fontClass} ${lineClass} ${dyslexicClass} text-slate-800 transition-all`}>
+                      {sent}
+                    </p>
+                    {speaking === i && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 flex items-end gap-0.5">
+                        {[6, 10, 8].map((h, j) => (
+                          <span key={j} className="w-1 bg-indigo-500 rounded-full animate-bounce block"
+                            style={{ height: h, animationDelay: `${j * 0.15}s` }} />
+                        ))}
+                      </span>
+                    )}
+                    {!focusLine && speaking !== i && (
+                      <Volume2 size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {focusLine && (
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-black/10">
+                  <button disabled={focusIdx === 0}
+                    onClick={() => setFocusIdx(i => Math.max(0, i - 1))}
+                    className="text-xs px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-500 disabled:opacity-30">
+                    ← 上一句
+                  </button>
+                  <span className="text-xs text-slate-400">{focusIdx + 1} / {PASSAGE.length}</span>
+                  <button disabled={focusIdx === PASSAGE.length - 1}
+                    onClick={() => setFocusIdx(i => Math.min(PASSAGE.length - 1, i + 1))}
+                    className="text-xs px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-slate-500 disabled:opacity-30">
+                    下一句 →
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {dyslexic && (
+              <div className="bg-purple-50 border border-purple-100 rounded-2xl p-3">
+                <p className="text-xs text-purple-700 font-semibold mb-0.5">OpenDyslexic 字型已啟用（模擬）</p>
+                <p className="text-xs text-purple-600 leading-relaxed">
+                  實際部署時載入 OpenDyslexic CDN 字型，字母底部加重，減少字母翻轉混淆，適合英文讀寫障礙學生。
+                </p>
+              </div>
+            )}
+
+            <div className="bg-slate-100 rounded-2xl p-3">
+              <p className="text-xs text-slate-500 leading-relaxed">
+                💡 點擊任何句子可個別朗讀。在「設定」中開啟<strong>聚焦閱讀條</strong>，每次只顯示一行，減少視覺干擾。
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── ANSWER TAB ── */}
+        {tab === 'answer' && (
+          <div className="space-y-3">
+            <div className="rounded-2xl p-5 border border-slate-200 shadow-sm transition-colors duration-300"
+              style={{ backgroundColor: themeHex }}>
+              <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-3">語音作答</p>
+              <p className={`${fontClass} ${lineClass} ${dyslexicClass} font-semibold text-slate-800 mb-5 leading-snug`}>
+                {QUESTION}
+              </p>
+
+              {!answered ? (
+                <div className="flex flex-col items-center gap-3 py-4">
+                  <button onClick={startRecord} disabled={recording}
+                    className={`relative w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-md
+                      ${recording ? 'bg-red-500 scale-105' : 'bg-slate-900 hover:bg-slate-700'}`}>
+                    {recording && <span className="absolute inset-0 rounded-full bg-red-400 animate-ping opacity-30" />}
+                    {recording
+                      ? <MicOff size={22} className="text-white relative z-10" />
+                      : <Mic    size={22} className="text-white relative z-10" />}
+                  </button>
+                  <p className="text-sm text-slate-400 text-center">
+                    {recording ? '識別中，請繼續說話…' : '點擊麥克風，說話代替打字'}
+                  </p>
+                  {recording && (
+                    <div className="flex items-end gap-1">
+                      {[5, 9, 13, 9, 5].map((h, i) => (
+                        <span key={i} className="w-1.5 bg-red-400 rounded-full animate-bounce block"
+                          style={{ height: h, animationDelay: `${i * 0.1}s` }} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="bg-white rounded-xl p-3 border border-slate-100">
+                    <p className="text-xs text-slate-400 mb-1.5">系統識別 · 你的回答</p>
+                    <p className={`${fontClass} ${lineClass} ${dyslexicClass} text-slate-700`}>
+                      {SAMPLE_ANSWER}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-slate-500 mb-2">關鍵概念使用情況</p>
+                    <div className="flex flex-wrap gap-2">
+                      {KEYWORDS.map((kw, i) => (
+                        <span key={i} className={`text-xs px-2.5 py-1 rounded-full border font-medium flex items-center gap-1 transition-all
+                          ${matched.includes(kw)
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-slate-100 text-slate-400 border-slate-200'}`}>
+                          {matched.includes(kw) && <CheckCircle size={10} />}
+                          {kw}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-black/5">
+                    <p className="text-sm text-slate-500">關鍵概念覆蓋率</p>
+                    <span className={`text-xl font-bold px-3 py-1 rounded-xl border
+                      ${matched.length / KEYWORDS.length >= 0.8
+                        ? 'text-emerald-600 bg-emerald-50 border-emerald-200'
+                        : 'text-yellow-600 bg-yellow-50 border-yellow-200'}`}>
+                      {Math.round((matched.length / KEYWORDS.length) * 100)}%
+                    </span>
+                  </div>
+
+                  <button onClick={resetAnswer}
+                    className="w-full py-3 bg-slate-900 text-white rounded-xl text-sm font-semibold">
+                    重新作答
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-amber-50 border border-amber-100 rounded-2xl p-3">
+              <p className="text-xs text-amber-700 font-semibold mb-0.5">語音輸入說明</p>
+              <p className="text-xs text-amber-600 leading-relaxed">
+                語音作答讓 SEN 學生說話代替打字，降低書寫壓力，同時保留完整的學習參與度。作答記錄同步至學生檔案。
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ── IEP TAB ── */}
+        {tab === 'iep' && (
+          <div className="space-y-3">
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-2xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                  <User size={18} className="text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">學生 A · 3B</p>
+                  <span className="text-xs bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full">
+                    讀寫障礙 · IEP
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-0">
+                {[
+                  { label: '輔助模式',    val: '已預設開啟',      ok: true  },
+                  { label: '字體大小',    val: '大 (1.125rem)',   ok: true  },
+                  { label: '行距',        val: '寬 (1.75)',       ok: true  },
+                  { label: '背景色',      val: '米白 (#FAF7F2)',  ok: true  },
+                  { label: '聚焦閱讀條', val: '可手動開啟',       ok: null  },
+                  { label: '語音輸入',    val: '已啟用',          ok: true  },
+                  { label: 'TTS 朗讀',   val: '全文及逐句',       ok: true  },
+                ].map((row, i) => (
+                  <div key={i} className="flex items-center justify-between py-2.5 border-b border-slate-50 last:border-0">
+                    <p className="text-sm text-slate-500">{row.label}</p>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-slate-700 font-medium">{row.val}</span>
+                      {row.ok === true && <CheckCircle size={12} className="text-emerald-500 flex-shrink-0" />}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+              <p className="text-sm font-semibold text-slate-700 mb-3">本週輔助使用記錄</p>
+              <div className="space-y-0">
+                {IEP_LOG.map((r, i) => (
+                  <div key={i} className="flex items-center gap-3 py-2.5 border-b border-slate-50 last:border-0">
+                    <span className="text-xs text-slate-300 font-mono w-12 flex-shrink-0">{r.date}</span>
+                    <span className="text-sm text-slate-600 flex-1">{r.action}</span>
+                    <span className="text-xs font-semibold text-slate-400">{r.count} 次</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { val: IEP_LOG.reduce((a, r) => a + r.count, 0), label: '總使用次數', color: 'text-slate-800' },
+                { val: '4', label: '本週活躍天', color: 'text-purple-600' },
+                { val: '100%', label: 'TTS 使用率', color: 'text-emerald-600' },
+              ].map((s, i) => (
+                <div key={i} className="bg-white rounded-2xl p-3 text-center border border-slate-100 shadow-sm">
+                  <div className={`text-xl font-bold ${s.color}`}>{s.val}</div>
+                  <div className="text-xs text-slate-400 mt-0.5 leading-tight">{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4">
+              <p className="text-xs font-semibold text-purple-700 mb-1">自動同步至老師端 D-01</p>
+              <p className="text-xs text-purple-600 leading-relaxed">
+                以上記錄自動同步至班主任及支援老師的健康頁面，配合 IEP 跟進及調整支援策略，無需手動匯報。
+              </p>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
