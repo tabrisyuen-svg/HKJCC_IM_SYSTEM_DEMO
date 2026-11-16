@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 提示詞產生器</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang HK','Noto Sans HK',sans-serif;background:#FAFAF9;color:#1C1917;min-height:100vh;font-size:14px;line-height:1.5;}
+button,input,select,textarea{font-family:inherit;}
+
+.hdr{background:#fff;border-bottom:1px solid #E7E5E4;padding:11px 20px;position:sticky;top:0;z-index:100;}
+.hdr-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.hdr-l{display:flex;align-items:center;gap:10px;}
+.hdr-ic{font-size:20px;}
+.hdr-t{font-size:14px;font-weight:700;}
+.hdr-s{font-size:10px;color:#78716C;margin-top:1px;}
+
+.wrap{max-width:1100px;margin:0 auto;padding:14px 16px;display:grid;grid-template-columns:265px 1fr;gap:14px;align-items:start;}
+@media(max-width:680px){.wrap{grid-template-columns:1fr;padding:10px 10px;}}
+
+.sidebar{position:sticky;top:62px;}
+@media(max-width:680px){.sidebar{position:static;}}
+
+.sb-title{font-size:9px;font-weight:700;color:#A8A29E;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;padding:0 2px;}
+
+.cats{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.cat-btn{padding:4px 9px;border-radius:20px;border:1px solid #E7E5E4;background:#fff;font-size:11px;font-weight:500;cursor:pointer;color:#78716C;transition:all .15s;line-height:1.4;}
+.cat-btn.on{background:#1C1917;color:#fff;border-color:#1C1917;}
+.cat-btn:not(.on):hover{border-color:#A8A29E;color:#1C1917;}
+
+.tpl-list{display:flex;flex-direction:column;gap:5px;max-height:calc(100vh - 155px);overflow-y:auto;padding-right:2px;}
+.tpl-list::-webkit-scrollbar{width:3px;}
+.tpl-list::-webkit-scrollbar-thumb{background:#D6D3D1;border-radius:2px;}
+
+.tc{background:#fff;border:1px solid #E7E5E4;border-radius:10px;padding:9px 11px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:8px;}
+.tc:hover{border-color:#A8A29E;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.tc.on{border-color:#1C1917;background:#F7F6F5;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.tc-ic{font-size:16px;flex-shrink:0;margin-top:1px;}
+.tc-info{min-width:0;}
+.tc-nm{font-size:12px;font-weight:600;color:#1C1917;margin-bottom:1px;}
+.tc-ds{font-size:10px;color:#78716C;line-height:1.3;}
+.tg{display:inline-block;font-size:9px;padding:1px 6px;border-radius:4px;margin-top:4px;font-weight:500;border:1px solid;}
+.tg-電郵{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE;}
+.tg-報告{background:#F0FDF4;color:#15803D;border-color:#BBF7D0;}
+.tg-提案{background:#FFF7ED;color:#C2410C;border-color:#FED7AA;}
+.tg-通知{background:#FDF4FF;color:#7E22CE;border-color:#E9D5FF;}
+.tg-分析{background:#F0F9FF;color:#0369A1;border-color:#BAE6FD;}
+.tg-文書{background:#FFF1F2;color:#BE123C;border-color:#FECDD3;}
+
+.content{min-width:0;}
+
+.welcome{background:#fff;border:1px solid #E7E5E4;border-radius:16px;padding:56px 24px;text-align:center;}
+.wi{font-size:36px;margin-bottom:10px;}
+.wt{font-size:17px;font-weight:700;margin-bottom:7px;}
+.ws{font-size:12px;color:#78716C;line-height:1.6;max-width:380px;margin:0 auto;}
+.w-tips{margin-top:22px;display:flex;flex-wrap:wrap;justify-content:center;gap:7px;}
+.w-tip{font-size:11px;background:#F5F5F4;color:#57534E;padding:4px 11px;border-radius:20px;border:1px solid #E7E5E4;}
+
+.fbox{background:#fff;border:1px solid #E7E5E4;border-radius:16px;overflow:hidden;margin-bottom:12px;}
+.fhd{padding:13px 16px;border-bottom:1px solid #F5F5F4;display:flex;align-items:flex-start;gap:10px;}
+.fhd-ic{font-size:21px;flex-shrink:0;margin-top:2px;}
+.fhd-nm{font-size:14px;font-weight:700;margin-bottom:2px;}
+.fhd-ds{font-size:11px;color:#78716C;}
+
+.fbody{padding:15px 16px;display:flex;flex-direction:column;gap:12px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fl{font-size:11px;font-weight:600;color:#44403C;display:flex;align-items:center;gap:4px;}
+.fl-r{color:#EF4444;font-size:10px;}
+.fl-o{color:#A8A29E;font-weight:400;font-size:10px;}
+.fi,.fs,.fta{border:1px solid #E7E5E4;border-radius:8px;padding:8px 11px;font-size:12px;color:#1C1917;background:#FAFAF9;outline:none;width:100%;transition:border-color .15s,background .15s;}
+.fi:focus,.fs:focus,.fta:focus{border-color:#A8A29E;background:#fff;}
+.fi::placeholder,.fta::placeholder{color:#C4BAB4;}
+.fta{resize:vertical;min-height:76px;line-height:1.6;}
+.fs{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2378716C' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px;}
+.fft{padding:12px 16px;border-top:1px solid #F5F5F4;display:flex;align-items:center;gap:9px;}
+.gen-btn{flex:1;padding:10px 16px;background:#1C1917;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.gen-btn:hover:not(:disabled){background:#292524;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.gen-btn:active:not(:disabled){transform:translateY(1px);}
+.gen-btn:disabled{background:#A8A29E;cursor:not-allowed;}
+.rst-btn{padding:10px 13px;border:1px solid #E7E5E4;border-radius:10px;font-size:12px;font-weight:500;color:#78716C;background:#fff;cursor:pointer;transition:all .15s;}
+.rst-btn:hover{border-color:#A8A29E;}
+
+.obox{background:#fff;border:1px solid #E7E5E4;border-radius:16px;overflow:hidden;}
+
+/* thinking */
+.thinking-wrap{padding:36px 20px;text-align:center;}
+.th-ic{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#F5F5F4,#E7E5E4);display:flex;align-items:center;justify-content:center;font-size:21px;margin:0 auto 13px;animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(28,25,23,.12);}50%{box-shadow:0 0 0 10px rgba(28,25,23,0);}}
+.th-lbl{font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:1px;margin-bottom:4px;}
+.dot{width:5px;height:5px;border-radius:50%;background:#1C1917;display:inline-block;margin:0 1px;animation:dblink 1.4s ease infinite;}
+.dot:nth-child(2){animation-delay:.2s;}
+.dot:nth-child(3){animation-delay:.4s;}
+@keyframes dblink{0%,80%,100%{opacity:.2;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+.th-sub{font-size:11px;color:#78716C;margin-bottom:18px;}
+.th-steps{max-width:270px;margin:0 auto;display:flex;flex-direction:column;gap:6px;}
+.th-step{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#F5F5F4;border-radius:8px;font-size:11px;color:#78716C;opacity:0;transition:opacity .4s;}
+.th-step.show{opacity:1;}
+.sdot{width:6px;height:6px;border-radius:50%;background:#D6D3D1;flex-shrink:0;transition:background .3s;}
+.th-step.show .sdot{background:#22C55E;}
+
+/* error */
+.err-hd{padding:13px 16px;border-bottom:1px solid #FECACA;background:#FEF2F2;display:flex;align-items:center;gap:10px;}
+.err-hd-ic{font-size:18px;}
+.err-hd-t{font-size:13px;font-weight:700;color:#991B1B;}
+.err-hd-c{font-size:10px;color:#EF4444;font-family:ui-monospace,monospace;margin-top:1px;}
+.err-body{padding:14px 16px;}
+.err-desc{font-size:12px;color:#57534E;margin-bottom:13px;line-height:1.6;}
+.err-reasons{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.err-r{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:#57534E;padding:8px 11px;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;line-height:1.5;}
+.err-rn{font-family:ui-monospace,monospace;font-size:9px;color:#EF4444;flex-shrink:0;margin-top:2px;}
+.err-acts{display:flex;gap:8px;}
+.retry-btn{flex:1;padding:9px 14px;background:#1C1917;color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.retry-btn:hover{background:#292524;}
+.dis-btn{padding:9px 14px;border:1px solid #E7E5E4;border-radius:9px;font-size:12px;font-weight:500;color:#78716C;background:#fff;cursor:pointer;transition:all .15s;}
+.dis-btn:hover{border-color:#A8A29E;}
+
+/* result */
+.res-hd{padding:10px 15px;border-bottom:1px solid #F5F5F4;display:flex;align-items:center;justify-content:space-between;}
+.res-hd-l{display:flex;align-items:center;gap:7px;}
+.rh-dot{width:8px;height:8px;border-radius:50%;background:#22C55E;animation:gblink 2s ease infinite;}
+@keyframes gblink{0%,100%{opacity:1;}50%{opacity:.4;}}
+.rh-lbl{font-size:11px;font-weight:600;color:#44403C;}
+.copy-btn{font-size:11px;padding:4px 11px;border:1px solid #E7E5E4;border-radius:7px;background:#fff;color:#44403C;cursor:pointer;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:4px;}
+.copy-btn:hover{border-color:#A8A29E;}
+.copy-btn.ok{background:#F0FDF4;border-color:#BBF7D0;color:#15803D;}
+.copy-btn.inv{visibility:hidden;}
+
+.res-body{padding:15px;font-size:12px;line-height:1.9;color:#292524;background:#FAFAF9;white-space:pre-wrap;word-break:break-word;min-height:140px;font-family:ui-monospace,SFMono-Regular,'SF Mono',Menlo,monospace;}
+.cur{display:inline-block;width:2px;height:14px;background:#1C1917;vertical-align:middle;margin-left:1px;animation:cblink .7s ease infinite;}
+@keyframes cblink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+.res-ft{padding:7px 15px;border-top:1px solid #F5F5F4;display:flex;justify-content:space-between;align-items:center;}
+.res-ft span{font-size:10px;color:#A8A29E;}
+
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-l">
+      <span class="hdr-ic">🤖</span>
+      <div>
+        <div class="hdr-t">AI 提示詞產生器</div>
+        <div class="hdr-s">36 個文書範本 · 一鍵生成專業提示詞</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="sidebar">
+    <div class="sb-title">範本分類</div>
+    <div class="cats" id="cats"></div>
+    <div class="sb-title">選擇範本</div>
+    <div class="tpl-list" id="tplList"></div>
+  </aside>
+
+  <main class="content">
+    <div class="welcome" id="welcome">
+      <div class="wi">✨</div>
+      <div class="wt">選擇一個範本開始</div>
+      <div class="ws">從左側選擇你需要的文書範本，填入相關資料，即可生成一條完整、專業的 AI 提示詞，直接貼至任何 AI 工具使用。</div>
+      <div class="w-tips">
+        <span class="w-tip">📧 電郵撰寫</span>
+        <span class="w-tip">📋 會議報告</span>
+        <span class="w-tip">📝 提案計劃</span>
+        <span class="w-tip">📢 通知公告</span>
+        <span class="w-tip">📊 整理分析</span>
+        <span class="w-tip">✍️ 其他文書</span>
+      </div>
+    </div>
+
+    <div id="mainArea" class="hidden">
+      <div class="fbox" id="formBox">
+        <div class="fhd">
+          <div class="fhd-ic" id="fhdIc">📨</div>
+          <div>
+            <div class="fhd-nm" id="fhdNm">範本名稱</div>
+            <div class="fhd-ds" id="fhdDs">描述</div>
+            <span class="tg" id="fhdTg" style="margin-top:5px;display:inline-block;"></span>
+          </div>
+        </div>
+        <div class="fbody" id="fbody"></div>
+        <div class="fft">
+          <button class="gen-btn" id="genBtn" onclick="generate()"><span>✨</span><span>產生提示詞</span></button>
+          <button class="rst-btn" onclick="resetForm()">清除</button>
+        </div>
+      </div>
+
+      <div class="obox hidden" id="obox">
+        <!-- thinking -->
+        <div id="stThinking" class="hidden">
+          <div class="thinking-wrap">
+            <div class="th-ic">🧠</div>
+            <div class="th-lbl">Thinking<span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+            <div class="th-sub">正在分析你的需求，請稍候...</div>
+            <div class="th-steps">
+              <div class="th-step" id="sp1"><span class="sdot"></span><span>分析輸入結構與語意...</span></div>
+              <div class="th-step" id="sp2"><span class="sdot"></span><span>匹配最佳提示詞框架...</span></div>
+              <div class="th-step" id="sp3"><span class="sdot"></span><span>套用六大提示詞原則...</span></div>
+              <div class="th-step" id="sp4"><span class="sdot"></span><span>優化輸出格式與細節...</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- error -->
+        <div id="stError" class="hidden">
+          <div class="err-hd">
+            <span class="err-hd-ic">⚠️</span>
+            <div>
+              <div class="err-hd-t">Request Processing Failed</div>
+              <div class="err-hd-c" id="errCode">ERR_0000 / MATCH_CONFLICT</div>
+            </div>
+          </div>
+          <div class="err-body">
+            <div class="err-desc">系統偵測到處理請求時發生節點衝突，本次請求已被安全中止。技術詳情如下：</div>
+            <div class="err-reasons" id="errReasons"></div>
+            <div class="err-acts">
+              <button class="retry-btn" onclick="generate()">↺ 重試</button>
+              <button class="dis-btn" onclick="dismissErr()">返回編輯</button>
+            </div>
+          </div>
+        </div>
+        <!-- result -->
+        <div id="stResult" class="hidden">
+          <div class="res-hd">
+            <div class="res-hd-l"><div class="rh-dot"></div><span class="rh-lbl">提示詞已生成</span></div>
+            <button class="copy-btn inv" id="copyBtn" onclick="doCopy()"><span>📋</span><span>複製</span></button>
+          </div>
+          <div class="res-body" id="resBody"></div>
+          <div class="res-ft">
+            <span id="resWc"></span>
+            <span>可直接貼至任何 AI 工具使用</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const CATS=[
+  {id:'email',  ic:'📧',nm:'電郵類'},
+  {id:'meeting',ic:'📋',nm:'會議報告'},
+  {id:'proposal',ic:'📝',nm:'提案計劃'},
+  {id:'notice', ic:'📢',nm:'通知公告'},
+  {id:'analysis',ic:'📊',nm:'整理分析'},
+  {id:'other',  ic:'✍️',nm:'其他文書'},
+];
+
+const T=[
+  /* ── 電郵類 ── */
+  {id:'e1',cat:'email',ic:'📨',nm:'一般查詢電郵',ds:'向機構或個人提出查詢',tg:'電郵',
+   flds:[
+    {id:'recipient',lb:'收件人身份',tp:'text',ph:'例：供應商客服、政府部門、大學招生處',req:1},
+    {id:'topic',lb:'查詢主題',tp:'text',ph:'例：產品報價、申請資格、服務條款',req:1},
+    {id:'details',lb:'具體問題或細節',tp:'textarea',ph:'描述你想查詢的具體內容...',req:1},
+    {id:'tone',lb:'語氣',tp:'select',opts:['正式','半正式','輕鬆友好'],req:1},
+    {id:'extra',lb:'特別要求',tp:'text',ph:'例：需要中英對照、150字以內',req:0},
+   ],
+   gen(f){return`你是一位專業電郵撰寫顧問，擅長撰寫清晰、有禮的商業電郵。\n\n請幫我撰寫一封給【${f.recipient}】的查詢電郵，詳情如下：\n\n━━━ 任務資料 ━━━\n查詢主題：${f.topic}\n具體查詢內容：${f.details}\n語氣要求：${f.tone}${f.extra?'\n特別要求：'+f.extra:''}\n\n━━━ 格式及限制 ━━━\n• 電郵結構須完整：主旨行建議、稱謂、開場白、正文、結語及簽署\n• 語氣保持${f.tone}，專業有禮\n• 字數控制在 150–250 字以內\n• 若有不確定的個人資料，請以 [請填寫] 標示，絕對不可憑空捏造\n• 最後單獨列出一個主旨行建議`}
+  },
+  {id:'e2',cat:'email',ic:'🔄',nm:'跟進未回覆電郵',ds:'禮貌追蹤對方尚未回覆的事項',tg:'電郵',
+   flds:[
+    {id:'recipient',lb:'收件人身份',tp:'text',ph:'例：合作方、HR、供應商',req:1},
+    {id:'original_topic',lb:'原本查詢或請求',tp:'text',ph:'例：合約審閱、面試安排、報價單',req:1},
+    {id:'last_contact',lb:'上次聯絡時間',tp:'text',ph:'例：三天前、上週一、2025年1月5日',req:1},
+    {id:'urgency',lb:'緊急程度',tp:'select',opts:['一般跟進','較為緊急','非常緊急'],req:1},
+    {id:'extra',lb:'補充說明',tp:'text',ph:'例：已發送兩次、有截止日期',req:0},
+   ],
+   gen(f){return`你是一位商業溝通專家，擅長以不失禮但有效的方式跟進商業電郵。\n\n請幫我撰寫一封跟進電郵，向【${f.recipient}】追蹤尚未回覆的事項：\n\n━━━ 任務資料 ━━━\n原本查詢：${f.original_topic}\n上次聯絡：${f.last_contact}\n緊急程度：${f.urgency}${f.extra?'\n補充說明：'+f.extra:''}\n\n━━━ 格式及限制 ━━━\n• 語氣有禮、不帶催促感，根據緊急程度【${f.urgency}】調整措辭\n• 開頭需自然引用上次溝通內容\n• 清楚說明希望對方採取的行動及期望回覆時間\n• 字數控制在 100–180 字\n• 包含主旨行建議\n• 若有不確定資料，請以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'e3',cat:'email',ic:'🙏',nm:'道歉補救電郵',ds:'為失誤致歉並提出補救方案',tg:'電郵',
+   flds:[
+    {id:'recipient',lb:'致歉對象',tp:'text',ph:'例：客戶、合作夥伴、上司',req:1},
+    {id:'incident',lb:'事件描述',tp:'textarea',ph:'簡述發生了什麼問題或失誤...',req:1},
+    {id:'remedy',lb:'補救方案或承諾',tp:'text',ph:'例：退款、重新安排、加急處理',req:1},
+    {id:'tone',lb:'語氣',tp:'select',opts:['正式道歉','誠懇友好','商業專業'],req:1},
+   ],
+   gen(f){return`你是一位危機溝通專家，擅長撰寫真誠、有效的道歉電郵，能在維護關係的同時清晰傳達補救方案。\n\n請幫我撰寫一封道歉電郵，向【${f.recipient}】致歉：\n\n━━━ 任務資料 ━━━\n事件描述：${f.incident}\n補救方案：${f.remedy}\n語氣要求：${f.tone}\n\n━━━ 格式及限制 ━━━\n• 電郵需包含：誠懇道歉、承認責任、解釋補救措施、承諾防止再發\n• 避免過於空泛的道歉詞，需具體回應事件\n• 語氣${f.tone}，不過於戲劇化\n• 字數 150–250 字\n• 包含主旨行建議\n• 個人資料不確定處以 [請填寫] 標示，絕不捏造`}
+  },
+  {id:'e4',cat:'email',ic:'🚫',nm:'婉拒拒絕電郵',ds:'有禮貌地拒絕請求或邀請',tg:'電郵',
+   flds:[
+    {id:'sender_role',lb:'我的身份',tp:'text',ph:'例：部門主管、自由工作者、學生',req:1},
+    {id:'request',lb:'對方的請求或邀請',tp:'text',ph:'例：合作邀請、演講邀請、加班要求',req:1},
+    {id:'reason',lb:'婉拒原因',tp:'text',ph:'例：時間衝突、資源不足、不符合方向',req:1},
+    {id:'alternative',lb:'替代建議',tp:'text',ph:'例：推薦其他人選、改期再議',req:0},
+    {id:'tone',lb:'語氣',tp:'select',opts:['委婉正式','直接但有禮'],req:1},
+   ],
+   gen(f){return`你是一位專業溝通顧問，擅長以不傷感情、維護關係的方式撰寫婉拒電郵。\n\n請幫我撰寫一封婉拒電郵，詳情如下：\n\n━━━ 任務資料 ━━━\n我的身份：${f.sender_role}\n對方的請求：${f.request}\n婉拒原因：${f.reason}\n替代建議：${f.alternative||'（無）'}\n語氣要求：${f.tone}\n\n━━━ 格式及限制 ━━━\n• 先表示感謝或認可對方的邀請/請求\n• 清楚但有禮地表明無法接受，給出合理解釋\n• ${f.alternative?'在適當位置加入替代建議：'+f.alternative:'不需提供替代建議'}\n• 語氣${f.tone}，結尾保持友好\n• 字數 100–200 字\n• 包含主旨行建議`}
+  },
+  {id:'e5',cat:'email',ic:'✅',nm:'感謝確認電郵',ds:'表達謝意並確認重要細節',tg:'電郵',
+   flds:[
+    {id:'recipient',lb:'收件人身份',tp:'text',ph:'例：合作方、講者、供應商',req:1},
+    {id:'thanks_for',lb:'感謝事由',tp:'text',ph:'例：出席會議、提供報價、完成交付',req:1},
+    {id:'confirmation',lb:'需確認的事項',tp:'text',ph:'例：會議時間、交付規格、付款安排',req:0},
+    {id:'next_step',lb:'下一步行動',tp:'text',ph:'例：等候確認、下週跟進、準備合約',req:0},
+   ],
+   gen(f){return`你是一位專業商業電郵撰寫顧問，擅長撰寫簡潔、積極的感謝及確認電郵。\n\n請幫我撰寫一封感謝確認電郵，向【${f.recipient}】表達謝意：\n\n━━━ 任務資料 ━━━\n感謝事由：${f.thanks_for}${f.confirmation?'\n需確認的事項：'+f.confirmation:''}${f.next_step?'\n下一步行動：'+f.next_step:''}\n\n━━━ 格式及限制 ━━━\n• 開場真誠表達感謝，具體提及感謝的事由\n• ${f.confirmation?'清楚列出需要確認的事項，請對方回覆確認':'（本次無需確認事項）'}\n• ${f.next_step?'說明下一步行動：'+f.next_step:'（本次無需說明下一步）'}\n• 語氣專業友好，簡潔清晰，字數 100–180 字\n• 包含主旨行建議\n• 個人資料不確定處以 [請填寫] 標示`}
+  },
+  {id:'e6',cat:'email',ic:'🤝',nm:'商業邀請電郵',ds:'邀請對方出席活動或參與合作',tg:'電郵',
+   flds:[
+    {id:'recipient',lb:'受邀對象身份',tp:'text',ph:'例：行業專家、合作夥伴、潛在客戶',req:1},
+    {id:'event',lb:'活動名稱或邀請事項',tp:'text',ph:'例：行業論壇、商業晚宴、產品發布會',req:1},
+    {id:'event_details',lb:'活動詳情',tp:'textarea',ph:'時間、地點、目的等...',req:1},
+    {id:'benefits',lb:'對受邀方的好處',tp:'text',ph:'例：人脈拓展、獨家資訊、合作機會',req:1},
+    {id:'cta',lb:'希望對方採取的行動',tp:'text',ph:'例：回覆確認出席、點擊連結報名',req:1},
+   ],
+   gen(f){return`你是一位活動推廣及商業邀請函撰寫專家，擅長撰寫令受邀者感到尊重且有動力出席的邀請電郵。\n\n請幫我撰寫一封商業邀請電郵，向【${f.recipient}】發出邀請：\n\n━━━ 任務資料 ━━━\n活動名稱：${f.event}\n活動詳情：${f.event_details}\n對受邀方的好處：${f.benefits}\n期望行動（CTA）：${f.cta}\n\n━━━ 格式及限制 ━━━\n• 開場需讓受邀者感到被重視，非大量群發感覺\n• 清楚說明活動價值及對受邀者的具體好處\n• 行動號召（CTA）清晰、具體\n• 語氣熱情專業，避免過度推銷\n• 字數 200–300 字\n• 包含主旨行建議\n• 個人資料不確定處以 [請填寫] 標示`}
+  },
+  {id:'e7',cat:'email',ic:'😤',nm:'投訴電郵',ds:'向服務提供者或機構提出正式投訴',tg:'電郵',
+   flds:[
+    {id:'recipient',lb:'投訴對象',tp:'text',ph:'例：電訊公司客服、政府部門、餐廳管理層',req:1},
+    {id:'incident',lb:'事件詳細描述',tp:'textarea',ph:'包括日期、地點及經過...',req:1},
+    {id:'impact',lb:'造成的影響或損失',tp:'text',ph:'例：金錢損失、時間浪費、精神困擾',req:1},
+    {id:'expectation',lb:'期望的解決方案',tp:'text',ph:'例：退款、道歉、解釋、調查',req:1},
+    {id:'tone',lb:'語氣',tp:'select',opts:['正式投訴','強硬要求','理性陳述'],req:1},
+   ],
+   gen(f){return`你是一位消費者權益及法律文書撰寫顧問，擅長撰寫有力、有條理的投訴電郵，能有效傳達不滿並要求合理補救。\n\n請幫我向【${f.recipient}】撰寫一封投訴電郵：\n\n━━━ 任務資料 ━━━\n事件描述：${f.incident}\n造成的影響：${f.impact}\n期望的解決方案：${f.expectation}\n語氣要求：${f.tone}\n\n━━━ 格式及限制 ━━━\n• 開場清楚說明投訴目的\n• 以時序列出事件經過，邏輯清晰\n• 明確說明造成的損失或影響\n• 清楚提出具體要求及回覆期限建議（例如「14個工作日內」）\n• 語氣${f.tone}，有力但不失禮，字數 200–350 字\n• 包含主旨行建議\n• 個人資料不確定處以 [請填寫] 標示，不可捏造`}
+  },
+
+  /* ── 會議報告 ── */
+  {id:'m1',cat:'meeting',ic:'📝',nm:'會議紀錄',ds:'整理會議要點、決議及行動項目',tg:'報告',
+   flds:[
+    {id:'meeting_topic',lb:'會議主題',tp:'text',ph:'例：2025年第一季業務檢討',req:1},
+    {id:'attendees',lb:'出席人員',tp:'text',ph:'例：張總監、李經理、財務部代表',req:1},
+    {id:'key_points',lb:'主要討論重點',tp:'textarea',ph:'簡列討論過的議題及內容...',req:1},
+    {id:'decisions',lb:'決議事項',tp:'textarea',ph:'會議中達成的決定或共識...',req:1},
+    {id:'action_items',lb:'跟進行動',tp:'text',ph:'例：王生負責準備報告（截止2月28日）',req:0},
+   ],
+   gen(f){return`你是一位專業行政助理，擅長將會議要點整理成格式清晰、易於存檔及跟進的會議紀錄。\n\n請根據以下資料，撰寫一份完整的會議紀錄：\n\n━━━ 會議資料 ━━━\n會議主題：${f.meeting_topic}\n出席人員：${f.attendees}\n主要討論重點：${f.key_points}\n決議事項：${f.decisions}${f.action_items?'\n跟進行動：'+f.action_items:''}\n\n━━━ 格式要求 ━━━\n• 格式：會議基本資料（主題、日期[請填寫]、地點[請填寫]、出席人員）→ 討論事項（逐點列出）→ 決議事項 → 跟進行動（負責人及截止日期）\n• 語氣正式、客觀、第三身\n• 使用標準會議紀錄格式，易於存檔\n• 若有不清楚的細節，以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'m2',cat:'meeting',ic:'📊',nm:'週期工作報告',ds:'定期匯報工作進度及成果',tg:'報告',
+   flds:[
+    {id:'period',lb:'報告期間',tp:'text',ph:'例：2025年1月、第一季度',req:1},
+    {id:'role',lb:'職位或部門',tp:'text',ph:'例：市場部經理、IT支援團隊',req:1},
+    {id:'completed',lb:'完成事項',tp:'textarea',ph:'本期完成的主要工作...',req:1},
+    {id:'pending',lb:'待處理事項',tp:'text',ph:'尚未完成或需跟進的工作',req:1},
+    {id:'target_reader',lb:'目標讀者',tp:'text',ph:'例：直屬上司、部門總監、管理層',req:1},
+   ],
+   gen(f){return`你是一位專業報告撰寫顧問，熟悉企業內部工作報告的格式與表達方式，能將工作進度清晰、有重點地呈現給管理層。\n\n請為【${f.role}】撰寫一份【${f.period}】工作報告，目標讀者為【${f.target_reader}】：\n\n━━━ 報告資料 ━━━\n完成事項：${f.completed}\n待處理事項：${f.pending}\n\n━━━ 格式及限制 ━━━\n• 格式：執行摘要（1-2句）→ 本期完成事項（要點列舉）→ 待處理事項及計劃 → 需要支持或資源（如適用）\n• 語氣專業、積極，突出成果\n• 完成事項需量化（如有數字請使用，若無則以 [請補充數據] 提示）\n• 避免冗長，重點突出\n• 若有不確定資訊，以 [請填寫] 標示，絕不捏造`}
+  },
+  {id:'m3',cat:'meeting',ic:'🚀',nm:'項目進度更新',ds:'向持份者更新項目最新狀況',tg:'報告',
+   flds:[
+    {id:'project_name',lb:'項目名稱',tp:'text',ph:'例：CRM系統升級、新品發布活動',req:1},
+    {id:'current_status',lb:'現時狀態',tp:'select',opts:['按計劃進行中','輕微延誤','嚴重延誤','提前完成','暫停'],req:1},
+    {id:'progress',lb:'進度詳情',tp:'textarea',ph:'已完成的里程碑、現時進展...',req:1},
+    {id:'risks',lb:'風險或問題',tp:'text',ph:'例：供應商延誤、預算超支風險',req:0},
+    {id:'next_steps',lb:'下一步行動',tp:'text',ph:'未來1-2週的計劃',req:1},
+   ],
+   gen(f){return`你是一位項目管理顧問（PMP），擅長撰寫清晰、有條理的項目進度更新報告，能有效讓持份者掌握項目狀況。\n\n請撰寫一份【${f.project_name}】的項目進度更新報告：\n\n━━━ 項目資料 ━━━\n現時狀態：${f.current_status}\n進度詳情：${f.progress}${f.risks?'\n風險或問題：'+f.risks:''}\n下一步行動：${f.next_steps}\n\n━━━ 格式及限制 ━━━\n• 格式：項目狀態（用顏色標示 🟢/🟡/🔴 對應狀態）→ 進度摘要 → 完成里程碑 → 風險與問題（如有）→ 下一步計劃\n• 語氣專業客觀，現時狀態【${f.current_status}】的措辭需配合\n• 重點數據需清楚呈現\n• 若有不確定數據，以 [請補充] 標示，不可捏造`}
+  },
+  {id:'m4',cat:'meeting',ic:'🔍',nm:'事件調查報告',ds:'記錄事件經過並提出改善建議',tg:'報告',
+   flds:[
+    {id:'incident_name',lb:'事件名稱',tp:'text',ph:'例：系統宕機事件、客訴升級事件',req:1},
+    {id:'date',lb:'發生日期',tp:'text',ph:'例：2025年1月15日下午2時',req:1},
+    {id:'description',lb:'事件描述',tp:'textarea',ph:'詳細描述事件經過...',req:1},
+    {id:'cause',lb:'根本原因',tp:'text',ph:'例：人為操作失誤、系統漏洞、流程缺失',req:1},
+    {id:'recommendations',lb:'改善建議',tp:'text',ph:'防止再發的具體措施',req:1},
+   ],
+   gen(f){return`你是一位企業風險管理顧問，擅長撰寫客觀、全面的事件調查報告，能清晰分析根本原因並提出可行的改善建議。\n\n請撰寫關於【${f.incident_name}】的事件調查報告：\n\n━━━ 事件資料 ━━━\n發生日期：${f.date}\n事件描述：${f.description}\n根本原因：${f.cause}\n改善建議：${f.recommendations}\n\n━━━ 格式及限制 ━━━\n• 格式：執行摘要 → 事件概述（時序）→ 影響範圍 → 根本原因分析（引用5-Why方法框架）→ 改善建議及行動計劃 → 結語\n• 語氣客觀、中立，避免主觀判斷或推卸責任\n• 改善建議需具體、可執行，並建議負責人及時間表格式\n• 若有不確定資訊，以 [待查核] 標示，絕不捏造`}
+  },
+  {id:'m5',cat:'meeting',ic:'🎯',nm:'年度總結報告',ds:'回顧全年成就、挑戰及來年計劃',tg:'報告',
+   flds:[
+    {id:'department',lb:'部門或個人名稱',tp:'text',ph:'例：市場部、張小明',req:1},
+    {id:'year',lb:'年份',tp:'text',ph:'例：2025',req:1},
+    {id:'achievements',lb:'主要成就',tp:'textarea',ph:'今年達成的重要成果或里程碑...',req:1},
+    {id:'challenges',lb:'面對的挑戰',tp:'textarea',ph:'今年遇到的困難及如何應對...',req:1},
+    {id:'goals_next_year',lb:'明年目標',tp:'text',ph:'來年的重點計劃或目標',req:1},
+   ],
+   gen(f){return`你是一位企業管理顧問，擅長撰寫全面、有說服力的年度總結報告，能有效展示成果、反思挑戰並規劃未來。\n\n請為【${f.department}】撰寫一份【${f.year}年度】總結報告：\n\n━━━ 報告資料 ━━━\n主要成就：${f.achievements}\n面對的挑戰：${f.challenges}\n明年目標：${f.goals_next_year}\n\n━━━ 格式及限制 ━━━\n• 格式：年度概覽（引言）→ 主要成就（量化成果，如有數字以 [請補充數字] 提示）→ 挑戰與應對策略 → 明年目標與計劃（SMART格式）→ 結語\n• 語氣積極正面，成就部分突出具體影響\n• 挑戰部分展示學習態度，不只列問題\n• 整體字數 400–600 字`}
+  },
+  {id:'m6',cat:'meeting',ic:'📈',nm:'數據分析報告',ds:'解讀數據並提出洞察與建議',tg:'報告',
+   flds:[
+    {id:'topic',lb:'分析主題',tp:'text',ph:'例：季度銷售數據、網站流量分析',req:1},
+    {id:'data_source',lb:'數據來源及主要數字',tp:'textarea',ph:'貼上你的數據或描述主要數字...',req:1},
+    {id:'audience',lb:'目標讀者',tp:'text',ph:'例：管理層、市場部同事、投資者',req:1},
+    {id:'format',lb:'報告格式',tp:'select',opts:['執行摘要（簡短）','完整分析報告','簡報用要點'],req:1},
+   ],
+   gen(f){return`你是一位數據分析顧問，擅長解讀商業數據並以清晰、有洞察的方式向不同受眾呈現分析結果。\n\n請根據以下數據，撰寫一份【${f.topic}】分析報告，目標讀者為【${f.audience}】：\n\n━━━ 分析資料 ━━━\n數據來源及主要數字：\n${f.data_source}\n輸出格式：${f.format}\n\n━━━ 格式及限制 ━━━\n• 以【${f.format}】格式輸出\n• 分析需涵蓋：主要趨勢 → 關鍵洞察 → 異常或值得注意的數據點 → 建議行動\n• 語氣根據讀者【${f.audience}】調整\n• 所有結論必須基於提供的數據，不可憑空推斷\n• 若數據不足以支持某結論，請明確指出「需要更多數據」而非捏造`}
+  },
+
+  /* ── 提案計劃 ── */
+  {id:'p1',cat:'proposal',ic:'💡',nm:'新項目提案書',ds:'向管理層或客戶提出新項目構想',tg:'提案',
+   flds:[
+    {id:'project_name',lb:'項目名稱',tp:'text',ph:'例：數碼化客戶服務系統',req:1},
+    {id:'problem',lb:'要解決的問題或背景',tp:'textarea',ph:'現時面對什麼問題或機遇...',req:1},
+    {id:'solution',lb:'建議方案',tp:'textarea',ph:'如何解決這個問題...',req:1},
+    {id:'benefits',lb:'預期效益',tp:'text',ph:'例：節省30%人力、提升客戶滿意度',req:1},
+    {id:'resources',lb:'所需資源',tp:'text',ph:'例：預算$50萬、3個月時間',req:1},
+   ],
+   gen(f){return`你是一位商業策略及提案撰寫顧問，擅長撰寫能打動決策者、邏輯清晰且具說服力的項目提案書。\n\n請撰寫【${f.project_name}】的項目提案書：\n\n━━━ 提案資料 ━━━\n問題或背景：${f.problem}\n建議方案：${f.solution}\n預期效益：${f.benefits}\n所需資源：${f.resources}\n\n━━━ 格式及限制 ━━━\n• 格式：執行摘要 → 問題陳述（現狀及痛點）→ 建議方案（詳細說明）→ 預期效益（盡量量化）→ 所需資源及時間表 → 風險評估 → 建議下一步\n• 語氣專業有說服力，以效益為主軸\n• 效益部分盡量量化，無法量化的以 [建議補充數據] 提示\n• 避免空洞口號，每個主張都需有支撐\n• 字數 400–600 字\n• 若有不確定資訊以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'p2',cat:'proposal',ic:'📅',nm:'工作計劃書',ds:'制定項目執行路線圖',tg:'提案',
+   flds:[
+    {id:'project',lb:'項目或工作名稱',tp:'text',ph:'例：品牌重塑項目',req:1},
+    {id:'objectives',lb:'目標及預期成果',tp:'textarea',ph:'這個計劃要達成什麼...',req:1},
+    {id:'timeline',lb:'時間線',tp:'text',ph:'例：3個月、2025年Q1至Q2',req:1},
+    {id:'team',lb:'負責部門或人員',tp:'text',ph:'例：市場部主導，IT部門協作',req:1},
+    {id:'kpi',lb:'KPI 或成功指標',tp:'text',ph:'例：完成率達100%、客戶滿意度+10%',req:0},
+   ],
+   gen(f){return`你是一位項目管理（PMP）及策略規劃專家，擅長制定結構清晰、可執行性強的工作計劃書。\n\n請為【${f.project}】制定一份完整的工作計劃書：\n\n━━━ 計劃資料 ━━━\n目標及預期成果：${f.objectives}\n時間線：${f.timeline}\n負責部門或人員：${f.team}${f.kpi?'\nKPI 或成功指標：'+f.kpi:''}\n\n━━━ 格式及限制 ━━━\n• 格式：計劃概覽 → 目標與範圍 → 工作分解結構（WBS，按階段列出主要任務）→ 時間表 → 資源分配 → 風險管理 → 成功指標\n• 任務需具體到可執行的層面，每個階段需有清晰里程碑及負責人\n• ${f.kpi?'成功指標圍繞：'+f.kpi:'請為此計劃建議3-5個合適的KPI'}\n• 若有不確定資訊以 [請填寫] 標示`}
+  },
+  {id:'p3',cat:'proposal',ic:'🎉',nm:'活動企劃書',ds:'為活動或推廣策劃完整方案',tg:'提案',
+   flds:[
+    {id:'event_name',lb:'活動名稱',tp:'text',ph:'例：年度員工晚宴、產品發布會',req:1},
+    {id:'purpose',lb:'活動目的',tp:'text',ph:'例：表彰員工、推廣新品、增強凝聚力',req:1},
+    {id:'audience',lb:'目標對象及規模',tp:'text',ph:'例：全體員工200人、潛在客戶50人',req:1},
+    {id:'date_venue',lb:'日期及地點',tp:'text',ph:'例：2025年3月15日、香港會議展覽中心',req:1},
+    {id:'budget',lb:'預算範圍',tp:'text',ph:'例：$8萬、待定',req:0},
+   ],
+   gen(f){return`你是一位活動策劃及公關專家，擅長撰寫全面、有創意且可執行的活動企劃書。\n\n請為【${f.event_name}】撰寫活動企劃書：\n\n━━━ 活動資料 ━━━\n活動目的：${f.purpose}\n目標對象：${f.audience}\n日期及地點：${f.date_venue}${f.budget?'\n預算範圍：'+f.budget:''}\n\n━━━ 格式及限制 ━━━\n• 格式：活動概覽 → 目的與目標 → 受眾分析 → 活動流程（時序）→ 場地及後勤安排 → 宣傳推廣計劃 → 預算概算 → 人員分工 → 風險預案 → 成功指標\n• 活動流程需具體列出時間及環節\n• ${f.budget?'預算需控制在'+f.budget+'以內':'請提供合理估算，以 [待確認] 標示未確定項目'}\n• 若有不確定資訊以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'p4',cat:'proposal',ic:'💰',nm:'預算申請',ds:'向管理層申請特定項目預算',tg:'提案',
+   flds:[
+    {id:'department',lb:'申請部門',tp:'text',ph:'例：市場部、IT部門',req:1},
+    {id:'item',lb:'申請項目',tp:'text',ph:'例：購置電腦設備、市場推廣費用',req:1},
+    {id:'amount',lb:'申請金額',tp:'text',ph:'例：$120,000',req:1},
+    {id:'justification',lb:'申請理由及效益',tp:'textarea',ph:'為何需要這筆預算，預期帶來什麼效益...',req:1},
+    {id:'urgency',lb:'緊急程度',tp:'select',opts:['一般（下季度前）','優先（本月內）','緊急（本週內）'],req:1},
+   ],
+   gen(f){return`你是一位財務及商業顧問，擅長撰寫具說服力、邏輯清晰的預算申請書，能有效向管理層爭取資源。\n\n請為【${f.department}】撰寫一份預算申請書：\n\n━━━ 申請資料 ━━━\n申請項目：${f.item}\n申請金額：${f.amount}\n申請理由及效益：${f.justification}\n緊急程度：${f.urgency}\n\n━━━ 格式及限制 ━━━\n• 格式：申請摘要 → 申請背景（現時痛點）→ 申請詳情（項目說明）→ 費用明細（逐項列出）→ 預期效益（投資回報分析）→ 若不批准的潛在影響 → 申請批准建議\n• 以效益為主軸，突出 ROI 概念\n• 費用明細需具體，如無法細列則以 [請補充明細] 提示\n• 緊急程度為【${f.urgency}】，措辭需配合\n• 若有不確定資訊以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'p5',cat:'proposal',ic:'⚙️',nm:'流程改善建議',ds:'提出現有工作流程的優化方案',tg:'提案',
+   flds:[
+    {id:'current_process',lb:'現有流程名稱',tp:'text',ph:'例：員工報銷流程、客戶投訴處理',req:1},
+    {id:'problem',lb:'現有問題或痛點',tp:'textarea',ph:'現時流程有什麼不足...',req:1},
+    {id:'suggestion',lb:'改善建議',tp:'textarea',ph:'建議如何改善...',req:1},
+    {id:'expected_improvement',lb:'預期改善效果',tp:'text',ph:'例：縮短50%處理時間、減少人為錯誤',req:1},
+    {id:'implementation',lb:'實施方式',tp:'text',ph:'例：分三階段、需IT系統支援',req:0},
+   ],
+   gen(f){return`你是一位業務流程優化（BPO）顧問，擅長分析現有流程的缺陷並提出切實可行的改善方案。\n\n請就【${f.current_process}】撰寫一份流程改善建議書：\n\n━━━ 建議資料 ━━━\n現有問題：${f.problem}\n改善建議：${f.suggestion}\n預期效果：${f.expected_improvement}${f.implementation?'\n實施方式：'+f.implementation:''}\n\n━━━ 格式及限制 ━━━\n• 格式：現狀分析（問題診斷）→ 改善目標 → 建議方案（現行流程 vs 改善後流程對比）→ 實施計劃 → 預期效益 → 所需資源 → 建議行動\n• 以「現在 vs 改善後」對比方式呈現，讓差異清晰可見\n• 改善建議需具體可執行，非籠統建議，效益盡量量化\n• 若有不確定資訊以 [請填寫] 標示`}
+  },
+  {id:'p6',cat:'proposal',ic:'🫱',nm:'合作方案提案',ds:'向潛在合作夥伴提出合作構想',tg:'提案',
+   flds:[
+    {id:'my_org',lb:'我方機構或部門',tp:'text',ph:'例：ABC科技有限公司',req:1},
+    {id:'partner',lb:'合作對象',tp:'text',ph:'例：XYZ教育機構、政府部門',req:1},
+    {id:'collaboration_type',lb:'合作模式',tp:'text',ph:'例：聯合推廣、技術授權、資源共享',req:1},
+    {id:'value_proposition',lb:'合作價值及雙方效益',tp:'textarea',ph:'這次合作對雙方有什麼好處...',req:1},
+    {id:'next_step',lb:'建議下一步',tp:'text',ph:'例：安排初步會面、發送合約草稿',req:1},
+   ],
+   gen(f){return`你是一位商業發展及策略合作顧問，擅長撰寫能打動合作方、以共贏為核心的合作提案書。\n\n請以【${f.my_org}】的立場，向【${f.partner}】撰寫一份合作方案提案：\n\n━━━ 提案資料 ━━━\n合作模式：${f.collaboration_type}\n合作價值及雙方效益：${f.value_proposition}\n建議下一步：${f.next_step}\n\n━━━ 格式及限制 ━━━\n• 格式：提案摘要 → 我方背景及優勢 → 合作機遇（市場背景）→ 建議合作模式詳述 → 雙方得益分析（平衡呈現）→ 合作條款框架建議 → 下一步行動\n• 以對方立場為主，強調對方的得益\n• 語氣專業、積極，建立互信感\n• 避免過度承諾，不確定事項以 [待商議] 標示\n• 字數 400–500 字`}
+  },
+
+  /* ── 通知公告 ── */
+  {id:'n1',cat:'notice',ic:'📣',nm:'內部通告',ds:'向員工或部門發出內部通知',tg:'通知',
+   flds:[
+    {id:'topic',lb:'通告主題',tp:'text',ph:'例：辦公室搬遷、系統維護、政策調整',req:1},
+    {id:'audience',lb:'受眾',tp:'text',ph:'例：全體員工、市場部同事、管理層',req:1},
+    {id:'content',lb:'主要內容',tp:'textarea',ph:'通告的具體資訊...',req:1},
+    {id:'effective_date',lb:'生效或相關日期',tp:'text',ph:'例：2025年2月1日起',req:1},
+    {id:'action_required',lb:'員工需採取的行動',tp:'text',ph:'例：請於1月31日前回覆確認',req:0},
+   ],
+   gen(f){return`你是一位企業傳訊顧問，擅長撰寫清晰、格式規範的內部通告，確保員工能快速理解重要資訊及所需行動。\n\n請撰寫一份內部通告，向【${f.audience}】通知以下事項：\n\n━━━ 通告資料 ━━━\n主題：${f.topic}\n主要內容：${f.content}\n生效日期：${f.effective_date}${f.action_required?'\n員工需採取的行動：'+f.action_required:''}\n\n━━━ 格式及限制 ━━━\n• 格式：通告抬頭（收件人、發件人、日期、主題）→ 正文（清晰說明事項）→ 行動要求（如有）→ 查詢聯絡 [請填寫]\n• 語氣正式、清晰，重要資訊需突出\n• 避免冗長，直接說重點，行動指示需具體包含截止日期\n• 若有不確定資訊以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'n2',cat:'notice',ic:'📰',nm:'對外公告聲明',ds:'向公眾或媒體發出正式聲明',tg:'通知',
+   flds:[
+    {id:'org_name',lb:'機構名稱',tp:'text',ph:'例：ABC集團有限公司',req:1},
+    {id:'topic',lb:'公告主題',tp:'text',ph:'例：人事變動、業務調整、事件回應',req:1},
+    {id:'content',lb:'聲明內容',tp:'textarea',ph:'公告的詳細內容...',req:1},
+    {id:'effective_date',lb:'日期',tp:'text',ph:'例：2025年1月20日',req:1},
+    {id:'contact',lb:'查詢聯絡方式',tp:'text',ph:'例：電郵、電話',req:0},
+   ],
+   gen(f){return`你是一位公關及企業傳訊顧問，擅長撰寫專業、謹慎的對外公告及聲明，能有效管理公眾認知及媒體關係。\n\n請以【${f.org_name}】名義，撰寫一份關於【${f.topic}】的對外公告聲明：\n\n━━━ 聲明資料 ━━━\n主題：${f.topic}\n聲明內容：${f.content}\n日期：${f.effective_date}${f.contact?'\n查詢聯絡：'+f.contact:''}\n\n━━━ 格式及限制 ━━━\n• 格式：標題 → 引言（概述要點）→ 詳細說明 → 機構立場 → 聯絡資訊\n• 語氣正式、權威，代表機構官方立場\n• 措辭謹慎，避免引起誤解或爭議\n• 所有事實陳述必須基於提供的資料，不可捏造\n• 若有不確定資訊以 [請核實後填寫] 標示，字數 200–350 字`}
+  },
+  {id:'n3',cat:'notice',ic:'📋',nm:'政策更新通知',ds:'通知員工或客戶政策變更的詳情',tg:'通知',
+   flds:[
+    {id:'policy_name',lb:'政策名稱',tp:'text',ph:'例：差旅報銷政策、個人資料保護政策',req:1},
+    {id:'changes',lb:'主要變更內容',tp:'textarea',ph:'新政策與舊政策的主要分別...',req:1},
+    {id:'reason',lb:'更新原因',tp:'text',ph:'例：法規要求、業務需要、優化流程',req:1},
+    {id:'effective_date',lb:'生效日期',tp:'text',ph:'例：2025年3月1日',req:1},
+    {id:'action_required',lb:'受影響人員需採取的行動',tp:'text',ph:'例：閱讀並簽署確認、更新相關表格',req:0},
+   ],
+   gen(f){return`你是一位企業法務及合規傳訊專家，擅長將複雜的政策變更以清晰、易理解的方式傳達給相關人員。\n\n請撰寫一份【${f.policy_name}】更新通知：\n\n━━━ 通知資料 ━━━\n主要變更內容：${f.changes}\n更新原因：${f.reason}\n生效日期：${f.effective_date}${f.action_required?'\n所需行動：'+f.action_required:''}\n\n━━━ 格式及限制 ━━━\n• 格式：通知標題 → 更新背景（為何更新）→ 主要變更摘要（舊 vs 新對比，使用清晰格式）→ 生效日期 → 受影響範圍 → 所需行動 → 查詢方式\n• 變更內容需以「原來 → 更新後」格式對比呈現\n• 語氣正式、清晰，確保讀者理解影響\n• 重要日期需突出標示\n• 若有不確定資訊以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'n4',cat:'notice',ic:'🎊',nm:'活動通知',ds:'通知員工或公眾即將舉辦的活動',tg:'通知',
+   flds:[
+    {id:'event_name',lb:'活動名稱',tp:'text',ph:'例：團隊建立日、週年慶典',req:1},
+    {id:'date_time',lb:'日期及時間',tp:'text',ph:'例：2025年4月5日（六）下午2時',req:1},
+    {id:'venue',lb:'地點',tp:'text',ph:'例：香港會議展覽中心1號展館',req:1},
+    {id:'audience',lb:'通知對象',tp:'text',ph:'例：全體員工、各部門主管',req:1},
+    {id:'rsvp',lb:'報名或回覆要求',tp:'text',ph:'例：請於3月25日前透過表單報名',req:0},
+   ],
+   gen(f){return`你是一位活動策劃及企業傳訊顧問，擅長撰寫令人期待、資訊完整的活動通知。\n\n請為【${f.event_name}】撰寫一份活動通知，對象為【${f.audience}】：\n\n━━━ 活動資料 ━━━\n日期及時間：${f.date_time}\n地點：${f.venue}${f.rsvp?'\n報名或回覆要求：'+f.rsvp:''}\n\n━━━ 格式及限制 ━━━\n• 格式：活動標題 → 活動簡介（目的及亮點）→ 活動詳情（日期、時間、地點）→ 活動流程概覽 → 報名或回覆指引（如有）→ 聯絡查詢\n• 語氣熱情積極，讓受邀者期待參與\n• 關鍵資訊（日期、地點）需突出\n• 若有不確定資訊以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'n5',cat:'notice',ic:'⚠️',nm:'警告提示通知',ds:'提醒相關人員注意重要風險或問題',tg:'通知',
+   flds:[
+    {id:'topic',lb:'警告主題',tp:'text',ph:'例：網絡安全威脅、工地安全、資料外洩風險',req:1},
+    {id:'risk',lb:'風險或問題描述',tp:'textarea',ph:'詳細說明風險的性質及嚴重程度...',req:1},
+    {id:'audience',lb:'受影響對象',tp:'text',ph:'例：全體員工、IT系統用戶',req:1},
+    {id:'action',lb:'要求採取的具體行動',tp:'text',ph:'例：立即更改密碼、停止使用指定系統',req:1},
+    {id:'deadline',lb:'行動期限',tp:'text',ph:'例：24小時內、2025年2月5日前',req:0},
+   ],
+   gen(f){return`你是一位風險管理及企業安全傳訊專家，擅長撰寫清晰、有緊迫感但不引起過度恐慌的警告通知。\n\n請就【${f.topic}】撰寫一份警告提示通知，對象為【${f.audience}】：\n\n━━━ 通知資料 ━━━\n風險描述：${f.risk}\n要求採取的行動：${f.action}${f.deadline?'\n行動期限：'+f.deadline:''}\n\n━━━ 格式及限制 ━━━\n• 格式：警告標題（需清晰標示嚴重程度）→ 風險說明（簡明扼要）→ 受影響範圍 → 立即行動指引（逐步說明）→ 後果說明（若不採取行動）→ 聯絡支援\n• 語氣嚴肅但清晰，製造適當緊迫感而非恐慌\n• 行動指引需具體到「步驟1、步驟2…」的層面\n• 技術術語需作簡單解釋\n• 若有不確定資訊以 [待確認] 標示，不可捏造`}
+  },
+
+  /* ── 整理分析 ── */
+  {id:'a1',cat:'analysis',ic:'📄',nm:'文件摘要',ds:'提取文件核心內容並簡化呈現',tg:'分析',
+   flds:[
+    {id:'doc_type',lb:'文件類型',tp:'text',ph:'例：合約、政策文件、學術報告',req:1},
+    {id:'content',lb:'文件內容',tp:'textarea',ph:'貼上文件全文，或描述文件的主要內容...',req:1},
+    {id:'length',lb:'摘要長度',tp:'select',opts:['3句話以內','半頁（約200字）','一頁（約500字）'],req:1},
+    {id:'audience',lb:'閱讀對象',tp:'text',ph:'例：管理層、非專業人士、法律部門',req:1},
+    {id:'focus',lb:'特別關注的重點',tp:'text',ph:'例：只看財務條款、只看風險事項',req:0},
+   ],
+   gen(f){return`你是一位專業文件分析師，擅長快速提取文件要點，以簡潔清晰的摘要呈現給不同背景的讀者。\n\n請為以下【${f.doc_type}】撰寫一份摘要，閱讀對象為【${f.audience}】：\n\n━━━ 文件內容 ━━━\n${f.content}\n\n━━━ 任務要求 ━━━\n摘要長度：${f.length}${f.focus?'\n特別關注：'+f.focus:''}\n\n━━━ 格式及限制 ━━━\n• 以【${f.length}】的長度輸出摘要\n• 語言適合【${f.audience}】的理解程度\n• 摘要需涵蓋：核心主旨 → 主要要點 → 重要細節或條款 → 關鍵結論或行動\n• ${f.focus?'重點聚焦於：'+f.focus:'全面涵蓋文件重點'}\n• 嚴格根據原文內容，不可加入文件以外的資訊或個人解讀\n• 若有不清楚的內容，說明「[原文此處不清晰]」而非推測`}
+  },
+  {id:'a2',cat:'analysis',ic:'⚖️',nm:'方案比較分析',ds:'客觀比較多個選項的優劣',tg:'分析',
+   flds:[
+    {id:'topic',lb:'比較主題',tp:'text',ph:'例：選擇辦公室地點、採購軟件方案',req:1},
+    {id:'options',lb:'比較選項',tp:'text',ph:'例：方案A（XX）、方案B（YY）、方案C（ZZ）',req:1},
+    {id:'criteria',lb:'比較維度',tp:'text',ph:'例：成本、實施時間、功能、風險',req:1},
+    {id:'audience',lb:'目標讀者',tp:'text',ph:'例：管理層、採購委員會',req:1},
+    {id:'format',lb:'輸出格式',tp:'select',opts:['比較表格','段落分析報告','優劣評分'],req:1},
+   ],
+   gen(f){return`你是一位商業分析顧問，擅長進行客觀、全面的方案比較分析，協助決策者作出有根據的選擇。\n\n請就【${f.topic}】進行方案比較分析，目標讀者為【${f.audience}】：\n\n━━━ 分析資料 ━━━\n比較選項：${f.options}\n比較維度：${f.criteria}\n輸出格式：${f.format}\n\n━━━ 格式及限制 ━━━\n• 以【${f.format}】格式輸出\n• 分析需涵蓋每個比較維度：${f.criteria}\n• 分析需客觀中立，每個方案公平對待\n• 比較後需有「分析師建議」部分，說明在提供資訊基礎上哪個方案較優及原因\n• 若提供的資訊不足以作出某維度的比較，請明確說明「需要補充資訊」而非猜測\n• 若有不確定資訊以 [請補充] 標示`}
+  },
+  {id:'a3',cat:'analysis',ic:'❓',nm:'FAQ 整理',ds:'整理常見問題及標準答案',tg:'分析',
+   flds:[
+    {id:'topic',lb:'主題範疇',tp:'text',ph:'例：新員工入職、產品使用、差旅報銷',req:1},
+    {id:'common_issues',lb:'常見問題類型或背景資料',tp:'textarea',ph:'描述常見的疑問，或貼上相關政策/資料...',req:1},
+    {id:'num_questions',lb:'問題數量',tp:'select',opts:['5條','10條','15條','20條'],req:1},
+    {id:'tone',lb:'語氣',tp:'select',opts:['正式','友好口語','中性'],req:1},
+    {id:'extra',lb:'特別要求',tp:'text',ph:'例：需要中英對照、針對特定受眾',req:0},
+   ],
+   gen(f){return`你是一位知識管理及企業傳訊顧問，擅長整理常見問題並以清晰、實用的FAQ格式呈現。\n\n請就【${f.topic}】整理一份FAQ文件：\n\n━━━ 參考資料 ━━━\n${f.common_issues}\n\n━━━ 任務要求 ━━━\n問題數量：${f.num_questions}\n語氣：${f.tone}${f.extra?'\n特別要求：'+f.extra:''}\n\n━━━ 格式及限制 ━━━\n• 整理【${f.num_questions}】的常見問題及答案\n• 問題需涵蓋不同類別，由基礎到進階排列\n• 答案語氣保持【${f.tone}】，每條答案 2–4 句\n• 問題措辭需貼近真實用戶的提問方式\n• 嚴格根據提供的背景資料撰寫答案；若提供資料不足，明確說明「[需要更多資訊以回答此問題]」，絕不捏造答案\n• 末尾加上「更多問題請聯絡 [請填寫聯絡方式]」`}
+  },
+  {id:'a4',cat:'analysis',ic:'🧭',nm:'SWOT 分析',ds:'全面評估優勢、劣勢、機遇與威脅',tg:'分析',
+   flds:[
+    {id:'subject',lb:'分析對象',tp:'text',ph:'例：公司新產品、個人職涯、業務拓展計劃',req:1},
+    {id:'background',lb:'背景資料',tp:'textarea',ph:'提供相關的背景資訊，讓分析更準確...',req:1},
+    {id:'industry',lb:'所屬行業或範疇',tp:'text',ph:'例：零售業、科技業、教育',req:1},
+    {id:'purpose',lb:'分析目的',tp:'text',ph:'例：制定市場策略、申請投資、個人規劃',req:1},
+    {id:'format',lb:'輸出格式',tp:'select',opts:['四象限表格','段落式報告','要點列表'],req:1},
+   ],
+   gen(f){return`你是一位策略管理顧問，擅長進行深入、全面的 SWOT 分析，能從多角度識別關鍵因素並提出策略建議。\n\n請就【${f.subject}】進行 SWOT 分析：\n\n━━━ 分析資料 ━━━\n背景資料：${f.background}\n所屬行業：${f.industry}\n分析目的：${f.purpose}\n輸出格式：${f.format}\n\n━━━ 格式及限制 ━━━\n• 以【${f.format}】格式輸出\n• 每個象限（S/W/O/T）需列出 3–5 個具體要點\n• 優勢（S）：內部積極因素 ｜ 劣勢（W）：內部消極因素 ｜ 機遇（O）：外部積極因素 ｜ 威脅（T）：外部消極因素\n• 分析後加入「策略建議」（SO、WO、ST、WT策略各一點）\n• 分析必須基於提供的資料，不可憑空捏造數據\n• 策略建議需圍繞分析目的【${f.purpose}】`}
+  },
+  {id:'a5',cat:'analysis',ic:'📉',nm:'利弊分析',ds:'評估決策或方案的正反面因素',tg:'分析',
+   flds:[
+    {id:'topic',lb:'分析主題',tp:'text',ph:'例：是否接受工作邀請、是否推出新產品線',req:1},
+    {id:'context',lb:'背景或情況說明',tp:'textarea',ph:'提供更多背景讓分析更貼切...',req:1},
+    {id:'stakeholders',lb:'相關持份者',tp:'text',ph:'例：員工、股東、客戶、合作夥伴',req:1},
+    {id:'timeframe',lb:'考慮時間範圍',tp:'text',ph:'例：短期（1年）、中長期（3-5年）',req:0},
+    {id:'format',lb:'輸出格式',tp:'select',opts:['兩欄表格','段落式','加權評分表'],req:1},
+   ],
+   gen(f){return`你是一位決策分析顧問，擅長從多角度、多持份者立場全面評估決策的利弊，協助作出有理據的判斷。\n\n請就【${f.topic}】進行利弊分析：\n\n━━━ 分析資料 ━━━\n背景說明：${f.context}\n相關持份者：${f.stakeholders}${f.timeframe?'\n考慮時間範圍：'+f.timeframe:''}\n輸出格式：${f.format}\n\n━━━ 格式及限制 ━━━\n• 以【${f.format}】格式輸出\n• 分析需涵蓋以下持份者的視角：${f.stakeholders}\n• 每方至少列出 4–6 個具體因素（非籠統描述）\n• ${f.timeframe?'同時考慮短期和長期影響，重點關注'+f.timeframe+'時間範圍':'同時考慮短期和長期影響'}\n• 分析後給出「總結建議」：綜合各方因素後的客觀判斷\n• 嚴格基於提供的背景資料分析，不確定的假設需標明`}
+  },
+  {id:'a6',cat:'analysis',ic:'🔭',nm:'競爭對手分析',ds:'深度了解競爭格局及自身定位',tg:'分析',
+   flds:[
+    {id:'my_product',lb:'我方產品或服務',tp:'text',ph:'例：企業管理軟件SaaS、有機護膚品牌',req:1},
+    {id:'competitors',lb:'競爭對手',tp:'text',ph:'例：品牌A、品牌B、品牌C',req:1},
+    {id:'dimensions',lb:'比較維度',tp:'text',ph:'例：定價、功能、市場份額、品牌形象',req:1},
+    {id:'market',lb:'目標市場',tp:'text',ph:'例：香港中小企業、亞洲B2C消費者',req:1},
+    {id:'purpose',lb:'分析用途',tp:'text',ph:'例：制定競爭策略、投資者報告',req:1},
+   ],
+   gen(f){return`你是一位市場策略及競爭情報分析師，擅長進行全面的競爭對手分析，為品牌定位及策略制定提供洞察。\n\n請就【${f.my_product}】與競爭對手進行分析，分析用途為【${f.purpose}】：\n\n━━━ 分析資料 ━━━\n競爭對手：${f.competitors}\n比較維度：${f.dimensions}\n目標市場：${f.market}\n\n━━━ 格式及限制 ━━━\n• 格式：市場概覽 → 競爭對手概述（逐一介紹）→ 比較分析表格（維度：${f.dimensions}）→ 各方優劣勢總結 → 我方競爭優勢分析 → 策略建議\n• 分析需客觀，同等對待各競爭對手\n• 若提供的資料不足以分析某維度，明確說明「[需要市場調研數據]」而非捏造\n• 策略建議需針對目標市場【${f.market}】及分析用途【${f.purpose}】`}
+  },
+
+  /* ── 其他文書 ── */
+  {id:'o1',cat:'other',ic:'🎙️',nm:'演講稿致辭',ds:'撰寫有結構、有感染力的演講內容',tg:'文書',
+   flds:[
+    {id:'topic',lb:'演講主題',tp:'text',ph:'例：數碼轉型的未來、感謝晚宴致辭',req:1},
+    {id:'audience',lb:'聽眾背景及規模',tp:'text',ph:'例：行業專家200人、公司全體員工50人',req:1},
+    {id:'duration',lb:'演講時長',tp:'select',opts:['3分鐘','5分鐘','10分鐘','15分鐘'],req:1},
+    {id:'opening_style',lb:'開場風格',tp:'select',opts:['故事引入','數據衝擊','提問互動','金句開場'],req:1},
+    {id:'key_message',lb:'核心訊息',tp:'text',ph:'你希望聽眾記住的最重要一點',req:1},
+   ],
+   gen(f){const wc={'3分鐘':'350-450字','5分鐘':'600-750字','10分鐘':'1200-1500字','15分鐘':'1800-2200字'};return`你是一位專業演講撰稿人（Speechwriter），曾為企業高層及公眾人物撰稿，擅長撰寫有感染力、結構清晰的演講稿。\n\n請為以下場合撰寫演講稿：\n\n━━━ 演講資料 ━━━\n主題：${f.topic}\n聽眾：${f.audience}\n時長：${f.duration}\n開場風格：${f.opening_style}\n核心訊息：${f.key_message}\n\n━━━ 格式及限制 ━━━\n• 以【${f.opening_style}】方式開場，立即吸引注意力\n• 結構：開場 → 主要論點（2-3個）→ 高潮（情感或數據衝擊）→ 有力結語（呼應開場）\n• 語氣自然，適合口語表達，避免書面文字腔調\n• 長度：約${wc[f.duration]||'視時長而定'}\n• 核心訊息【${f.key_message}】需在演講中重複強調\n• 末尾標示預估演講時間\n• 若需個人化細節，以 [請填寫個人故事/名字] 標示`}
+  },
+  {id:'o2',cat:'other',ic:'📰',nm:'新聞稿',ds:'向媒體發布重要消息或公告',tg:'文書',
+   flds:[
+    {id:'org_name',lb:'機構名稱',tp:'text',ph:'例：ABC科技集團',req:1},
+    {id:'topic',lb:'新聞稿主題',tp:'text',ph:'例：推出新產品、宣布合作、人事任命',req:1},
+    {id:'key_facts',lb:'主要事實（5W1H）',tp:'textarea',ph:'誰、什麼事、何時、何地、為何、如何...',req:1},
+    {id:'quote',lb:'引述',tp:'text',ph:'例：CEO張先生：「…」（若無可留空）',req:0},
+    {id:'contact',lb:'媒體查詢聯絡',tp:'text',ph:'例：公關部 李小姐 電話：XXXX',req:0},
+   ],
+   gen(f){return`你是一位資深公關及媒體傳訊顧問，擅長撰寫符合媒體標準的新聞稿，能吸引記者注意並清晰傳達核心訊息。\n\n請以【${f.org_name}】名義撰寫一份新聞稿：\n\n━━━ 新聞資料 ━━━\n主題：${f.topic}\n主要事實（5W1H）：${f.key_facts}${f.quote?'\n引述：'+f.quote:''}${f.contact?'\n媒體查詢：'+f.contact:''}\n\n━━━ 格式及限制 ━━━\n• 格式：標題（吸引眼球）→ 副題（補充說明）→ 導言（首段包含最重要事實）→ 正文（詳細說明，倒金字塔結構）→ 引述 → 機構簡介（Boilerplate）→ 聯絡資訊\n• 採用倒金字塔新聞寫作結構，最重要資訊放首段\n• 語氣客觀中立，第三身，避免宣傳語言\n• 字數 300–500 字\n• 若有不確定資訊以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'o3',cat:'other',ic:'🌟',nm:'推薦信',ds:'為他人撰寫有力的推薦函',tg:'文書',
+   flds:[
+    {id:'candidate',lb:'被推薦人姓名',tp:'text',ph:'例：陳大文',req:1},
+    {id:'purpose',lb:'推薦用途',tp:'text',ph:'例：申請MBA課程、應聘市場部主管',req:1},
+    {id:'relationship',lb:'與被推薦人的關係',tp:'text',ph:'例：直屬上司（3年）、合作夥伴',req:1},
+    {id:'strengths',lb:'主要優點及具體例子',tp:'textarea',ph:'描述被推薦人的突出能力及你親身觀察的例子...',req:1},
+    {id:'recommender',lb:'推薦人姓名及職銜',tp:'text',ph:'例：張志明，XX公司市場總監',req:1},
+   ],
+   gen(f){return`你是一位專業推薦信撰寫顧問，擅長撰寫有說服力、真實具體的推薦信，能有效突出被推薦人的優勢。\n\n請以【${f.recommender}】的身份，為【${f.candidate}】撰寫一封推薦信，用途為【${f.purpose}】：\n\n━━━ 推薦資料 ━━━\n推薦人與被推薦人關係：${f.relationship}\n被推薦人主要優點及例子：${f.strengths}\n\n━━━ 格式及限制 ━━━\n• 格式：稱謂 → 自我介紹及與被推薦人關係 → 整體評價 → 具體能力及例子（2-3個）→ 為何適合此用途 → 無保留推薦 → 聯絡方式\n• 每個優點必須配合具體例子，避免空泛讚美\n• 語氣真誠、具體，第一身陳述，字數 350–450 字\n• 末尾留下聯絡資訊位置 [請填寫電話/電郵]\n• 嚴格根據提供的資料撰寫，不可捏造未提及的例子`}
+  },
+  {id:'o4',cat:'other',ic:'😠',nm:'投訴信',ds:'撰寫正式書面投訴以尋求補救',tg:'文書',
+   flds:[
+    {id:'recipient',lb:'收信方',tp:'text',ph:'例：電訊公司總裁、消費者委員會',req:1},
+    {id:'incident',lb:'事件詳細描述',tp:'textarea',ph:'包括日期、地點及詳細經過...',req:1},
+    {id:'impact',lb:'造成的損失或影響',tp:'text',ph:'例：金錢損失$2000、精神困擾、時間浪費',req:1},
+    {id:'demand',lb:'要求的補救或回應',tp:'text',ph:'例：全額退款、書面道歉、相關人員懲處',req:1},
+    {id:'tone',lb:'語氣',tp:'select',opts:['正式強硬','理性陳述','保留法律追究權利'],req:1},
+   ],
+   gen(f){return`你是一位消費者權益律師助理及法律文書撰寫專家，擅長撰寫有法律效力、邏輯嚴密的正式投訴信。\n\n請向【${f.recipient}】撰寫一封正式投訴信：\n\n━━━ 投訴資料 ━━━\n事件描述：${f.incident}\n造成的損失：${f.impact}\n要求的補救：${f.demand}\n語氣要求：${f.tone}\n\n━━━ 格式及限制 ━━━\n• 格式：收信人資料 → 發信人資料 → 日期 → 主題 → 正文（投訴背景 → 事件時序 → 影響 → 要求）→ 期限聲明 → 簽署\n• 以時序清楚列出事件經過，明確說明損失及影響，盡量量化\n• 要求部分需具體，包含合理期限（例如「14個工作日內」）\n• 語氣【${f.tone}】，有力而不失禮\n• ${f.tone==='保留法律追究權利'?'在結尾加入「本人保留追究相關法律責任的權利」的適當措辭':''}\n• 個人資料不確定處以 [請填寫] 標示，不可捏造`}
+  },
+  {id:'o5',cat:'other',ic:'📱',nm:'社交媒體文案',ds:'撰寫適合各平台的吸引內容',tg:'文書',
+   flds:[
+    {id:'platform',lb:'發布平台',tp:'select',opts:['Facebook','Instagram','LinkedIn','Twitter / X','小紅書'],req:1},
+    {id:'topic',lb:'文案主題',tp:'text',ph:'例：新品發布、公司里程碑、節日祝福',req:1},
+    {id:'target_audience',lb:'目標受眾',tp:'text',ph:'例：25-35歲職場人士、香港家長',req:1},
+    {id:'tone',lb:'語氣',tp:'select',opts:['專業品牌','輕鬆幽默','感性共鳴','教育啟發'],req:1},
+    {id:'word_limit',lb:'字數',tp:'select',opts:['50字以內','100字以內','200字以內'],req:1},
+   ],
+   gen(f){return`你是一位社交媒體內容策略師，深諳各平台的演算法、用戶行為及文案風格，擅長撰寫能引發互動的貼文。\n\n請為【${f.platform}】撰寫一則文案：\n\n━━━ 文案資料 ━━━\n主題：${f.topic}\n目標受眾：${f.target_audience}\n語氣：${f.tone}\n字數上限：${f.word_limit}\n\n━━━ 格式及限制 ━━━\n• 文案需針對【${f.platform}】的用戶習慣和格式\n• 語氣保持【${f.tone}】，貼合目標受眾【${f.target_audience}】\n• 嚴格控制在【${f.word_limit}】以內\n• 開頭需有強力的 Hook，吸引停留\n• 結尾需有明確的 CTA（呼籲行動），例如：分享、留言、點擊連結\n• 適當使用 Emoji（${f.platform==='LinkedIn'?'節制使用':'自由使用'}）\n• 附上 3–5 個相關 Hashtag 建議\n• 若需個人化細節以 [請填寫] 標示`}
+  },
+  {id:'o6',cat:'other',ic:'🙋',nm:'自我介紹',ds:'撰寫適合不同場合的自我介紹',tg:'文書',
+   flds:[
+    {id:'purpose',lb:'使用場合',tp:'select',opts:['求職面試','商業社交場合','學術發表場合','社交媒體個人簡介'],req:1},
+    {id:'background',lb:'個人背景',tp:'textarea',ph:'工作經歷、學歷、主要技能或成就...',req:1},
+    {id:'highlights',lb:'想突出的重點',tp:'text',ph:'例：管理經驗、跨國項目、特定技術專長',req:1},
+    {id:'duration',lb:'長度',tp:'select',opts:['30秒電梯簡介','1分鐘版本','書面版本（200字）'],req:1},
+    {id:'tone',lb:'語氣',tp:'select',opts:['正式專業','親切自然','自信有活力'],req:1},
+   ],
+   gen(f){return`你是一位職涯發展顧問及個人品牌專家，擅長協助不同背景的人撰寫有吸引力、令人印象深刻的自我介紹。\n\n請為以下場合撰寫自我介紹：【${f.purpose}】\n\n━━━ 個人資料 ━━━\n個人背景：${f.background}\n想突出的重點：${f.highlights}\n長度：${f.duration}\n語氣：${f.tone}\n\n━━━ 格式及限制 ━━━\n• 針對【${f.purpose}】的場合調整內容重點和語氣\n• 長度：【${f.duration}】\n• 開場需有記憶點，不要以「大家好，我叫XX」這種平淡方式開始\n• 重點突出：${f.highlights}\n• 語氣【${f.tone}】，自然流暢，適合口語表達\n• 結尾需留下深刻印象或引發對話的話題\n• 嚴格根據提供的背景資料，不可捏造未提及的經歷\n• 個人化細節不確定處以 [請填寫] 標示`}
+  },
+];
+
+const ERR_POOL=[
+  '偵測到輸入內容複雜度超出當前處理閾值，語意分析模組無法完成解析',
+  '自然語言推理引擎發生內部衝突，請求已被安全中止以防止輸出錯誤',
+  '系統負載異常，分配至本請求的運算資源不足，請稍後重試',
+  '內容安全過濾器觸發誤判，請求被標記為待人工審核狀態',
+  '語言模型上下文視窗溢出，輸入標記數量超出當前限制',
+  '分佈式節點同步失敗，無法確保輸出結果的一致性',
+  '本地快取索引發生損壞，無法取得必要的語義向量數據',
+  '請求優先級隊列異常，任務調度器發生意外中斷',
+  '熱詞偵測系統誤觸發，請求被臨時凍結等待系統解封',
+  '模型權重載入超時，推理引擎未能在規定時限內完成初始化',
+];
+
+let curCat='email', curTpl=null, twTimer=null, resText='';
+
+(function init(){
+  renderCats();
+  renderTpls('email');
+})();
+
+function renderCats(){
+  document.getElementById('cats').innerHTML=CATS.map(c=>`
+    <button class="cat-btn${c.id===curCat?' on':''}" onclick="selCat('${c.id}')">${c.ic} ${c.nm}</button>
+  `).join('');
+}
+
+function selCat(id){curCat=id;renderCats();renderTpls(id);}
+
+function renderTpls(cat){
+  document.getElementById('tplList').innerHTML=T.filter(t=>t.cat===cat).map(t=>`
+    <div class="tc${curTpl&&curTpl.id===t.id?' on':''}" onclick="selTpl('${t.id}')">
+      <span class="tc-ic">${t.ic}</span>
+      <div class="tc-info">
+        <div class="tc-nm">${t.nm}</div>
+        <div class="tc-ds">${t.ds}</div>
+        <span class="tg tg-${t.tg}">${t.tg}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selTpl(id){
+  if(twTimer){clearInterval(twTimer);twTimer=null;}
+  curTpl=T.find(t=>t.id===id);
+  if(!curTpl)return;
+  renderTpls(curCat);
+  document.getElementById('welcome').classList.add('hidden');
+  document.getElementById('mainArea').classList.remove('hidden');
+  document.getElementById('obox').classList.add('hidden');
+  showSt(null);
+  document.getElementById('fhdIc').textContent=curTpl.ic;
+  document.getElementById('fhdNm').textContent=curTpl.nm;
+  document.getElementById('fhdDs').textContent=curTpl.ds;
+  const tg=document.getElementById('fhdTg');
+  tg.textContent=curTpl.tg;tg.className=`tg tg-${curTpl.tg}`;
+  renderFlds(curTpl.flds);
+  if(window.innerWidth<=680)document.getElementById('mainArea').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderFlds(flds){
+  document.getElementById('fbody').innerHTML=flds.map(f=>{
+    let inp='';
+    if(f.tp==='text') inp=`<input class="fi" type="text" id="f_${f.id}" placeholder="${f.ph||''}" ${f.req?'required':''}>`;
+    else if(f.tp==='textarea') inp=`<textarea class="fta" id="f_${f.id}" placeholder="${f.ph||''}" rows="3" ${f.req?'required':''}></textarea>`;
+    else if(f.tp==='select') inp=`<select class="fs" id="f_${f.id}">${f.opts.map(o=>`<option>${o}</option>`).join('')}</select>`;
+    return`<div class="fg"><label class="fl" for="f_${f.id}">${f.lb}${f.req?'<span class="fl-r">*</span>':'<span class="fl-o">（選填）</span>'}</label>${inp}</div>`;
+  }).join('');
+}
+
+function resetForm(){
+  if(!curTpl)return;
+  curTpl.flds.forEach(f=>{
+    const el=document.getElementById('f_'+f.id);
+    if(!el)return;
+    if(f.tp==='select')el.selectedIndex=0;
+    else el.value='';
+    el.style.borderColor='';el.style.background='';
+  });
+  document.getElementById('obox').classList.add('hidden');
+  showSt(null);
+}
+
+function collectVals(){
+  const vals={};let ok=true;
+  curTpl.flds.forEach(f=>{
+    const el=document.getElementById('f_'+f.id);
+    if(!el)return;
+    const v=el.value.trim();
+    if(f.req&&!v){el.style.borderColor='#EF4444';el.style.background='#FFF5F5';ok=false;}
+    else{el.style.borderColor='';el.style.background='';}
+    vals[f.id]=v;
+  });
+  return ok?vals:null;
+}
+
+function generate(){
+  if(!curTpl)return;
+  if(twTimer){clearInterval(twTimer);twTimer=null;}
+  ['sp1','sp2','sp3','sp4'].forEach(s=>{const e=document.getElementById(s);if(e)e.classList.remove('show');});
+
+  const vals=collectVals();
+  if(!vals)return;
+
+  document.getElementById('obox').classList.remove('hidden');
+  showSt('Thinking');
+  document.getElementById('genBtn').disabled=true;
+
+  const n1=Math.floor(Math.random()*100)+1;
+  const n2=Math.floor(Math.random()*100)+1;
+  const isErr=(n1===n2);
+
+  ['sp1','sp2','sp3','sp4'].forEach((s,i)=>{
+    setTimeout(()=>{const e=document.getElementById(s);if(e)e.classList.add('show');},300+i*480);
+  });
+
+  const delay=3000+Math.random()*2000;
+  setTimeout(()=>{
+    document.getElementById('genBtn').disabled=false;
+    ['sp1','sp2','sp3','sp4'].forEach(s=>{const e=document.getElementById(s);if(e)e.classList.remove('show');});
+    if(isErr){showErrState(n1,n2);}
+    else{showResult(curTpl.gen(vals));}
+  },delay);
+}
+
+function showSt(st){
+  ['stThinking','stError','stResult'].forEach(id=>{
+    const e=document.getElementById(id);if(e)e.classList.add('hidden');
+  });
+  if(st){const e=document.getElementById('st'+st);if(e)e.classList.remove('hidden');}
+}
+
+function showErrState(n1,n2){
+  showSt('Error');
+  document.getElementById('errCode').textContent=`ERR_${String(n1).padStart(4,'0')} / MATCH_CONFLICT`;
+  const cnt=3+Math.floor(Math.random()*3);
+  const picked=[...ERR_POOL].sort(()=>Math.random()-.5).slice(0,cnt);
+  document.getElementById('errReasons').innerHTML=picked.map((r,i)=>`
+    <div class="err-r"><span class="err-rn">[E${String(i+1).padStart(2,'0')}]</span><span>${r}</span></div>
+  `).join('');
+  document.getElementById('obox').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function dismissErr(){
+  document.getElementById('obox').classList.add('hidden');
+  showSt(null);
+}
+
+function showResult(text){
+  resText=text;
+  showSt('Result');
+  const body=document.getElementById('resBody');
+  const cb=document.getElementById('copyBtn');
+  cb.classList.add('inv');
+  body.textContent='';
+  document.getElementById('obox').scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  let i=0;
+  const cur=document.createElement('span');
+  cur.className='cur';
+  body.appendChild(cur);
+
+  if(twTimer)clearInterval(twTimer);
+  twTimer=setInterval(()=>{
+    if(i<text.length){
+      cur.insertAdjacentText('beforebegin',text[i]);
+      i++;
+      body.scrollTop=body.scrollHeight;
+    } else {
+      clearInterval(twTimer);twTimer=null;
+      cur.remove();
+      cb.classList.remove('inv');
+      document.getElementById('resWc').textContent=`共 ${text.length} 個字符`;
+    }
+  },15);
+}
+
+function doCopy(){
+  if(!resText)return;
+  const cb=document.getElementById('copyBtn');
+  const copy=()=>{cb.classList.add('ok');cb.innerHTML='<span>✓</span><span>已複製！</span>';setTimeout(()=>{cb.classList.remove('ok');cb.innerHTML='<span>📋</span><span>複製</span>';},2000);};
+  if(navigator.clipboard){navigator.clipboard.writeText(resText).then(copy).catch(()=>{fb();copy();});}
+  else{fb();copy();}
+  function fb(){const ta=document.createElement('textarea');ta.value=resText;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
+}
+</script>
+</body>
+</html>
