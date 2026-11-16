@@ -25,7 +25,6 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .nav-tab:hover{background:var(--card2);color:var(--text);}
 .nav-tab.active{background:var(--green);color:#fff;}
 .nav-tab.active .ni{color:var(--yellow);}
-.ni{font-size:15px;}
 .coming-chip{font-size:9px;padding:2px 6px;border-radius:10px;background:rgba(122,144,168,.12);color:var(--muted);}
 .admin-authed-chip{font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(27,110,60,.2);color:#4ADE80;display:none;}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}
@@ -52,10 +51,6 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .bd-done{background:rgba(34,197,94,.15);color:#22C55E;}
 .bd-wip{background:rgba(122,144,168,.1);color:var(--muted);}
 .sb-divider{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;padding:14px 10px 6px;margin-top:4px;border-top:1px solid var(--border);}
-.sb-cs{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:32px 20px;text-align:center;gap:12px;}
-.sb-cs.on{display:flex;}
-.sb-cs-ico{font-size:36px;opacity:.25;}
-.sb-cs p{font-size:12px;color:var(--muted);line-height:1.8;}
 .sb-logout{padding:8px;border-top:1px solid var(--border);margin-top:auto;}
 .sb-item-danger{color:#FCA5A5 !important;}
 .sb-item-danger:hover{background:rgba(239,68,68,.08) !important;border-color:rgba(239,68,68,.15) !important;color:#FCA5A5 !important;}
@@ -188,10 +183,10 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       <span class="ni">👨‍👩‍👧</span>家長端
     </div>
     <div class="nav-tab" data-tab="skills" onclick="switchTab('skills')">
-      <span class="ni">⭐</span>技能系統<span class="coming-chip">即將推出</span>
+      <span class="ni">📋</span>任務列表
     </div>
     <div class="nav-tab" data-tab="ai" onclick="switchTab('ai')">
-      <span class="ni">🤖</span>AI 教練<span class="coming-chip">即將推出</span>
+      <span class="ni">🤖</span>AI 教練
     </div>
     <div class="nav-tab" data-tab="admin" onclick="switchTab('admin')">
       <span class="ni">⚙️</span>管理
@@ -280,9 +275,31 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       </nav>
     </div>
 
-    <!-- Coming Soon -->
-    <div class="sb-cs" id="sb-skills"><div class="sb-cs-ico">⭐</div><p><strong style="color:var(--text)">技能系統</strong><br>即將推出</p></div>
-    <div class="sb-cs" id="sb-ai"><div class="sb-cs-ico">🤖</div><p><strong style="color:var(--text)">AI 教練</strong><br>即將推出</p></div>
+    <!-- 任務列表 M-01 -->
+    <div class="sb-sec" id="sb-skills">
+      <div class="sb-hdr">
+        <div class="sb-hdr-tag">TASKS</div>
+        <div class="sb-hdr-name">任務列表</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-item on" data-skillpage="skills-main" onclick="switchSkillsPage('skills-main')">
+          <span class="si">📋</span>任務系統<span class="sb-badge bd-done">M-01</span>
+        </div>
+      </nav>
+    </div>
+
+    <!-- AI 教練 A-01 -->
+    <div class="sb-sec" id="sb-ai">
+      <div class="sb-hdr">
+        <div class="sb-hdr-tag">AI CORE</div>
+        <div class="sb-hdr-name">AI 教練</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-item on" data-aipage="ai-main" onclick="switchAIPage('ai-main')">
+          <span class="si">🤖</span>AI 教練<span class="sb-badge bd-done">A-01</span>
+        </div>
+      </nav>
+    </div>
 
     <!-- 管理 -->
     <div class="sb-sec" id="sb-admin">
@@ -361,16 +378,20 @@ const IFRAME_PAGES = {
   progress:          { src:'TeachingResources/T_03_Progress.html',    code:'T-03', label:'Progress',        ready:true  },
   tgroup:            { src:'TeachingResources/T_04_Group.html',       code:'T-04', label:'Group',           ready:true  },
   analytics:         { src:'TeachingResources/T_05_Analytics.html',   code:'T-05', label:'Analytics',       ready:true  },
-  timetable:         { src:'TeachingResources/T_06_Timetable.html',        code:'T-06', label:'Timetable',       ready:true  },
-  health:            { src:'TeachingResources/T_07_Health.html',           code:'T-07', label:'Health',          ready:true  },
-  event:             { src:'TeachingResources/T_08_Event.html',            code:'T-08', label:'Event',           ready:true  },
-  'staff-analytics': { src:'StaffManagement/T_09_Staff_Analytics.html',    code:'T-09', label:'Staff Analytics', ready:true  },
+  timetable:         { src:'TeachingResources/T_06_Timetable.html',   code:'T-06', label:'Timetable',       ready:true  },
+  health:            { src:'TeachingResources/T_07_Health.html',      code:'T-07', label:'Health',          ready:true  },
+  event:             { src:'TeachingResources/T_08_Event.html',       code:'T-08', label:'Event',           ready:true  },
+  'staff-analytics': { src:'StaffManagement/T_09_Staff_Analytics.html', code:'T-09', label:'Staff Analytics', ready:true },
   // Meridian
-  retrace:           { src:'Meridian/S_01_Retrace.html',                   code:'S-01', label:'Retrace · 錯題本', ready:true  },
-  echo:              { src:'Meridian/S_02_Echo.html',                      code:'S-02', label:'Echo · 口語練習',  ready:true  },
-  ease:              { src:'Meridian/S_03_Ease.html',                      code:'S-03', label:'Ease · SEN 支援',  ready:true  },
+  retrace:           { src:'Meridian/S_01_Retrace.html',              code:'S-01', label:'Retrace · 錯題本', ready:true },
+  echo:              { src:'Meridian/S_02_Echo.html',                 code:'S-02', label:'Echo · 口語練習',  ready:true },
+  ease:              { src:'Meridian/S_03_Ease.html',                 code:'S-03', label:'Ease · SEN 支援',  ready:true },
   // Parent
-  parents:           { src:'ParentPortal/P_01_Parents.html',               code:'P-01', label:'家長總覽',         ready:true  },
+  parents:           { src:'ParentPortal/P_01_Parents.html',          code:'P-01', label:'家長總覽',         ready:true },
+  // Tasks
+  'skills-main':     { src:'Tasks/M_01_TaskSystem.html',              code:'M-01', label:'任務列表',         ready:true },
+  // AI Core
+  'ai-main':         { src:'AICore/A_01_Coach.html',                  code:'A-01', label:'AI 教練',          ready:true },
   // Admin
   'admin-f02':       { src:'Admin/F_02_SchoolManagement.html',        code:'F-02', label:'學校管理',         ready:true  },
   'admin-f03':       { src:'Admin/F_03_AIChat.html',                  code:'F-03', label:'AI 對話',          ready:true  },
@@ -386,11 +407,6 @@ const CS_PAGES = {
   'admin-f05':  { ico:'⚠️', title:'F-05 · 用量及額度', sub:'GitHub 檔名需先修正，修正後即可載入。'              },
 };
 
-const TAB_CS = {
-  skills:{ ico:'⭐', title:'技能系統即將推出', sub:'加減分、行為記錄、技能評分功能正在開發中，敬請期待。'  },
-  ai:    { ico:'🤖', title:'AI 教練即將推出',  sub:'班級整體分析、個別學生建議、異常預警功能正在開發中。' },
-};
-
 /* ── STATE ── */
 let adminAuthed     = sessionStorage.getItem('adminAuthed') === '1';
 let curTab          = 'student';
@@ -398,6 +414,8 @@ let curPage         = 'dashboard';
 let curTeachingPage = 't-dashboard';
 let curMeridianPage = 'm-dashboard';
 let curParentPage   = 'p-dashboard';
+let curSkillsPage   = 'skills-main';
+let curAIPage       = 'ai-main';
 let curAdminPage    = 'admin-home';
 
 /* ── VIEWS ── */
@@ -466,6 +484,14 @@ function buildDashboard(){
 <div class="mod-grid">
   <div class="mod-card" onclick="goParent('parents')"><div class="mod-row"><div class="mod-ico mi-am">👨‍👩‍👧</div><div class="mod-info"><h4>家長總覽</h4><p>Parents</p></div><div class="mod-code">P-01</div></div><div class="mod-desc">子女學習進度、出勤記錄、通知及家校聯繫。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
 </div>
+<div class="sec-ttl">任務列表</div>
+<div class="mod-grid">
+  <div class="mod-card" onclick="switchTab('skills')"><div class="mod-row"><div class="mod-ico mi-g">📋</div><div class="mod-info"><h4>任務系統</h4><p>8 種計劃模板</p></div><div class="mod-code">M-01</div></div><div class="mod-desc">學生獎勵、遊學團、課外活動、閱讀計劃、義工服務等 8 種計劃全流程管理。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>
+<div class="sec-ttl">AI 教練</div>
+<div class="mod-grid">
+  <div class="mod-card" onclick="switchTab('ai')"><div class="mod-row"><div class="mod-ico mi-b">🤖</div><div class="mod-info"><h4>AI 教練</h4><p>個人化學習建議</p></div><div class="mod-code">A-01</div></div><div class="mod-desc">班級整體分析、個別學生學習建議、異常預警，AI 驅動教學輔助。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>
 <div class="sec-ttl">開發進度</div>
 <div class="act-card">
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>D-01 學生檔案</strong><span>個人資料、聯絡資訊、學業與行為記錄管理</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
@@ -479,6 +505,8 @@ function buildDashboard(){
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>T-09 Staff Analytics</strong><span>員工數據分析，StaffManagement 資料夾</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>S-01 Retrace · S-02 Echo · S-03 Ease</strong><span>Meridian 學生端：錯題本、口語練習、SEN 支援</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>P-01 家長總覽</strong><span>ParentPortal 家長端</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>M-01 任務系統</strong><span>Tasks 資料夾 · 8 種計劃模板全流程管理</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>A-01 AI 教練</strong><span>AICore 資料夾 · AI 驅動個人化學習建議</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
 </div>`;
   showView('dashboard');
 }
@@ -545,6 +573,39 @@ function buildParentDashboard(){
   showView('dashboard');
 }
 
+/* ── TASKS DASHBOARD ── */
+function buildSkillsDashboard(){
+  document.getElementById('dashboard-view').innerHTML=`
+<div class="breadcrumb"><span>任務列表</span><span>›</span><strong>總覽</strong></div>
+<div class="dash-hello"><h1>任務列表 <em>M-01</em> 📋</h1><p>Tasks/M_01_TaskSystem · 8 種計劃模板，全流程管理</p></div>
+<div class="qs-grid">
+  <div class="qs-card qc-g"><div class="qs-lbl">計劃模板</div><div class="qs-num" style="color:#4ADE80">8</div><div class="qs-sub">種類型</div><div class="qs-ico">📋</div></div>
+  <div class="qs-card qc-y"><div class="qs-lbl">活躍計劃</div><div class="qs-num" style="color:var(--yellow)">22</div><div class="qs-sub">本學年</div><div class="qs-ico">🚀</div></div>
+  <div class="qs-card qc-b"><div class="qs-lbl">角色權限</div><div class="qs-num" style="color:#93C5FD">4</div><div class="qs-sub">學生 / 老師 / 管理 / 校長</div><div class="qs-ico">🔐</div></div>
+</div>
+<div class="sec-ttl">任務系統</div>
+<div class="mod-grid" style="margin-bottom:0">
+  <div class="mod-card" onclick="switchSkillsPage('skills-main')"><div class="mod-row"><div class="mod-ico mi-g">📋</div><div class="mod-info"><h4>任務系統</h4><p>8 種計劃模板</p></div><div class="mod-code">M-01</div></div><div class="mod-desc">學生獎勵、遊學團、課外活動、閱讀計劃、義工服務、比賽、專題研習、家長義工 — 甘特圖 + 節點流程 + 報表。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>`;
+  showView('dashboard');
+}
+
+/* ── AI DASHBOARD ── */
+function buildAIDashboard(){
+  document.getElementById('dashboard-view').innerHTML=`
+<div class="breadcrumb"><span>AI 教練</span><span>›</span><strong>總覽</strong></div>
+<div class="dash-hello"><h1>AI 教練 <em>A-01</em> 🤖</h1><p>AICore/A_01_Coach · AI 驅動個人化學習建議</p></div>
+<div class="qs-grid">
+  <div class="qs-card qc-g"><div class="qs-lbl">已完成模組</div><div class="qs-num" style="color:#4ADE80">1</div><div class="qs-sub">A-01</div><div class="qs-ico">✅</div></div>
+  <div class="qs-card qc-b"><div class="qs-lbl">支援語言</div><div class="qs-num" style="color:#93C5FD">3</div><div class="qs-sub">中 · 英 · 粵</div><div class="qs-ico">🌐</div></div>
+</div>
+<div class="sec-ttl">AI 教練模組</div>
+<div class="mod-grid" style="margin-bottom:0">
+  <div class="mod-card" onclick="switchAIPage('ai-main')"><div class="mod-row"><div class="mod-ico mi-b">🤖</div><div class="mod-info"><h4>AI 教練</h4><p>個人化學習建議</p></div><div class="mod-code">A-01</div></div><div class="mod-desc">班級整體分析、個別學生學習建議、異常預警，AI 驅動教學輔助。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>`;
+  showView('dashboard');
+}
+
 /* ── ADMIN DASHBOARD ── */
 function buildAdminDashboard(){
   document.getElementById('dashboard-view').innerHTML=`
@@ -568,16 +629,16 @@ function switchTab(tab){
   ['student','teaching','meridian','parent','skills','ai','admin'].forEach(s=>{
     const el=document.getElementById('sb-'+s);if(!el)return;
     el.classList.remove('on');
-    if(el.classList.contains('sb-cs'))el.style.display='none';
   });
   const target=document.getElementById('sb-'+tab);
-  if(target){if(target.classList.contains('sb-cs'))target.style.display='flex';else target.classList.add('on');}
+  if(target) target.classList.add('on');
   if(tab==='student')      renderStudentPage(curPage);
   else if(tab==='teaching')renderTeachingPage(curTeachingPage);
   else if(tab==='meridian')renderMeridianPage(curMeridianPage);
   else if(tab==='parent')  renderParentPage(curParentPage);
+  else if(tab==='skills')  renderSkillsPage(curSkillsPage);
+  else if(tab==='ai')      renderAIPage(curAIPage);
   else if(tab==='admin')   renderAdminPage(curAdminPage);
-  else{const cs=TAB_CS[tab];showCS(cs.ico,cs.title,cs.sub);}
   closeSidebar();
 }
 
@@ -638,6 +699,32 @@ function renderParentPage(page){
   const cfg=IFRAME_PAGES[page];
   if(cfg&&cfg.ready){loadIframe(page);return;}
   showCS('🚧',cfg?cfg.label:page,'開發中，敬請期待。');
+}
+
+/* ── SKILLS / TASKS ROUTING ── */
+function switchSkillsPage(page){
+  curSkillsPage=page;
+  document.querySelectorAll('#sb-skills .sb-item[data-skillpage]').forEach(i=>i.classList.toggle('on',i.dataset.skillpage===page));
+  renderSkillsPage(page);closeSidebar();
+}
+function renderSkillsPage(page){
+  if(page==='skills-dashboard'){buildSkillsDashboard();return;}
+  const cfg=IFRAME_PAGES[page];
+  if(cfg&&cfg.ready){loadIframe(page);return;}
+  showCS('📋',cfg?cfg.label:page,'開發中，敬請期待。');
+}
+
+/* ── AI ROUTING ── */
+function switchAIPage(page){
+  curAIPage=page;
+  document.querySelectorAll('#sb-ai .sb-item[data-aipage]').forEach(i=>i.classList.toggle('on',i.dataset.aipage===page));
+  renderAIPage(page);closeSidebar();
+}
+function renderAIPage(page){
+  if(page==='ai-dashboard'){buildAIDashboard();return;}
+  const cfg=IFRAME_PAGES[page];
+  if(cfg&&cfg.ready){loadIframe(page);return;}
+  showCS('🤖',cfg?cfg.label:page,'開發中，敬請期待。');
 }
 
 /* ── ADMIN ROUTING ── */
