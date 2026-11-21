@@ -20,12 +20,27 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft
 .lbr:hover{background:#f8fafc}
 .si:hover{box-shadow:0 2px 12px rgba(0,0,0,.07)}
 .gbar{height:24px;border-radius:6px;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:500;overflow:hidden;white-space:nowrap;position:absolute;top:6px}.gbar:hover{opacity:.8}
-.ntf{position:fixed;top:1rem;right:1rem;z-index:200;padding:.7rem 1rem;border-radius:.8rem;font-size:.85rem;font-weight:500;border:1px solid;box-shadow:0 4px 20px rgba(0,0,0,.12);animation:ni .22s ease}
+.ntf{position:fixed;top:1rem;right:1rem;z-index:300;padding:.7rem 1rem;border-radius:.8rem;font-size:.85rem;font-weight:500;border:1px solid;box-shadow:0 4px 20px rgba(0,0,0,.12);animation:ni .22s ease}
 @keyframes ni{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.2);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:1rem}
 .mb{background:#fff;border-radius:1.25rem;padding:1.5rem;width:100%;max-width:28rem;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18)}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
-input:focus,select:focus{outline:none;border-color:#60a5fa!important}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#818cf8!important}
+/* ★ AI */
+@keyframes blink{50%{opacity:0}}
+.cur{animation:blink .75s step-end infinite;display:inline}
+@keyframes sln{0%{top:-2px}100%{top:calc(100% + 2px)}}
+.sln{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(74,222,128,.55) 50%,transparent);animation:sln 2.5s linear infinite;pointer-events:none;z-index:1}
+@keyframes aigl{0%,100%{box-shadow:0 0 0 1px rgba(74,222,128,.2),0 30px 60px rgba(0,0,0,.55)}50%{box-shadow:0 0 0 1px rgba(74,222,128,.6),0 30px 60px rgba(74,222,128,.12)}}
+.aigl{animation:aigl 2s ease-in-out infinite}
+@keyframes lln{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:translateX(0)}}
+.lln{animation:lln .15s ease}
+@keyframes fdup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fdup{animation:fdup .35s ease}
+@keyframes aipulse{0%,100%{opacity:1}50%{opacity:.3}}
+.aipulse{animation:aipulse 1.1s ease-in-out infinite}
+@keyframes shimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.aibtn{background:linear-gradient(135deg,#4f46e5,#7c3aed,#6366f1,#4f46e5);background-size:300% 300%;animation:shimmer 3.5s ease infinite;border:none;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body style="background:#f8fafc;background-image:radial-gradient(circle,#cbd5e1 1px,transparent 1px);background-size:20px 20px">
@@ -33,7 +48,56 @@ input:focus,select:focus{outline:none;border-color:#60a5fa!important}
 <div id="N"></div>
 <div id="M"></div>
 <script>
-/* ── DATA ── */
+/* ═══ CONSTANTS ═══ */
+const COLOR_OPTS=[
+  {c:'#3b82f6',bg:'#eff6ff',tc:'#1d4ed8',bc:'#bfdbfe',tbbg:'#dbeafe',tbtc:'#1e40af'},
+  {c:'#8b5cf6',bg:'#f5f3ff',tc:'#6d28d9',bc:'#ddd6fe',tbbg:'#ede9fe',tbtc:'#5b21b6'},
+  {c:'#22c55e',bg:'#f0fdf4',tc:'#15803d',bc:'#bbf7d0',tbbg:'#dcfce7',tbtc:'#166534'},
+  {c:'#f59e0b',bg:'#fffbeb',tc:'#b45309',bc:'#fde68a',tbbg:'#fef3c7',tbtc:'#92400e'},
+  {c:'#f43f5e',bg:'#fff1f2',tc:'#be123c',bc:'#fecdd3',tbbg:'#ffe4e6',tbtc:'#9f1239'},
+  {c:'#f97316',bg:'#fff7ed',tc:'#c2410c',bc:'#fed7aa',tbbg:'#ffedd5',tbtc:'#9a3412'},
+  {c:'#06b6d4',bg:'#ecfeff',tc:'#0e7490',bc:'#a5f3fc',tbbg:'#cffafe',tbtc:'#155e75'},
+  {c:'#ec4899',bg:'#fdf2f8',tc:'#be185d',bc:'#fbcfe8',tbbg:'#fce7f3',tbtc:'#9d174d'},
+];
+const TK_CYCLE={pending:'active',active:'done',done:'pending'};
+const TK_ST={
+  done:{l:'完成',c:'#16a34a',bg:'#f0fdf4',bc:'#bbf7d0',ico:'✅'},
+  active:{l:'進行中',c:'#2563eb',bg:'#eff6ff',bc:'#bfdbfe',ico:'⏳'},
+  pending:{l:'待辦',c:'#9ca3af',bg:'#f9fafb',bc:'#e5e7eb',ico:'○'},
+};
+const AI_MSGS=[
+  'INITIALIZING LANGUAGE MODEL...',
+  'PARSING INPUT SCHEMA...',
+  'TOKENIZING CONTENT...',
+  'RUNNING PATTERN RECOGNITION...',
+  'CROSS-REFERENCING TEMPLATE DATABASE...',
+  'ANALYSING TASK STRUCTURE...',
+  'MAPPING WORKFLOW DEPENDENCIES...',
+  'SELECTING OPTIMAL CONFIGURATION...',
+  'STRUCTURING OUTPUT NODES...',
+  'VALIDATING SCHEMA INTEGRITY...',
+  'GENERATING TEMPLATE BLUEPRINT...',
+  'RUNNING FINAL OPTIMISATION...',
+  'COMPILING OUTPUT...',
+];
+const EMOJI_MAP=[
+  [/閱讀|書|讀本|圖書/,'📚'],
+  [/義工|服務|關懷|愛心/,'❤️'],
+  [/比賽|競賽|辯論|冠軍|頒獎/,'🥇'],
+  [/遊學|旅行|參觀|外訪|考察/,'✈️'],
+  [/音樂|唱歌|樂器|合唱/,'🎵'],
+  [/藝術|美術|繪畫|設計/,'🎨'],
+  [/科學|實驗|STEM/,'🔬'],
+  [/體育|運動|球|跑步|游泳/,'⚽'],
+  [/研習|專題|學習/,'🎓'],
+  [/獎勵|積分|獎品/,'🏆'],
+  [/家長|親子|家庭/,'👨‍👩‍👧'],
+  [/活動|課外|CCA/,'⚡'],
+  [/環保|綠色|植樹/,'🌿'],
+  [/科技|電腦|程式|編程/,'💻'],
+];
+
+/* ═══ STATIC DATA ═══ */
 const TT=[
   {id:'rewards',n:'學生獎勵計劃',e:'🏆',c:'#3b82f6',bg:'#eff6ff',tc:'#1d4ed8',bc:'#bfdbfe',tbbg:'#dbeafe',tbtc:'#1e40af',a:3,d:'積分兌換零食文具，激勵學習動力',f:['加減積分','獎品兌換','排行榜','歷史記錄']},
   {id:'studytour',n:'遊學團計劃',e:'✈️',c:'#8b5cf6',bg:'#f5f3ff',tc:'#6d28d9',bc:'#ddd6fe',tbbg:'#ede9fe',tbtc:'#5b21b6',a:1,d:'海內外遊學節點管理，多方協作',f:['節點管理','多方協作','家長確認','費用追蹤']},
@@ -44,7 +108,7 @@ const TT=[
   {id:'pbl',n:'專題研習計劃',e:'🎓',c:'#06b6d4',bg:'#ecfeff',tc:'#0e7490',bc:'#a5f3fc',tbbg:'#cffafe',tbtc:'#155e75',a:3,d:'小組分工草稿提交批改評語全流程',f:['小組管理','進度追蹤','批改評語','最終評分']},
   {id:'parentvol',n:'家長義工計劃',e:'👨‍👩‍👧',c:'#ec4899',bg:'#fdf2f8',tc:'#be185d',bc:'#fbcfe8',tbbg:'#fce7f3',tbtc:'#9d174d',a:2,d:'家長協助學校活動排班管理出席確認',f:['報名系統','排班管理','出席確認','服務報告']},
 ];
-const ND=[
+const ND_INIT=[
   {id:1,n:'收集報名表',dl:'1月15日',st:'done',p:'王老師',docs:['報名表','家長同意書'],note:'已收齊全班32份'},
   {id:2,n:'收費截止',dl:'1月22日',st:'done',p:'陳主任',docs:['收費記錄'],note:'已收$28,800'},
   {id:3,n:'提交護照副本',dl:'2月1日',st:'active',p:'王老師',docs:['護照副本','身份證副本'],note:'待收：5名同學'},
@@ -80,10 +144,15 @@ const RL=[
 ];
 const NV=[{id:'dashboard',l:'總覽',e:'🏠'},{id:'tasks',l:'計劃中心',e:'🚩'},{id:'rewards_tab',l:'學生獎勵',e:'🏆'},{id:'nodes',l:'節點流程',e:'🗂️'},{id:'gantt',l:'甘特圖',e:'📊'},{id:'reports',l:'報表分析',e:'📈'}];
 
-/* ── STATE ── */
+/* ═══ STATE ═══ */
 let S={
   tab:'dashboard',role:'admin',rSub:'leaderboard',rF:'all',
   exN:null,shopS:1,ptT:'add',ptA:'',ptR:'',selS:null,modal:false,
+  aiModal:false,aiStep:'input',aiType:'template',aiTplId:null,
+  aiInput:{n:'',d:'',f:'',dl:'',p:'',note:''},
+  aiResult:{},aiLog:[],aiProgress:0,
+  tplDetail:null,CT:[],TK:{},tkF:'all',
+  ND:[...ND_INIT],
   stus:[
     {id:1,n:'陳小明',cls:'5A',pts:450,e:'👦',tr:'up'},
     {id:2,n:'李美玲',cls:'5A',pts:380,e:'👧',tr:'up'},
@@ -101,37 +170,326 @@ let S={
     {id:6,n:'吳嘉欣',sid:6,t:'add',a:25,r:'協助清潔',by:'陳老師',tm:'昨天'},
   ]
 };
+let aiTimer=null;
 
-/* ── HELPERS ── */
+/* ═══ HELPERS ═══ */
 const dStu=()=>{const s=[...S.stus].sort((a,b)=>b.pts-a.pts);return S.role==='student'?s.filter(x=>x.id===1):S.role==='teacher'?s.filter(x=>x.cls==='5A'):s;};
 const dTx=()=>{if(S.role==='student')return S.txns.filter(t=>t.sid===1);if(S.role==='teacher'){const ids=S.stus.filter(s=>s.cls==='5A').map(s=>s.id);return S.txns.filter(t=>ids.includes(t.sid));}return S.txns;};
 const ce=()=>S.role==='admin'||S.role==='teacher';
 const ca=()=>S.role==='admin'||S.role==='principal';
 
-/* ── NOTIFICATION ── */
+/* ═══ NOTIFICATION ═══ */
 let nT=null;
 function ntf(msg,type='ok'){
   clearTimeout(nT);
   document.getElementById('N').innerHTML=`<div class="ntf ${type==='err'?'bg-red-50 text-red-700 border-red-200':'bg-white text-gray-800 border-gray-200'}">${msg}</div>`;
-  nT=setTimeout(()=>{document.getElementById('N').innerHTML='';},2500);
+  nT=setTimeout(()=>{document.getElementById('N').innerHTML='';},2800);
 }
 
-/* ── CHARTS ── */
+/* ═══ CHARTS ═══ */
 let bC=null,pC=null;
 function initCharts(){
   if(typeof Chart==='undefined')return;
   const bc=document.getElementById('bc'),pc=document.getElementById('pc');
   if(!bc||!pc)return;
-  if(bC){bC.destroy();bC=null;}
-  if(pC){pC.destroy();pC=null;}
+  if(bC){bC.destroy();bC=null;}if(pC){pC.destroy();pC=null;}
   bC=new Chart(bc,{type:'bar',data:{labels:MP.map(d=>d.m),datasets:[{label:'加分',data:MP.map(d=>d.e),backgroundColor:'#3b82f6',borderRadius:4},{label:'兌換',data:MP.map(d=>d.r),backgroundColor:'#8b5cf6',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11},color:'#6b7280'}}},scales:{x:{grid:{display:false},ticks:{font:{size:11},color:'#9ca3af'}},y:{grid:{color:'#f3f4f6'},ticks:{font:{size:11},color:'#9ca3af'}}}}});
   pC=new Chart(pc,{type:'doughnut',data:{labels:PD.map(d=>d.n),datasets:[{data:PD.map(d=>d.v),backgroundColor:PD.map(d=>d.c),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'55%'}});
 }
 
-/* ── TAB: DASHBOARD ── */
+/* ═══ AI GENERATION ENGINE ═══ */
+function genEmoji(str){
+  for(const[re,e]of EMOJI_MAP)if(re.test(str))return e;
+  return['🌟','🎯','💡','🏫','🚀','✨'][Math.floor(Math.random()*6)];
+}
+function genColorIdx(str){
+  const cm=[[/藍|科|技|電|程|IT/,0],[/紫|學|習|研|專/,1],[/綠|環|義|運|體|服/,2],[/黃|閱|書|讀|金/,3],[/紅|愛|心|關|懷/,4],[/橙|比|賽|冠|競/,5],[/青|遊|旅|藝|參/,6],[/粉|家|親|活|CCA/,7]];
+  for(const[re,i]of cm)if(re.test(str))return i;
+  return Math.floor(Math.random()*8);
+}
+function genFeatures(n,d){
+  const fb={閱:['目標設定','進度追蹤','老師審批','積分聯動'],義:['時數記錄','機構確認','成就系統','活動管理'],比:['報名管理','資格審查','成績記錄','頒獎系統'],遊:['節點管理','家長確認','費用追蹤','多方協作'],體:['出席追蹤','成績記錄','表現評分','成就頒發'],獎:['加減積分','排行榜','兌換系統','歷史記錄']};
+  const s=n+(d||'');
+  for(const[k,v]of Object.entries(fb))if(s.includes(k))return v;
+  return['進度追蹤','通知系統','報告匯出','權限管理'];
+}
+function genDocs(n){
+  const dm=[[/報名|登記/,['報名表']],[/收費|費用/,['收費記錄','收據']],[/護照|身份/,['護照副本','身份證副本']],[/保險/,['保險單']],[/報告|成果/,['活動報告']],[/同意|家長/,['家長同意書']]];
+  const docs=[];for(const[re,d]of dm)if(re.test(n))docs.push(...d);
+  return docs;
+}
+function detectType(r){
+  if(r._type==='template'){
+    const m={'📚':'閱讀學習','❤️':'義工服務','🥇':'比賽管理','✈️':'遊學活動','🎵':'音樂藝術','🎨':'藝術創作','🔬':'科學探究','⚽':'體育活動','🎓':'學術研習','🏆':'獎勵激勵','👨‍👩‍👧':'家長參與','⚡':'課外活動','🌿':'環保教育','💻':'資訊科技'};
+    return m[r.e]||'一般計劃';
+  }
+  if(/報名|收費/.test(r.n))return'行政管理';
+  if(/護照|文件/.test(r.n))return'資料收集';
+  if(/活動|服務/.test(r.n))return'活動節點';
+  return'一般任務';
+}
+function genResult(type,input){
+  if(type==='template'){
+    const ci=genColorIdx(input.n+(input.d||''));
+    const co=COLOR_OPTS[ci];
+    return{_type:'template',id:'ai_'+Date.now(),n:input.n,e:genEmoji(input.n+(input.d||'')),d:input.d||'由 AI 智能分析生成的計劃範本',f:input.f?input.f.split(/[,，、\s]+/).filter(Boolean):genFeatures(input.n,input.d),a:0,...co,conf:Math.floor(88+Math.random()*10)};
+  }
+  return{_type:type,id:Date.now(),n:input.n,dl:input.dl||'',p:input.p||'',st:'pending',docs:genDocs(input.n),note:input.note||'',conf:Math.floor(90+Math.random()*9)};
+}
+
+/* ═══ AI MODAL SYSTEM ═══ */
+function oAIMod(type,tplId=null){
+  if(aiTimer){clearInterval(aiTimer);aiTimer=null;}
+  S.aiModal=true;S.aiStep='input';S.aiType=type;S.aiTplId=tplId;
+  S.aiInput={n:'',d:'',f:'',dl:'',p:'',note:''};S.aiLog=[];S.aiProgress=0;
+  rAIMod();
+}
+function cAIMod(){
+  if(aiTimer){clearInterval(aiTimer);aiTimer=null;}
+  S.aiModal=false;document.getElementById('M').innerHTML='';
+}
+function startAIThink(skip){
+  if(!skip&&!S.aiInput.n.trim()){ntf('請先輸入名稱！','err');return;}
+  if(aiTimer){clearInterval(aiTimer);aiTimer=null;}
+  S.aiStep='thinking';S.aiLog=[];S.aiProgress=0;
+  rAIMod();
+  const total=3200+Math.random()*5300,start=Date.now(),msgDelay=total/AI_MSGS.length;
+  aiTimer=setInterval(()=>{
+    const el=Date.now()-start,pct=el/total;
+    const prog=Math.min(96,100*(1-Math.exp(-3.5*pct)));
+    S.aiProgress=prog;
+    const msgCount=Math.min(AI_MSGS.length,Math.floor(el/msgDelay)+1);
+    if(S.aiLog.length<msgCount){
+      while(S.aiLog.length<msgCount)S.aiLog.push(AI_MSGS[S.aiLog.length]);
+      const logEl=document.getElementById('ai-log');
+      if(logEl){
+        logEl.innerHTML=S.aiLog.map((m,i)=>{
+          const done=i<S.aiLog.length-1;
+          return`<div class="lln" style="display:flex;align-items:center;gap:.5rem;padding:3px 0;font-family:'SF Mono',Consolas,monospace;font-size:11.5px;line-height:1.65">
+            <span style="color:${done?'#22c55e':'#4ade80'};flex-shrink:0;font-size:10px">${done?'✓':'›'}</span>
+            <span style="color:${done?'#4b5563':'#d1fae5'};flex:1">${m}</span>
+            ${done?'':`<span class="cur" style="color:#4ade80">▌</span>`}
+          </div>`;
+        }).join('');
+        logEl.scrollTop=logEl.scrollHeight;
+      }
+    }
+    const pe=document.getElementById('ai-prog'),pte=document.getElementById('ai-pct');
+    if(pe)pe.style.width=prog+'%';
+    if(pte)pte.textContent=Math.floor(prog)+'%';
+    if(el>=total){
+      clearInterval(aiTimer);aiTimer=null;
+      if(pe)pe.style.width='100%';if(pte)pte.textContent='100%';
+      setTimeout(()=>{S.aiStep='result';S.aiResult=genResult(S.aiType,S.aiInput);rAIMod();},400);
+    }
+  },120);
+}
+function regenAI(){startAIThink(true);}
+function doConfirmAI(){
+  const r=S.aiResult;
+  if(r._type==='template'){
+    const{_type,conf,...td}=r;
+    S.CT.push(td);S.TK[td.id]=[];
+    cAIMod();S.tab='tasks';S.tplDetail=td.id;S.tkF='all';
+    render();ntf('✨「'+td.n+'」AI 範本建立完成！');
+  }else if(r._type==='node'){
+    S.ND=[...S.ND,{id:r.id,n:r.n,dl:r.dl,st:'pending',p:r.p,docs:r.docs,note:r.note}];
+    cAIMod();render();ntf('✨ 節點「'+r.n+'」AI 建立完成！');
+  }else if(r._type==='task'){
+    if(!S.TK[S.aiTplId])S.TK[S.aiTplId]=[];
+    S.TK[S.aiTplId].push({id:r.id,n:r.n,dl:r.dl,p:r.p,st:'pending'});
+    cAIMod();render();ntf('✨ 任務「'+r.n+'」AI 建立完成！');
+  }
+}
+
+function rAIMod(){
+  if(!S.aiModal){document.getElementById('M').innerHTML='';return;}
+  const isT=S.aiType==='template';
+  const tName=S.aiType==='node'?'節點':isT?'計劃範本':'任務';
+
+  /* ── INPUT STAGE ── */
+  if(S.aiStep==='input'){
+    document.getElementById('M').innerHTML=`
+    <div class="mo" onclick="cAIMod()">
+      <div class="mb" style="max-width:25rem" onclick="event.stopPropagation()">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem">
+          <div style="display:flex;align-items:center;gap:.55rem">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:.6rem;display:flex;align-items:center;justify-content:center;font-size:.95rem">✨</div>
+            <span style="font-weight:700;font-size:1rem;color:#0f0f0f">AI 智能生成</span>
+            <span style="font-size:9px;background:#ede9fe;color:#5b21b6;padding:2px 7px;border-radius:20px;font-weight:700;letter-spacing:.3px">BETA</span>
+          </div>
+          <button onclick="cAIMod()" style="border:none;background:none;cursor:pointer;width:28px;height:28px;border-radius:7px;font-size:14px;color:#9ca3af">✕</button>
+        </div>
+        <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:.7rem;padding:.7rem .9rem;margin-bottom:1.1rem;display:flex;align-items:flex-start;gap:.55rem">
+          <span style="font-size:1rem;flex-shrink:0;margin-top:1px">🤖</span>
+          <p style="font-size:.78rem;color:#5b21b6;line-height:1.55;margin:0">描述您的計劃，AI 將自動配置功能模組、推薦配色方案與架構</p>
+        </div>
+        ${isT?`
+        <div style="margin-bottom:.85rem">
+          <label style="display:block;font-size:10.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem">計劃名稱 <span style="color:#ef4444">*</span></label>
+          <input id="ai-n" type="text" autocomplete="off" value="${S.aiInput.n}"
+            oninput="S.aiInput.n=this.value;const b=document.getElementById('ai-go');if(b){b.disabled=!this.value.trim();b.style.opacity=this.value.trim()?1:.4}"
+            placeholder="例：音樂比賽計劃、科技節活動..."
+            style="width:100%;border:1.5px solid #e5e7eb;border-radius:.65rem;padding:.6rem .8rem;font-size:.875rem;font-family:inherit;box-sizing:border-box;transition:border-color .15s">
+        </div>
+        <div style="margin-bottom:.85rem">
+          <label style="display:block;font-size:10.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem">計劃描述 <span style="color:#9ca3af;font-weight:400;text-transform:none;font-size:.75rem">可選 — AI 會分析內容</span></label>
+          <textarea id="ai-d" rows="2" autocomplete="off" oninput="S.aiInput.d=this.value" placeholder="例：管理全校同學比賽報名、成績記錄及頒獎..."
+            style="width:100%;border:1.5px solid #e5e7eb;border-radius:.65rem;padding:.6rem .8rem;font-size:.875rem;font-family:inherit;box-sizing:border-box;resize:none">${S.aiInput.d}</textarea>
+        </div>
+        <div style="margin-bottom:1.3rem">
+          <label style="display:block;font-size:10.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem">功能需求 <span style="color:#9ca3af;font-weight:400;text-transform:none;font-size:.75rem">可選，逗號分隔</span></label>
+          <input id="ai-f" type="text" autocomplete="off" value="${S.aiInput.f}" oninput="S.aiInput.f=this.value"
+            placeholder="例：報名管理, 成績記錄, 頒獎系統"
+            style="width:100%;border:1.5px solid #e5e7eb;border-radius:.65rem;padding:.6rem .8rem;font-size:.875rem;font-family:inherit;box-sizing:border-box">
+        </div>`:`
+        <div style="margin-bottom:.85rem">
+          <label style="display:block;font-size:10.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem">${tName}名稱 <span style="color:#ef4444">*</span></label>
+          <input id="ai-n" type="text" autocomplete="off" value="${S.aiInput.n}"
+            oninput="S.aiInput.n=this.value;const b=document.getElementById('ai-go');if(b){b.disabled=!this.value.trim();b.style.opacity=this.value.trim()?1:.4}"
+            placeholder="例：收集報名表、保險確認..."
+            style="width:100%;border:1.5px solid #e5e7eb;border-radius:.65rem;padding:.6rem .8rem;font-size:.875rem;font-family:inherit;box-sizing:border-box">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.85rem">
+          <div>
+            <label style="display:block;font-size:10.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem">截止日期</label>
+            <input id="ai-dl" type="text" autocomplete="off" value="${S.aiInput.dl}" oninput="S.aiInput.dl=this.value" placeholder="例：3月15日"
+              style="width:100%;border:1.5px solid #e5e7eb;border-radius:.65rem;padding:.6rem .8rem;font-size:.875rem;font-family:inherit;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="display:block;font-size:10.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem">負責人</label>
+            <input id="ai-p" type="text" autocomplete="off" value="${S.aiInput.p}" oninput="S.aiInput.p=this.value" placeholder="例：王老師"
+              style="width:100%;border:1.5px solid #e5e7eb;border-radius:.65rem;padding:.6rem .8rem;font-size:.875rem;font-family:inherit;box-sizing:border-box">
+          </div>
+        </div>
+        <div style="margin-bottom:1.3rem">
+          <label style="display:block;font-size:10.5px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.35rem">備注 <span style="color:#9ca3af;font-weight:400;text-transform:none;font-size:.75rem">可選</span></label>
+          <input id="ai-note" type="text" autocomplete="off" value="${S.aiInput.note}" oninput="S.aiInput.note=this.value" placeholder="額外說明..."
+            style="width:100%;border:1.5px solid #e5e7eb;border-radius:.65rem;padding:.6rem .8rem;font-size:.875rem;font-family:inherit;box-sizing:border-box">
+        </div>`}
+        <button id="ai-go" onclick="startAIThink(false)" ${!S.aiInput.n.trim()?'disabled':''}
+          class="aibtn"
+          style="width:100%;padding:.8rem;border-radius:.8rem;color:#fff;font-size:.9rem;font-weight:700;opacity:${S.aiInput.n.trim()?1:.4};display:flex;align-items:center;justify-content:center;gap:.4rem;transition:opacity .15s;letter-spacing:.2px">
+          ✨ 開始 AI 生成
+        </button>
+      </div>
+    </div>`;
+    setTimeout(()=>{const el=document.getElementById('ai-n');if(el)el.focus();},50);
+    return;
+  }
+
+  /* ── THINKING STAGE ── */
+  if(S.aiStep==='thinking'){
+    document.getElementById('M').innerHTML=`
+    <div class="mo">
+      <div class="aigl" style="background:#0a0e17;border-radius:1.3rem;padding:1.4rem 1.5rem;width:100%;max-width:25rem;position:relative;overflow:hidden">
+        <div class="sln"></div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1.1rem;padding-bottom:.85rem;border-bottom:1px solid rgba(74,222,128,.1)">
+          <div style="display:flex;gap:5px;flex-shrink:0">
+            <div style="width:11px;height:11px;border-radius:50%;background:#ff5f57"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#febc2e"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#28c840"></div>
+          </div>
+          <span style="font-family:'SF Mono',Consolas,monospace;font-size:10.5px;color:#374151;margin-left:.4rem;flex:1;letter-spacing:.3px">M-01 AI ENGINE v2.1</span>
+          <div style="display:flex;align-items:center;gap:.35rem;flex-shrink:0">
+            <span class="aipulse" style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block"></span>
+            <span style="font-family:monospace;font-size:9.5px;color:#4ade80;letter-spacing:.5px">PROCESSING</span>
+          </div>
+        </div>
+        <div style="background:#0d1321;border-radius:.6rem;padding:.75rem .9rem;margin-bottom:1.1rem">
+          <p style="font-family:monospace;font-size:9.5px;color:#374151;margin:0 0 .35rem;letter-spacing:.3px">INPUT › <span style="color:#818cf8">${S.aiInput.n}</span></p>
+          <p style="font-family:monospace;font-size:9.5px;color:#374151;margin:0;letter-spacing:.3px">TYPE › <span style="color:#818cf8">${tName.toUpperCase()}</span></p>
+        </div>
+        <div id="ai-log" style="height:185px;overflow-y:auto;margin-bottom:1.1rem;scroll-behavior:smooth;padding-right:4px">
+          <div style="display:flex;align-items:center;gap:.5rem;padding:3px 0;font-family:'SF Mono',Consolas,monospace;font-size:11.5px;line-height:1.65">
+            <span style="color:#4ade80;flex-shrink:0;font-size:10px">›</span>
+            <span style="color:#d1fae5">SYSTEM READY...</span>
+            <span class="cur" style="color:#4ade80">▌</span>
+          </div>
+        </div>
+        <div style="border-top:1px solid rgba(74,222,128,.08);padding-top:.9rem">
+          <div style="height:3px;background:#111827;border-radius:3px;overflow:hidden;margin-bottom:.5rem">
+            <div id="ai-prog" style="height:100%;background:linear-gradient(90deg,#4ade80,#22d3ee,#818cf8);border-radius:3px;width:${S.aiProgress}%;transition:width .12s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+            <span style="font-family:monospace;font-size:9.5px;color:#374151;letter-spacing:.3px">AI GENERATING ${tName.toUpperCase()}...</span>
+            <span id="ai-pct" style="font-family:monospace;font-size:9.5px;color:#4ade80;font-weight:700">${Math.floor(S.aiProgress)}%</span>
+          </div>
+          <button onclick="cAIMod()" style="display:block;margin:0 auto;border:none;background:none;cursor:pointer;font-size:11px;color:#374151;font-family:inherit;padding:.3rem .8rem;border-radius:.4rem;transition:color .1s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#374151'">取消</button>
+        </div>
+      </div>
+    </div>`;
+    return;
+  }
+
+  /* ── RESULT STAGE ── */
+  const r=S.aiResult;
+  const tdet=detectType(r);
+  document.getElementById('M').innerHTML=`
+  <div class="mo" onclick="cAIMod()">
+    <div class="mb fdup" style="max-width:25rem" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
+        <div style="display:flex;align-items:center;gap:.55rem">
+          <div style="width:30px;height:30px;background:linear-gradient(135deg,#059669,#10b981);border-radius:.55rem;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#fff;font-weight:700">✓</div>
+          <span style="font-weight:700;color:#0f0f0f;font-size:.95rem">AI 生成完成</span>
+        </div>
+        <span style="font-size:10.5px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:3px 10px;border-radius:20px;font-weight:700">置信度 ${r.conf}%</span>
+      </div>
+
+      ${r._type==='template'?`
+      <div style="background:${r.bg};border:1.5px solid ${r.bc};border-radius:.85rem;padding:1rem 1.1rem;margin-bottom:.9rem">
+        <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:.6rem">
+          <span style="font-size:1.9rem">${r.e}</span>
+          <span style="font-size:9.5px;background:rgba(255,255,255,.85);color:${r.tc};border:1px solid ${r.bc};padding:2px 8px;border-radius:20px;font-weight:700">AI 生成</span>
+        </div>
+        <h3 style="font-weight:700;color:#0f0f0f;font-size:.95rem;margin:0 0 .3rem">${r.n}</h3>
+        <p style="font-size:.78rem;color:#6b7280;margin:0 0 .65rem;line-height:1.5">${r.d}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.35rem">
+          ${r.f.map(f=>`<span style="font-size:11px;background:rgba(0,0,0,.07);color:#374151;padding:2px 8px;border-radius:20px">${f}</span>`).join('')}
+        </div>
+      </div>`:`
+      <div style="background:#f9fafb;border:1px solid #f1f5f9;border-radius:.85rem;padding:1rem;margin-bottom:.9rem">
+        <div style="display:flex;align-items:center;gap:.7rem">
+          <div style="width:38px;height:38px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">○</div>
+          <div style="flex:1;min-width:0">
+            <p style="font-weight:600;color:#0f0f0f;font-size:.9rem;margin:0 0 .2rem">${r.n}</p>
+            <p style="font-size:.77rem;color:#9ca3af;margin:0">${r.dl?'📅 '+r.dl+(r.p?' · ':''):''}${r.p?'👤 '+r.p:''}</p>
+          </div>
+          <span style="font-size:10px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:2px 8px;border-radius:20px;flex-shrink:0;font-weight:600">待辦</span>
+        </div>
+        ${r.docs&&r.docs.length?`
+        <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid #f1f5f9">
+          <p style="font-size:9.5px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin:0 0 .4rem">AI 建議文件</p>
+          <div style="display:flex;flex-wrap:wrap;gap:.35rem">
+            ${r.docs.map(d=>`<span style="font-size:11px;background:#eff6ff;color:#2563eb;padding:2px 8px;border-radius:6px;border:1px solid #bfdbfe">📄 ${d}</span>`).join('')}
+          </div>
+        </div>`:''}
+      </div>`}
+
+      <div style="background:#f8fafc;border:1px solid #f1f5f9;border-radius:.75rem;padding:.8rem 1rem;margin-bottom:1.2rem">
+        <p style="font-size:9.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin:0 0 .5rem">AI 分析摘要</p>
+        <div style="display:flex;flex-direction:column;gap:.3rem">
+          <div style="font-size:.78rem;color:#374151;display:flex;align-items:center;gap:.35rem"><span style="color:#22c55e;flex-shrink:0;font-size:10px">✓</span>偵測類型：<span style="font-weight:600">${tdet}</span></div>
+          ${r._type==='template'?`
+          <div style="font-size:.78rem;color:#374151;display:flex;align-items:center;gap:.35rem"><span style="color:#22c55e;flex-shrink:0;font-size:10px">✓</span>建議功能模組：${r.f.length} 個</div>
+          <div style="font-size:.78rem;color:#374151;display:flex;align-items:center;gap:.35rem"><span style="color:#22c55e;flex-shrink:0;font-size:10px">✓</span>配色方案：自動智能匹配</div>`:`
+          <div style="font-size:.78rem;color:#374151;display:flex;align-items:center;gap:.35rem"><span style="color:#22c55e;flex-shrink:0;font-size:10px">✓</span>建議所需文件：${r.docs&&r.docs.length?r.docs.length+' 項':'無'}</div>`}
+          <div style="font-size:.78rem;color:#374151;display:flex;align-items:center;gap:.35rem"><span style="color:#22c55e;flex-shrink:0;font-size:10px">✓</span>AI 置信度：<span style="color:#16a34a;font-weight:700">${r.conf}%</span></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.65rem">
+        <button onclick="regenAI()" style="flex:1;padding:.65rem;border-radius:.75rem;border:1.5px solid #e5e7eb;background:#fff;color:#374151;font-size:.85rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .12s" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='#fff'">↺ 重新生成</button>
+        <button onclick="doConfirmAI()" class="aibtn" style="flex:2;padding:.65rem;border-radius:.75rem;color:#fff;font-size:.85rem;font-weight:700;font-family:inherit">✓ 確認加入</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ═══ TAB: DASHBOARD ═══ */
 function rDash(){return`<div class="space-y-5">
   <div class="grid grid-cols-4 gap-4">
-    ${[{l:'活躍計劃',v:'22',e:'🚩',bg:'#eff6ff',sub:'+3 本月'},{l:'節點完成',v:'48',e:'✅',bg:'#f0fdf4',sub:'+12 本月'},{l:'待處理',v:'7',e:'⏰',bg:'#fffbeb',sub:'需關注'},{l:'本月兌換積分',v:'610',e:'💰',bg:'#f5f3ff',sub:'+18%'}].map(s=>`
+    ${[{l:'活躍計劃',v:String(22+S.CT.length),e:'🚩',bg:'#eff6ff',sub:'+3 本月'},{l:'節點完成',v:'48',e:'✅',bg:'#f0fdf4',sub:'+12 本月'},{l:'待處理',v:'7',e:'⏰',bg:'#fffbeb',sub:'需關注'},{l:'本月兌換積分',v:'610',e:'💰',bg:'#f5f3ff',sub:'+18%'}].map(s=>`
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sc transition-shadow">
       <div class="flex items-center justify-between mb-3"><div class="p-2 rounded-xl text-lg" style="background:${s.bg}">${s.e}</div><span class="text-xs text-gray-400">${s.sub}</span></div>
       <div class="text-2xl font-bold text-gray-900">${s.v}</div><div class="text-xs text-gray-500 mt-1">${s.l}</div>
@@ -164,37 +522,133 @@ function rDash(){return`<div class="space-y-5">
   </div>
   <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="font-semibold text-gray-900">8 種計劃模板</h3>
+      <h3 class="font-semibold text-gray-900">${TT.length+S.CT.length} 種計劃${S.CT.length?` · 含 ${S.CT.length} 個 AI 建立`:''}</h3>
       <button onclick="gTab('tasks')" class="text-sm text-blue-600 hover:text-blue-700">查看全部 →</button>
     </div>
     <div class="grid grid-cols-4 gap-3">
       ${TT.map(t=>`<button onclick="cType('${t.id}')" class="p-3.5 rounded-xl text-left border hover:shadow-sm transition-all" style="background:${t.bg};border-color:${t.bc}"><div class="text-lg mb-2">${t.e}</div><p class="text-xs font-semibold text-gray-800">${t.n}</p><p class="text-xs mt-0.5" style="color:${t.tc}">${t.a} 活躍</p></button>`).join('')}
+      ${S.CT.map(t=>`<button onclick="S.tplDetail='${t.id}';gTab('tasks')" class="p-3.5 rounded-xl text-left border hover:shadow-sm transition-all" style="background:${t.bg};border-color:${t.bc}"><div class="text-lg mb-1.5">${t.e}</div><p class="text-xs font-semibold text-gray-800">${t.n}</p><p class="text-xs mt-0.5" style="color:${t.tc}">✨ AI 建立</p></button>`).join('')}
     </div>
   </div>
 </div>`;}
 
-/* ── TAB: TASKS ── */
-function rTasks(){return`<div class="space-y-5">
+/* ═══ TAB: TASKS ═══ */
+function rTasks(){
+  if(S.tplDetail){const tpl=[...TT,...S.CT].find(t=>t.id===S.tplDetail);if(tpl)return rTplDetail(tpl);}
+  return`<div class="space-y-5">
   <div class="flex items-center justify-between">
-    <div><h2 class="text-xl font-bold text-gray-900">計劃中心</h2><p class="text-sm text-gray-500 mt-0.5">8 種計劃模板，彈性建立任何學校活動</p></div>
-    ${ce()?`<button onclick="ntf('新增計劃功能開發中...')" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700">+ 新增計劃</button>`:''}
+    <div><h2 class="text-xl font-bold text-gray-900">計劃中心</h2>
+    <p class="text-sm text-gray-500 mt-0.5">${TT.length+S.CT.length} 種計劃${S.CT.length?' · '+S.CT.length+' 個 AI 建立':''}</p></div>
+    ${ce()?`<button onclick="oAIMod('template')" class="aibtn flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-bold">✨ AI 生成範本</button>`:''}
   </div>
-  <div class="grid grid-cols-2 gap-4">
-    ${TT.map(t=>`
-    <div onclick="cType('${t.id}')" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 tc">
-      <div class="flex items-start justify-between mb-3">
-        <div class="p-2.5 rounded-xl text-2xl" style="background:${t.bg}">${t.e}</div>
-        <span class="text-xs font-medium px-2 py-1 rounded-full" style="background:${t.tbbg};color:${t.tbtc}">${t.a} 活躍</span>
-      </div>
-      <h3 class="font-semibold text-gray-900 mb-1">${t.n}</h3>
-      <p class="text-sm text-gray-500 mb-3">${t.d}</p>
-      <div class="flex flex-wrap gap-1.5">${t.f.map(x=>`<span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${x}</span>`).join('')}</div>
-      ${(t.id==='rewards'||t.id==='studytour')?`<div class="mt-3 pt-3 border-t border-gray-100 text-xs font-medium" style="color:${t.tc}">👁 點擊查看完整 Demo</div>`:''}
-    </div>`).join('')}
+  <div>
+    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">系統範本</p>
+    <div class="grid grid-cols-2 gap-4">
+      ${TT.map(t=>`
+      <div onclick="cType('${t.id}')" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 tc">
+        <div class="flex items-start justify-between mb-3">
+          <div class="p-2.5 rounded-xl text-2xl" style="background:${t.bg}">${t.e}</div>
+          <span class="text-xs font-medium px-2 py-1 rounded-full" style="background:${t.tbbg};color:${t.tbtc}">${t.a} 活躍</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-1">${t.n}</h3>
+        <p class="text-sm text-gray-500 mb-3">${t.d}</p>
+        <div class="flex flex-wrap gap-1.5">${t.f.map(x=>`<span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${x}</span>`).join('')}</div>
+        <div class="mt-3 pt-3 border-t border-gray-100 text-xs font-medium" style="color:${t.tc}">
+          ${(t.id==='rewards'||t.id==='studytour')?'👁 點擊查看完整 Demo':'📋 點擊管理任務'}${S.TK[t.id]&&S.TK[t.id].length?' · '+S.TK[t.id].length+' 個任務':''}
+        </div>
+      </div>`).join('')}
+    </div>
   </div>
+  ${S.CT.length>0?`
+  <div>
+    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">✨ AI 建立的計劃（${S.CT.length}）</p>
+    <div class="grid grid-cols-2 gap-4">
+      ${S.CT.map(t=>{
+        const tks=S.TK[t.id]||[];const dn=tks.filter(x=>x.st==='done').length;const pct=tks.length?Math.round((dn/tks.length)*100):0;
+        return`<div onclick="S.tplDetail='${t.id}';S.tkF='all';render()" class="bg-white rounded-2xl border shadow-sm p-5 tc" style="border-color:${t.bc}">
+          <div class="flex items-start justify-between mb-3">
+            <div class="p-2.5 rounded-xl text-2xl" style="background:${t.bg}">${t.e}</div>
+            <div class="flex flex-col items-end gap-1">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full" style="background:${t.tbbg};color:${t.tbtc}">${tks.length} 任務</span>
+              <span class="text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-600 font-semibold">✨ AI</span>
+            </div>
+          </div>
+          <h3 class="font-semibold text-gray-900 mb-2">${t.n}</h3>
+          ${tks.length>0?`
+          <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-1"><div class="h-full rounded-full" style="width:${pct}%;background:${t.c}"></div></div>
+          <p class="text-xs mb-2" style="color:${t.tc}">${dn}/${tks.length} 完成 · ${pct}%</p>`:`<p class="text-sm text-gray-400 mb-2">尚未有任務</p>`}
+          <div class="pt-2 border-t border-gray-100 text-xs font-medium" style="color:${t.tc}">📋 點擊管理任務 →</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`:''}
+  ${S.CT.length===0&&ce()?`
+  <div class="border-2 border-dashed border-indigo-100 rounded-2xl p-10 text-center bg-gradient-to-b from-indigo-50/50 to-white">
+    <div style="width:52px;height:52px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:1rem;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 1rem">✨</div>
+    <p class="font-semibold text-gray-700 mb-1">用 AI 建立你的第一個計劃</p>
+    <p class="text-sm text-gray-400 mb-5">輸入名稱和描述，AI 自動生成範本架構、功能模組及配色</p>
+    <button onclick="oAIMod('template')" class="aibtn px-6 py-2.5 text-white rounded-xl text-sm font-bold">✨ 開始 AI 生成</button>
+  </div>`:''}
 </div>`;}
 
-/* ── TAB: REWARDS ── */
+/* ═══ TASK DETAIL VIEW ═══ */
+function rTplDetail(tpl){
+  if(!S.TK[tpl.id])S.TK[tpl.id]=[];
+  const tasks=S.TK[tpl.id];
+  const done=tasks.filter(t=>t.st==='done').length;
+  const pct=tasks.length?Math.round((done/tasks.length)*100):0;
+  const filtered=S.tkF==='all'?tasks:tasks.filter(t=>t.st===S.tkF);
+  return`<div class="space-y-4">
+    <button onclick="S.tplDetail=null;render()" style="display:flex;align-items:center;gap:.35rem;font-size:.85rem;color:#6b7280;border:none;background:none;cursor:pointer;padding:0;margin-bottom:.1rem">← 返回計劃中心</button>
+    <div class="rounded-2xl p-5 text-white" style="background:linear-gradient(135deg,${tpl.c},${tpl.c}bb)">
+      <div class="flex items-start justify-between">
+        <div><div class="font-semibold text-lg mb-1">${tpl.e} ${tpl.n}</div>
+        <p class="text-sm" style="color:rgba(255,255,255,.8)">${tpl.d||'自訂計劃'}</p></div>
+        <div class="text-right flex-shrink-0 ml-4"><div class="text-3xl font-bold">${done}/${tasks.length}</div><div class="text-xs" style="color:rgba(255,255,255,.8)">節點完成</div></div>
+      </div>
+      <div class="mt-4 h-2 rounded-full overflow-hidden" style="background:rgba(255,255,255,.2)">
+        <div class="h-full bg-white rounded-full" style="width:${pct}%;transition:width .4s"></div>
+      </div>
+      <p class="text-xs mt-1.5" style="color:rgba(255,255,255,.8)">整體進度 ${pct}%</p>
+    </div>
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex gap-1 bg-white rounded-xl p-1 border border-gray-100">
+        ${[['all','全部'],['pending','待辦'],['active','進行中'],['done','完成']].map(([v,l])=>`
+        <button onclick="S.tkF='${v}';render()" style="${S.tkF===v?'background:'+tpl.c+';color:#fff':'background:transparent;color:#6b7280'}" class="px-3 py-1.5 rounded-lg text-xs font-medium border-none cursor-pointer">
+          ${l}${v!=='all'?`<span style="opacity:.65"> (${tasks.filter(t=>t.st===v).length})</span>`:''}
+        </button>`).join('')}
+      </div>
+      ${ce()?`<button onclick="oAIMod('task','${tpl.id}')" class="aibtn flex items-center gap-1.5 px-4 py-2 text-white rounded-xl text-sm font-bold flex-shrink-0">✨ AI 建立任務</button>`:''}
+    </div>
+    <div class="space-y-3">
+      ${filtered.length===0?`
+      <div class="text-center py-12 text-gray-400">
+        <div class="text-5xl mb-3">${tasks.length===0?'✨':'🔍'}</div>
+        <p class="text-sm">${tasks.length===0?'尚未有任務，點上方「AI 建立任務」開始':'沒有符合篩選條件的任務'}</p>
+      </div>`:''}
+      ${filtered.map(tk=>{
+        const cfg=TK_ST[tk.st];
+        return`<div class="bg-white rounded-2xl shadow-sm overflow-hidden" style="border:${tk.st==='active'?'1.5px solid '+tpl.bc:'1px solid #f1f5f9'}">
+          <div class="flex items-center gap-4 p-4">
+            <button onclick="tkgSt('${tpl.id}',${tk.id})" title="點擊切換狀態" style="width:40px;height:40px;border-radius:50%;background:${cfg.bg};border:none;cursor:pointer;font-size:1.1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+              ${cfg.ico}
+            </button>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-sm ${tk.st==='done'?'line-through text-gray-400':'text-gray-900'}">${tk.n}</div>
+              <div class="flex flex-wrap gap-3 mt-1 text-xs text-gray-400">
+                ${tk.dl?`<span>📅 ${tk.dl}</span>`:''}
+                ${tk.p?`<span>👤 ${tk.p}</span>`:''}
+                <span style="padding:1px 7px;border-radius:20px;background:${cfg.bg};color:${cfg.c};border:1px solid ${cfg.bc}">${cfg.l}</span>
+              </div>
+            </div>
+            <button onclick="tkDel('${tpl.id}',${tk.id})" title="刪除" style="padding:6px;border-radius:8px;border:none;background:none;cursor:pointer;color:#d1d5db;font-size:14px" onmouseover="this.style.color='#ef4444';this.style.background='#fef2f2'" onmouseout="this.style.color='#d1d5db';this.style.background='none'">🗑</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;}
+
+/* ═══ TAB: REWARDS ═══ */
 function rRewards(){
   const ds=dStu(),dt=dTx();
   const fs=S.rF==='all'?SH:SH.filter(r=>r.cat===S.rF);
@@ -291,11 +745,15 @@ function rRewards(){
   </div>`:''}
 </div>`;}
 
-/* ── TAB: NODES ── */
-function rNodes(){return`<div class="space-y-4">
-  <div>
-    <h2 class="text-xl font-bold text-gray-900">節點流程管理</h2>
-    <p class="text-sm text-gray-500 mt-0.5">日本遊學團 2025 — 多方協作節點追蹤</p>
+/* ═══ TAB: NODES ═══ */
+function rNodes(){
+  const ndDone=S.ND.filter(n=>n.st==='done').length;
+  const ndPct=S.ND.length?Math.round((ndDone/S.ND.length)*100):0;
+  return`<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <div><h2 class="text-xl font-bold text-gray-900">節點流程管理</h2>
+    <p class="text-sm text-gray-500 mt-0.5">日本遊學團 2025 — 多方協作節點追蹤</p></div>
+    ${ce()?`<button onclick="oAIMod('node')" class="aibtn flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-bold">✨ AI 建立節點</button>`:''}
   </div>
   <div class="rounded-2xl p-5 text-white" style="background:linear-gradient(135deg,#8b5cf6,#4f46e5)">
     <div class="flex items-start justify-between">
@@ -304,15 +762,15 @@ function rNodes(){return`<div class="space-y-4">
         <p style="color:#e9d5ff" class="text-sm">2025年3月10日 — 3月17日（7天6夜）</p>
         <p style="color:#e9d5ff" class="text-sm mt-0.5">32名學生 · 3名老師 · 預算 $96,000</p>
       </div>
-      <div class="text-right"><div class="text-4xl font-bold">2/8</div><div style="color:#e9d5ff" class="text-sm">節點完成</div></div>
+      <div class="text-right"><div class="text-4xl font-bold">${ndDone}/${S.ND.length}</div><div style="color:#e9d5ff" class="text-sm">節點完成</div></div>
     </div>
     <div class="mt-4 h-2 rounded-full overflow-hidden" style="background:rgba(255,255,255,.2)">
-      <div class="h-full bg-white rounded-full" style="width:25%"></div>
+      <div class="h-full bg-white rounded-full transition-all" style="width:${ndPct}%"></div>
     </div>
-    <p style="color:#e9d5ff" class="text-xs mt-1.5">整體進度 25%</p>
+    <p style="color:#e9d5ff" class="text-xs mt-1.5">整體進度 ${ndPct}%</p>
   </div>
   <div class="space-y-3">
-    ${ND.map(n=>`
+    ${S.ND.map(n=>`
     <div class="bg-white rounded-2xl shadow-sm overflow-hidden ${n.st==='active'?'border-2 border-purple-200':'border border-gray-100'}">
       <div class="flex items-center gap-4 p-4 cursor-pointer" onclick="tgN(${n.id})">
         <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-lg ${n.st==='done'?'bg-green-100':n.st==='active'?'bg-purple-100':'bg-gray-100'}">
@@ -324,9 +782,10 @@ function rNodes(){return`<div class="space-y-4">
             <span class="text-xs px-2 py-0.5 rounded-full ${n.st==='done'?'bg-green-100 text-green-700':n.st==='active'?'bg-purple-100 text-purple-700':'bg-gray-100 text-gray-500'}">
               ${n.st==='done'?'✓ 已完成':n.st==='active'?'進行中':'待開始'}
             </span>
+            ${n._ai?'<span class="text-xs bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded font-semibold">✨ AI</span>':''}
           </div>
           <div class="flex items-center gap-3 mt-0.5 text-xs text-gray-400 flex-wrap">
-            <span>負責：${n.p}</span><span>截止：${n.dl}</span>
+            <span>負責：${n.p||'未設定'}</span><span>截止：${n.dl||'未設定'}</span>
             ${n.note?`<span style="color:#d97706;font-weight:500">${n.note}</span>`:''}
           </div>
         </div>
@@ -336,19 +795,20 @@ function rNodes(){return`<div class="space-y-4">
       <div class="px-4 pb-4 pt-3 border-t border-gray-50">
         <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">所需文件</p>
         <div class="flex flex-wrap gap-2 mb-3">
-          ${n.docs.length?n.docs.map(d=>`<span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg">📄 ${d}</span>`).join(''):'<span class="text-xs text-gray-400">無需文件</span>'}
+          ${n.docs&&n.docs.length?n.docs.map(d=>`<span class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg">📄 ${d}</span>`).join(''):'<span class="text-xs text-gray-400">無需文件</span>'}
         </div>
         ${ce()?`<div class="flex gap-2 flex-wrap">
-          <button onclick="ntf('狀態已更新！')" class="text-xs px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100">更新狀態</button>
+          <button onclick="ndgSt(${n.id})" class="text-xs px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100">切換狀態</button>
           <button onclick="ntf('文件上傳功能開發中...')" class="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200">上傳文件</button>
           <button onclick="ntf('通知已發送！')" class="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200">發送通知</button>
+          <button onclick="ndDel(${n.id})" class="text-xs px-3 py-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-100">刪除節點</button>
         </div>`:''}
       </div>`:''}
     </div>`).join('')}
   </div>
 </div>`;}
 
-/* ── TAB: GANTT ── */
+/* ═══ TAB: GANTT ═══ */
 function rGantt(){const T=MONTHS.length;return`<div class="space-y-4">
   <div class="flex items-center justify-between">
     <div><h2 class="text-xl font-bold text-gray-900">年度甘特圖</h2><p class="text-sm text-gray-500 mt-0.5">2024-25 學年所有計劃時間軸總覽</p></div>
@@ -381,13 +841,11 @@ function rGantt(){const T=MONTHS.length;return`<div class="space-y-4">
   </div>
   <div class="bg-white rounded-2xl border border-gray-100 p-4">
     <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">圖例</p>
-    <div class="flex flex-wrap gap-4">
-      ${TT.map(t=>`<div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm" style="background:${t.c}"></div><span class="text-xs text-gray-500">${t.n}</span></div>`).join('')}
-    </div>
+    <div class="flex flex-wrap gap-4">${TT.map(t=>`<div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-sm" style="background:${t.c}"></div><span class="text-xs text-gray-500">${t.n}</span></div>`).join('')}</div>
   </div>
 </div>`;}
 
-/* ── TAB: REPORTS ── */
+/* ═══ TAB: REPORTS ═══ */
 function rRpts(){return`<div class="space-y-4">
   <div class="flex items-center justify-between">
     <div><h2 class="text-xl font-bold text-gray-900">報表分析</h2><p class="text-sm text-gray-500 mt-0.5">計劃數據一覽，支援匯出 PDF/CSV</p></div>
@@ -402,9 +860,7 @@ function rRpts(){return`<div class="space-y-4">
       <h3 class="font-semibold text-gray-900 mb-4">計劃類型分布</h3>
       <div class="flex items-center gap-2">
         <div style="width:50%;height:180px"><canvas id="pc"></canvas></div>
-        <div class="space-y-2 flex-1">
-          ${PD.map(d=>`<div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${d.c}"></div><span class="text-xs text-gray-600 flex-1">${d.n}</span><span class="text-xs font-semibold text-gray-800">${d.v}</span></div>`).join('')}
-        </div>
+        <div class="space-y-2 flex-1">${PD.map(d=>`<div class="flex items-center gap-2"><div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${d.c}"></div><span class="text-xs text-gray-600 flex-1">${d.n}</span><span class="text-xs font-semibold text-gray-800">${d.v}</span></div>`).join('')}</div>
       </div>
     </div>
     <div class="col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -412,33 +868,34 @@ function rRpts(){return`<div class="space-y-4">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gray-50"><tr>${['計劃名稱','類型','開始','結束','進度','負責人','狀態'].map(h=>`<th class="text-left text-xs font-medium text-gray-400 px-5 py-3">${h}</th>`).join('')}</tr></thead>
-          <tbody>
-            ${[
-              {n:'2024-25 學生積分計劃',t:'學生獎勵',s:'9月',e:'7月',p:65,l:'全體老師',st:'active'},
-              {n:'日本遊學團',t:'遊學團',s:'1月',e:'3月',p:25,l:'張老師',st:'active'},
-              {n:'籃球隊 2024-25',t:'課外活動',s:'9月',e:'6月',p:60,l:'李老師',st:'active'},
-              {n:'全校閱讀計劃 Q1',t:'閱讀計劃',s:'9月',e:'12月',p:100,l:'陳老師',st:'done'},
-              {n:'校際辯論賽',t:'比賽管理',s:'11月',e:'2月',p:70,l:'王老師',st:'active'},
-              {n:'P6 義工服務計劃',t:'義工服務',s:'10月',e:'5月',p:40,l:'黃老師',st:'active'},
-            ].map(x=>`
-            <tr class="border-t border-gray-50 hover:bg-gray-50">
-              <td class="px-5 py-3 text-sm font-medium text-gray-800">${x.n}</td>
-              <td class="px-5 py-3"><span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${x.t}</span></td>
-              <td class="px-5 py-3 text-sm text-gray-500">${x.s}</td>
-              <td class="px-5 py-3 text-sm text-gray-500">${x.e}</td>
-              <td class="px-5 py-3"><div class="flex items-center gap-2"><div class="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width:${x.p}%"></div></div><span class="text-xs text-gray-500">${x.p}%</span></div></td>
-              <td class="px-5 py-3 text-sm text-gray-500">${x.l}</td>
-              <td class="px-5 py-3"><span class="text-xs px-2 py-0.5 rounded-full ${x.st==='active'?'bg-green-100 text-green-600':'bg-gray-100 text-gray-500'}">${x.st==='active'?'進行中':'已完成'}</span></td>
-            </tr>`).join('')}
-          </tbody>
+          <tbody>${[
+            {n:'2024-25 學生積分計劃',t:'學生獎勵',s:'9月',e:'7月',p:65,l:'全體老師',st:'active'},
+            {n:'日本遊學團',t:'遊學團',s:'1月',e:'3月',p:25,l:'張老師',st:'active'},
+            {n:'籃球隊 2024-25',t:'課外活動',s:'9月',e:'6月',p:60,l:'李老師',st:'active'},
+            {n:'全校閱讀計劃 Q1',t:'閱讀計劃',s:'9月',e:'12月',p:100,l:'陳老師',st:'done'},
+            {n:'校際辯論賽',t:'比賽管理',s:'11月',e:'2月',p:70,l:'王老師',st:'active'},
+            {n:'P6 義工服務計劃',t:'義工服務',s:'10月',e:'5月',p:40,l:'黃老師',st:'active'},
+          ].map(x=>`
+          <tr class="border-t border-gray-50 hover:bg-gray-50">
+            <td class="px-5 py-3 text-sm font-medium text-gray-800">${x.n}</td>
+            <td class="px-5 py-3"><span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${x.t}</span></td>
+            <td class="px-5 py-3 text-sm text-gray-500">${x.s}</td><td class="px-5 py-3 text-sm text-gray-500">${x.e}</td>
+            <td class="px-5 py-3"><div class="flex items-center gap-2"><div class="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width:${x.p}%"></div></div><span class="text-xs text-gray-500">${x.p}%</span></div></td>
+            <td class="px-5 py-3 text-sm text-gray-500">${x.l}</td>
+            <td class="px-5 py-3"><span class="text-xs px-2 py-0.5 rounded-full ${x.st==='active'?'bg-green-100 text-green-600':'bg-gray-100 text-gray-500'}">${x.st==='active'?'進行中':'已完成'}</span></td>
+          </tr>`).join('')}</tbody>
         </table>
       </div>
     </div>
   </div>
 </div>`;}
 
-/* ── MODAL ── */
+/* ═══ POINTS MODAL ═══ */
 function rMod(){
+  if(S.aiModal){
+    if(S.aiStep==='thinking'&&document.getElementById('ai-log'))return;
+    rAIMod();return;
+  }
   if(!S.modal){document.getElementById('M').innerHTML='';return;}
   const pre=['默書滿分','積極參與','協助同學','比賽獲獎','遲交功課','違反規則'];
   const ok=S.selS&&S.ptA&&S.ptR;
@@ -447,7 +904,7 @@ function rMod(){
     <div class="mb" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between mb-5">
         <h3 class="font-bold text-gray-900 text-lg">調整積分</h3>
-        <button onclick="cMod()" class="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 cursor-pointer text-base">✕</button>
+        <button onclick="cMod()" style="border:none;background:none;cursor:pointer;width:30px;height:30px;border-radius:8px;font-size:16px;color:#9ca3af" class="hover:bg-gray-100">✕</button>
       </div>
       <div class="flex gap-2 mb-5">
         <button onclick="sPT('add')" class="flex-1 py-2.5 rounded-xl text-sm font-medium border cursor-pointer ${S.ptT==='add'?'bg-green-50 text-green-700 border-green-200':'bg-gray-50 text-gray-500 border-gray-200'}">➕ 加分</button>
@@ -485,7 +942,7 @@ function rMod(){
     </div>
   </div>`;}
 
-/* ── MAIN RENDER ── */
+/* ═══ MAIN RENDER ═══ */
 function render(){
   let c='';
   if(S.tab==='dashboard')c=rDash();
@@ -502,6 +959,7 @@ function render(){
       <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">M</div>
       <span class="font-bold text-gray-900 text-sm">任務系統 Demo</span>
       <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">M-01</span>
+      <span class="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-semibold">✨ AI 驅動</span>
     </div>
     <div class="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
       ${RL.map(r=>`<button onclick="gRole('${r.id}')" class="rb flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${S.role===r.id?'on':'text-gray-500 hover:text-gray-700'}">${r.e} ${r.l}</button>`).join('')}
@@ -518,7 +976,8 @@ function render(){
       <nav class="space-y-1 flex-1">
         ${NV.map(n=>`<button onclick="gTab('${n.id}')" class="nb w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium ${S.tab===n.id?'on':'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}">${n.e} ${n.l}</button>`).join('')}
       </nav>
-      <div class="pt-4 border-t border-gray-100">
+      <div class="pt-4 border-t border-gray-100 space-y-2">
+        ${ce()?`<button onclick="oAIMod('template')" class="aibtn w-full flex items-center justify-center gap-1.5 px-3 py-2 text-white rounded-xl text-xs font-bold">✨ AI 生成計劃</button>`:''}
         <div class="px-3 py-3 bg-gray-50 rounded-xl">
           <p class="text-xs font-semibold text-gray-700">${RL.find(r=>r.id===S.role)?.l}</p>
           <p class="text-xs text-gray-400 mt-0.5 leading-relaxed">${RL.find(r=>r.id===S.role)?.h}</p>
@@ -534,10 +993,14 @@ function render(){
   rMod();
 }
 
-/* ── HANDLERS ── */
-function gTab(t){S.tab=t;render();}
+/* ═══ HANDLERS ═══ */
+function gTab(t){if(t!=='tasks')S.tplDetail=null;S.tab=t;render();}
 function gRole(r){S.role=r;render();}
-function cType(id){if(id==='rewards')gTab('rewards_tab');else if(id==='studytour')gTab('nodes');else ntf((TT.find(t=>t.id===id)?.n||id)+' — 完整 Demo 開發中');}
+function cType(id){
+  if(id==='rewards')gTab('rewards_tab');
+  else if(id==='studytour')gTab('nodes');
+  else{if(!S.TK[id])S.TK[id]=[];S.tplDetail=id;S.tkF='all';S.tab='tasks';render();}
+}
 function sRS(t){S.rSub=t;render();}
 function sRF(f){S.rF=f;render();}
 function sSS(id){S.shopS=parseInt(id);render();}
@@ -548,22 +1011,36 @@ function sPT(t){S.ptT=t;rMod();}
 function sSel(id){S.selS=id;rMod();}
 function sPR(r){S.ptR=r;const el=document.getElementById('ptR');if(el)el.value=r;rMod();}
 function doPts(){
-  const amt=parseInt(S.ptA);
-  if(!S.selS||!amt||amt<=0||!S.ptR.trim())return;
+  const amt=parseInt(S.ptA);if(!S.selS||!amt||amt<=0||!S.ptR.trim())return;
   const stu=S.stus.find(s=>s.id===S.selS);if(!stu)return;
-  S.stus=S.stus.map(s=>s.id===S.selS?{...s,pts:S.ptT==='add'?s.pts+amt:Math.max(0,s.pts-amt)}:s);
-  S.txns=[{id:Date.now(),n:stu.n,sid:stu.id,t:S.ptT,a:amt,r:S.ptR.trim(),by:S.role==='teacher'?'老師':'管理員',tm:'剛剛'},...S.txns];
-  const msg=(S.ptT==='add'?'已加 ':'已扣 ')+amt+' 積分 ✓';
-  cMod();render();ntf(msg);
+  const pt=S.ptT;
+  S.stus=S.stus.map(s=>s.id===S.selS?{...s,pts:pt==='add'?s.pts+amt:Math.max(0,s.pts-amt)}:s);
+  S.txns=[{id:Date.now(),n:stu.n,sid:stu.id,t:pt,a:amt,r:S.ptR.trim(),by:S.role==='teacher'?'老師':'管理員',tm:'剛剛'},...S.txns];
+  cMod();render();ntf((pt==='add'?'已加 ':'已扣 ')+amt+' 積分 ✓');
 }
 function dRdm(stuId,itemId){
-  const stu=S.stus.find(s=>s.id===stuId);
-  const item=SH.find(i=>i.id===itemId);
+  const stu=S.stus.find(s=>s.id===stuId);const item=SH.find(i=>i.id===itemId);
   if(!stu||!item)return;
   if(stu.pts<item.c){ntf('積分不足！','err');return;}
   S.stus=S.stus.map(s=>s.id===stuId?{...s,pts:s.pts-item.c}:s);
   S.txns=[{id:Date.now(),n:stu.n,sid:stu.id,t:'redeem',a:item.c,r:'兌換'+item.n,by:'System',tm:'剛剛'},...S.txns];
   render();ntf(stu.n+' 成功兌換 '+item.n+'！');
+}
+function tkgSt(tplId,taskId){
+  if(!S.TK[tplId])return;
+  S.TK[tplId]=S.TK[tplId].map(t=>t.id===taskId?{...t,st:TK_CYCLE[t.st]}:t);render();
+}
+function tkDel(tplId,taskId){
+  if(!S.TK[tplId])return;
+  S.TK[tplId]=S.TK[tplId].filter(t=>t.id!==taskId);render();
+}
+function ndgSt(id){
+  S.ND=S.ND.map(n=>n.id===id?{...n,st:TK_CYCLE[n.st]}:n);
+  render();ntf('節點狀態已更新！');
+}
+function ndDel(id){
+  S.ND=S.ND.filter(n=>n.id!==id);if(S.exN===id)S.exN=null;
+  render();ntf('節點已刪除！');
 }
 
 render();
