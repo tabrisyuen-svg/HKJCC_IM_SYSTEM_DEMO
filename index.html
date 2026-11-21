@@ -106,6 +106,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
 .mi-mu{background:rgba(122,144,168,.12);}
 .mi-em{background:rgba(34,197,94,.15);}
 .mi-am{background:rgba(245,158,11,.2);}
+.mi-rp{background:rgba(99,102,241,.2);}
 .mod-info h4{font-size:14px;font-weight:600;}
 .mod-info p{font-size:11px;color:var(--muted);margin-top:1px;}
 .mod-code{margin-left:auto;font-size:10px;color:var(--yellow);font-weight:700;}
@@ -188,6 +189,10 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
     <div class="nav-tab" data-tab="ai" onclick="switchTab('ai')">
       <span class="ni">🤖</span>AI 教練
     </div>
+    <!-- ★ NEW: 報告 Tab -->
+    <div class="nav-tab" data-tab="report" onclick="switchTab('report')">
+      <span class="ni">📊</span>報告
+    </div>
     <div class="nav-tab" data-tab="admin" onclick="switchTab('admin')">
       <span class="ni">⚙️</span>管理
       <span class="coming-chip" id="adminLockChip">🔐</span>
@@ -228,7 +233,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       </nav>
     </div>
 
-    <!-- 教學資源 T-01~T-09 -->
+    <!-- 教學資源 -->
     <div class="sb-sec" id="sb-teaching">
       <div class="sb-hdr">
         <div class="sb-hdr-tag">TEACHING RESOURCES</div>
@@ -249,7 +254,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       </nav>
     </div>
 
-    <!-- Meridian S-01~S-03 -->
+    <!-- Meridian -->
     <div class="sb-sec" id="sb-meridian">
       <div class="sb-hdr">
         <div class="sb-hdr-tag">MERIDIAN · STUDENT PORTAL</div>
@@ -263,7 +268,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       </nav>
     </div>
 
-    <!-- Parent Portal P-01 -->
+    <!-- Parent -->
     <div class="sb-sec" id="sb-parent">
       <div class="sb-hdr">
         <div class="sb-hdr-tag">PARENT PORTAL</div>
@@ -275,7 +280,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       </nav>
     </div>
 
-    <!-- 任務列表 M-01 -->
+    <!-- 任務列表 -->
     <div class="sb-sec" id="sb-skills">
       <div class="sb-hdr">
         <div class="sb-hdr-tag">TASKS</div>
@@ -288,7 +293,7 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
       </nav>
     </div>
 
-    <!-- AI 教練 A-01 -->
+    <!-- AI 教練 -->
     <div class="sb-sec" id="sb-ai">
       <div class="sb-hdr">
         <div class="sb-hdr-tag">AI CORE</div>
@@ -298,6 +303,19 @@ body{font-family:'Segoe UI','Microsoft JhengHei',sans-serif;background:var(--dar
         <div class="sb-item on" data-aipage="ai-main" onclick="switchAIPage('ai-main')">
           <span class="si">🤖</span>AI 教練<span class="sb-badge bd-done">A-01</span>
         </div>
+      </nav>
+    </div>
+
+    <!-- ★ NEW: 報告 Sidebar -->
+    <div class="sb-sec" id="sb-report">
+      <div class="sb-hdr">
+        <div class="sb-hdr-tag">REPORT · 報告中心</div>
+        <div class="sb-hdr-name">報告生成器</div>
+      </div>
+      <nav class="sb-nav">
+        <div class="sb-item on" data-rpage="report-dashboard" onclick="switchReportPage('report-dashboard')"><span class="si">🏠</span>總覽</div>
+        <div class="sb-divider">報告模組</div>
+        <div class="sb-item" data-rpage="report-main" onclick="switchReportPage('report-main')"><span class="si">📊</span>報告生成器<span class="sb-badge bd-done">R-01</span></div>
       </nav>
     </div>
 
@@ -392,6 +410,8 @@ const IFRAME_PAGES = {
   'skills-main':     { src:'Tasks/M_01_TaskSystem.html',              code:'M-01', label:'任務列表',         ready:true },
   // AI Core
   'ai-main':         { src:'AICore/A_01_Coach.html',                  code:'A-01', label:'AI 教練',          ready:true },
+  // ★ NEW: Report
+  'report-main':     { src:'Report/Report.html',                      code:'R-01', label:'報告生成器',       ready:true },
   // Admin
   'admin-f02':       { src:'Admin/F_02_SchoolManagement.html',        code:'F-02', label:'學校管理',         ready:true  },
   'admin-f03':       { src:'Admin/F_03_AIChat.html',                  code:'F-03', label:'AI 對話',          ready:true  },
@@ -416,6 +436,7 @@ let curMeridianPage = 'm-dashboard';
 let curParentPage   = 'p-dashboard';
 let curSkillsPage   = 'skills-main';
 let curAIPage       = 'ai-main';
+let curReportPage   = 'report-dashboard'; // ★ NEW
 let curAdminPage    = 'admin-home';
 
 /* ── VIEWS ── */
@@ -492,6 +513,10 @@ function buildDashboard(){
 <div class="mod-grid">
   <div class="mod-card" onclick="switchTab('ai')"><div class="mod-row"><div class="mod-ico mi-b">🤖</div><div class="mod-info"><h4>AI 教練</h4><p>個人化學習建議</p></div><div class="mod-code">A-01</div></div><div class="mod-desc">班級整體分析、個別學生學習建議、異常預警，AI 驅動教學輔助。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
 </div>
+<div class="sec-ttl">報告中心</div>
+<div class="mod-grid">
+  <div class="mod-card" onclick="switchTab('report')"><div class="mod-row"><div class="mod-ico mi-rp">📊</div><div class="mod-info"><h4>報告生成器</h4><p>自選模組 · 導出報告</p></div><div class="mod-code">R-01</div></div><div class="mod-desc">自選數據模組，整合出席、成績、任務、AI 教練等，一鍵導出 Excel / PDF。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+</div>
 <div class="sec-ttl">開發進度</div>
 <div class="act-card">
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>D-01 學生檔案</strong><span>個人資料、聯絡資訊、學業與行為記錄管理</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
@@ -507,6 +532,7 @@ function buildDashboard(){
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>P-01 家長總覽</strong><span>ParentPortal 家長端</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>M-01 任務系統</strong><span>Tasks 資料夾 · 8 種計劃模板全流程管理</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
   <div class="act-row"><div class="act-ico" style="background:rgba(34,197,94,.15)">✅</div><div class="act-bd"><strong>A-01 AI 教練</strong><span>AICore 資料夾 · AI 驅動個人化學習建議</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
+  <div class="act-row"><div class="act-ico" style="background:rgba(99,102,241,.2)">📊</div><div class="act-bd"><strong>R-01 報告生成器</strong><span>Report 資料夾 · 自選模組、Excel / PDF 導出</span></div><span class="act-time" style="color:#22C55E">完成</span></div>
 </div>`;
   showView('dashboard');
 }
@@ -550,8 +576,8 @@ function buildMeridianDashboard(){
 </div>
 <div class="sec-ttl">Meridian 模組</div>
 <div class="mod-grid" style="margin-bottom:0">
-  <div class="mod-card" onclick="switchMeridianPage('retrace')"><div class="mod-row"><div class="mod-ico mi-em">⭐</div><div class="mod-info"><h4>Retrace</h4><p>錯題本 · 學習路徑</p></div><div class="mod-code">S-01</div></div><div class="mod-desc">Spaced Repetition 三級掌握追蹤，答錯後解說解鎖，個人進度雷達圖。老師預設題庫與解說，不依賴 AI。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
-  <div class="mod-card" onclick="switchMeridianPage('echo')"><div class="mod-row"><div class="mod-ico mi-b">🎤</div><div class="mod-info"><h4>Echo</h4><p>口語練習</p></div><div class="mod-code">S-02</div></div><div class="mod-desc">朗讀流暢度比對、對話關鍵詞匹配，支援英語、普通話及廣東話（實驗性），全瀏覽器原生運行。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchMeridianPage('retrace')"><div class="mod-row"><div class="mod-ico mi-em">⭐</div><div class="mod-info"><h4>Retrace</h4><p>錯題本 · 學習路徑</p></div><div class="mod-code">S-01</div></div><div class="mod-desc">Spaced Repetition 三級掌握追蹤，答錯後解說解鎖，個人進度雷達圖。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
+  <div class="mod-card" onclick="switchMeridianPage('echo')"><div class="mod-row"><div class="mod-ico mi-b">🎤</div><div class="mod-info"><h4>Echo</h4><p>口語練習</p></div><div class="mod-code">S-02</div></div><div class="mod-desc">朗讀流暢度比對、對話關鍵詞匹配，支援英語、普通話及廣東話。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
   <div class="mod-card" onclick="switchMeridianPage('ease')"><div class="mod-row"><div class="mod-ico mi-p">♿</div><div class="mod-info"><h4>Ease</h4><p>SEN 讀寫障礙支援</p></div><div class="mod-code">S-03</div></div><div class="mod-desc">TTS 朗讀、聚焦閱讀條、OpenDyslexic 字型、語音輸入答題，IEP 整合自動預設輔助模式。</div><span class="mod-pill pill-done">✅ 已完成</span></div>
 </div>`;
   showView('dashboard');
@@ -606,6 +632,31 @@ function buildAIDashboard(){
   showView('dashboard');
 }
 
+/* ── ★ NEW: REPORT DASHBOARD ── */
+function buildReportDashboard(){
+  document.getElementById('dashboard-view').innerHTML=`
+<div class="breadcrumb"><span>報告</span><span>›</span><strong>報告中心</strong></div>
+<div class="dash-hello"><h1>報告中心 <em>R-01</em> 📊</h1><p>Report/Report.html · 自選模組、自定數據範圍、一鍵導出</p></div>
+<div class="qs-grid">
+  <div class="qs-card qc-g"><div class="qs-lbl">已完成模組</div><div class="qs-num" style="color:#4ADE80">1</div><div class="qs-sub">R-01</div><div class="qs-ico">✅</div></div>
+  <div class="qs-card qc-b"><div class="qs-lbl">可選數據模組</div><div class="qs-num" style="color:#93C5FD">7</div><div class="qs-sub">勾選即顯示</div><div class="qs-ico">🗂️</div></div>
+  <div class="qs-card qc-y"><div class="qs-lbl">導出格式</div><div class="qs-num" style="color:var(--yellow)">2</div><div class="qs-sub">Excel · PDF</div><div class="qs-ico">📤</div></div>
+</div>
+<div class="sec-ttl">報告模組</div>
+<div class="mod-grid" style="margin-bottom:0">
+  <div class="mod-card" onclick="switchReportPage('report-main')">
+    <div class="mod-row">
+      <div class="mod-ico mi-rp">📊</div>
+      <div class="mod-info"><h4>報告生成器</h4><p>Report Builder</p></div>
+      <div class="mod-code">R-01</div>
+    </div>
+    <div class="mod-desc">自選數據模組（出席、成績、任務、節點、AI 教練、行為等），設定日期範圍與班別篩選，預覽後導出 Excel / PDF。</div>
+    <span class="mod-pill pill-done">✅ 已完成</span>
+  </div>
+</div>`;
+  showView('dashboard');
+}
+
 /* ── ADMIN DASHBOARD ── */
 function buildAdminDashboard(){
   document.getElementById('dashboard-view').innerHTML=`
@@ -626,7 +677,7 @@ function switchTab(tab){
   if(tab==='admin'&&!adminAuthed){showAdminLogin();return;}
   curTab=tab;
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
-  ['student','teaching','meridian','parent','skills','ai','admin'].forEach(s=>{
+  ['student','teaching','meridian','parent','skills','ai','report','admin'].forEach(s=>{
     const el=document.getElementById('sb-'+s);if(!el)return;
     el.classList.remove('on');
   });
@@ -638,6 +689,7 @@ function switchTab(tab){
   else if(tab==='parent')  renderParentPage(curParentPage);
   else if(tab==='skills')  renderSkillsPage(curSkillsPage);
   else if(tab==='ai')      renderAIPage(curAIPage);
+  else if(tab==='report')  renderReportPage(curReportPage);
   else if(tab==='admin')   renderAdminPage(curAdminPage);
   closeSidebar();
 }
@@ -701,7 +753,7 @@ function renderParentPage(page){
   showCS('🚧',cfg?cfg.label:page,'開發中，敬請期待。');
 }
 
-/* ── SKILLS / TASKS ROUTING ── */
+/* ── SKILLS ROUTING ── */
 function switchSkillsPage(page){
   curSkillsPage=page;
   document.querySelectorAll('#sb-skills .sb-item[data-skillpage]').forEach(i=>i.classList.toggle('on',i.dataset.skillpage===page));
@@ -725,6 +777,19 @@ function renderAIPage(page){
   const cfg=IFRAME_PAGES[page];
   if(cfg&&cfg.ready){loadIframe(page);return;}
   showCS('🤖',cfg?cfg.label:page,'開發中，敬請期待。');
+}
+
+/* ── ★ NEW: REPORT ROUTING ── */
+function switchReportPage(page){
+  curReportPage=page;
+  document.querySelectorAll('#sb-report .sb-item[data-rpage]').forEach(i=>i.classList.toggle('on',i.dataset.rpage===page));
+  renderReportPage(page);closeSidebar();
+}
+function renderReportPage(page){
+  if(page==='report-dashboard'){buildReportDashboard();return;}
+  const cfg=IFRAME_PAGES[page];
+  if(cfg&&cfg.ready){loadIframe(page);return;}
+  showCS('📊',cfg?cfg.label:page,'開發中，敬請期待。');
 }
 
 /* ── ADMIN ROUTING ── */
